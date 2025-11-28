@@ -1,0 +1,130 @@
+TW_Sector,TW_Industry,NQUSB_Code,NQUSB_Level,NQUSB_Name,Confidence,Notes
+Technology Services,Data Processing Services,NQUSB10101010,3,Computer Services,HIGH,Data processing aligns with computer services
+Technology Services,Internet Software/Services,NQUSB10101020,3,Consumer Digital Services,HIGH,Internet services = digital services
+Technology Services,Information Technology Services,NQUSB10101010,3,Computer Services,HIGH,IT services = computer services
+Technology Services,Packaged Software,NQUSB10101015,3,Software,HIGH,Exact match
+Electronic Technology,Semiconductors,NQUSB10102010,3,Semiconductors,HIGH,Exact match
+Electronic Technology,Telecommunications Equipment,NQUSB151010,2,Telecommunications Equipment,HIGH,Exact match
+Electronic Technology,Aerospace & Defense,NQUSB502010,2,Aerospace and Defense,HIGH,Electronic components in aerospace/defense
+Electronic Technology,Electronic Equipment/Instruments,NQUSB50202025,3,Electronic Equipment: Gauges and Meters,MEDIUM,Instruments = measurement equipment
+Electronic Technology,Computer Processing Hardware,NQUSB10102030,3,Computer Hardware,HIGH,Processing hardware = computer hardware
+Electronic Technology,Computer Peripherals,NQUSB10102030,3,Computer Hardware,HIGH,Peripherals are computer hardware
+Electronic Technology,Electronic Components,NQUSB10102015,3,Electronic Components,HIGH,Exact match
+Electronic Technology,Electronic Production Equipment,NQUSB10102020,3,Production Technology Equipment,HIGH,Production equipment match
+Electronic Technology,Computer Communications,NQUSB10102020,3,Production Technology Equipment,MEDIUM,Computer comms = production tech
+Finance,Major Banks,NQUSB3010,2,Banks,HIGH,Major banks = banks
+Finance,Property/Casualty Insurance,NQUSB30302025,3,Property and Casualty Insurance,HIGH,Exact match
+Finance,Finance/Rental/Leasing,NQUSB30201020,3,Consumer Lending,MEDIUM,Rental/leasing relates to lending
+Finance,Investment Managers,NQUSB30202010,3,Asset Managers and Custodians,HIGH,Investment managers = asset managers
+Finance,Real Estate Investment Trusts,NQUSB351020,2,Real Estate Investment Trusts,HIGH,Exact match
+Finance,Investment Banks/Brokers,NQUSB302020,2,Investment Banking and Brokerage Services,HIGH,Exact match
+Finance,Regional Banks,NQUSB3010,2,Banks,HIGH,Regional banks = banks
+Finance,Multi-Line Insurance,NQUSB30302010,3,Full Line Insurance,HIGH,Multi-line = full line
+Finance,Insurance Brokers/Services,NQUSB30302015,3,Insurance Brokers,HIGH,Exact match
+Finance,Life/Health Insurance,NQUSB303010,2,Life Insurance,HIGH,Life/health insurance
+Finance,Real Estate Development,NQUSB35101010,3,Real Estate Holding and Development,HIGH,Exact match
+Finance,Specialty Insurance,NQUSB303020,2,Non-life Insurance,MEDIUM,Specialty = non-life
+Finance,Financial Conglomerates,NQUSB30202000,3,Diversified Financial Services,HIGH,Conglomerates = diversified
+Finance,Savings Banks,NQUSB3010,2,Banks,HIGH,Savings banks = banks
+Health Technology,Pharmaceuticals: Major,NQUSB20103015,3,Pharmaceuticals,HIGH,Major pharma companies
+Health Technology,Medical Specialties,NQUSB20102010,3,Medical Equipment,HIGH,Specialties = surgical/medical equipment (ISRG)
+Health Technology,Biotechnology,NQUSB20103010,3,Biotechnology,HIGH,Exact match
+Health Technology,Pharmaceuticals: Other,NQUSB20103015,3,Pharmaceuticals,HIGH,Other pharma companies
+Health Technology,Pharmaceuticals: Generic,NQUSB20103015,3,Pharmaceuticals,HIGH,Generic pharma companies
+Retail Trade,Internet Retail,NQUSB40401010,3,Diversified Retailers,HIGH,Internet retail = broadline diversified
+Retail Trade,Specialty Stores,NQUSB40401030,3,Specialty Retailers,HIGH,Exact match
+Retail Trade,Home Improvement Chains,NQUSB40401025,3,Home Improvement Retailers,HIGH,Home improvement chains
+Retail Trade,Department Stores,NQUSB40401010,3,Diversified Retailers,HIGH,Department stores = diversified retailers
+Retail Trade,Apparel/Footwear Retail,NQUSB40401020,3,Apparel Retailers,HIGH,Exact match - VSCO FIX
+Retail Trade,Drugstore Chains,NQUSB45201015,3,Drug Retailers,HIGH,Drugstore = drug retailers
+Retail Trade,Food Retail,NQUSB45201010,3,Food Retailers and Wholesalers,HIGH,Food retail
+Retail Trade,Discount Stores,NQUSB40401010,3,Diversified Retailers,HIGH,Discount stores = diversified retailers
+Retail Trade,Electronics/Appliance Stores,NQUSB40401030,3,Specialty Retailers,MEDIUM,Electronics/appliance stores are specialty
+Retail Trade,Catalog/Specialty Distribution,NQUSB40401030,3,Specialty Retailers,HIGH,Catalog/specialty = specialty retailers
+Consumer Non-Durables,Household/Personal Care,NQUSB45201030,3,Nondurable Household Products,HIGH,Household care products
+Consumer Non-Durables,Beverages: Non-Alcoholic,NQUSB45101020,3,Soft Drinks,HIGH,Non-alcoholic = soft drinks
+Consumer Non-Durables,Food: Specialty/Candy,NQUSB45102020,3,Food Products,HIGH,Specialty food = food products
+Consumer Non-Durables,Tobacco,NQUSB451030,2,Tobacco,HIGH,Exact match
+Consumer Non-Durables,Beverages: Alcoholic,NQUSB45101015,3,Distillers and Vintners,HIGH,Alcoholic = distillers
+Consumer Non-Durables,Apparel/Footwear,NQUSB40204020,3,Clothing and Accessories,HIGH,Apparel/footwear = clothing accessories
+Consumer Non-Durables,Food: Major Diversified,NQUSB45102020,3,Food Products,HIGH,Major food producers
+Consumer Non-Durables,Food: Meat/Fish/Dairy,NQUSB45102020,3,Food Products,HIGH,Meat/fish/dairy = food products
+Consumer Non-Durables,Consumer Sundries,NQUSB45201030,3,Nondurable Household Products,MEDIUM,Sundries = household products
+Producer Manufacturing,Industrial Machinery,NQUSB50204000,3,Machinery: Industrial,HIGH,Exact match
+Producer Manufacturing,Electrical Products,NQUSB50202010,3,Electrical Components,HIGH,Electrical products = components
+Producer Manufacturing,Trucks/Construction/Farm Machinery,NQUSB50204020,3,Machinery: Construction and Handling,HIGH,Construction/farm machinery
+Producer Manufacturing,Auto Parts: OEM,NQUSB40101025,3,Auto Parts,HIGH,Auto parts OEM
+Producer Manufacturing,Building Products,NQUSB50101035,3,Building Materials: Other,HIGH,Building products = materials
+Producer Manufacturing,Industrial Conglomerates,NQUSB50203000,3,Diversified Industrials,HIGH,Industrial conglomerates = diversified
+Producer Manufacturing,Metal Fabrication,NQUSB55102015,3,Metal Fabricating,HIGH,Exact match
+Producer Manufacturing,Miscellaneous Manufacturing,NQUSB50203000,3,Diversified Industrials,MEDIUM,Miscellaneous = diversified
+Producer Manufacturing,Office Equipment/Supplies,NQUSB50205010,3,Industrial Suppliers,MEDIUM,Office equipment = suppliers
+Consumer Durables,Motor Vehicles,NQUSB40101020,3,Automobiles,HIGH,Motor vehicles = automobiles
+Consumer Durables,Homebuilding,NQUSB40202010,3,Home Construction,HIGH,Homebuilding = construction
+Consumer Durables,Recreational Products,NQUSB40203050,3,Recreational Products,HIGH,Exact match
+Consumer Durables,Tools & Hardware,NQUSB50204000,3,Machinery: Industrial,MEDIUM,Tools/hardware = industrial machinery
+Consumer Durables,Electronics/Appliances,NQUSB40202025,3,Household Equipment and Products,HIGH,Electronics/appliances = household equipment
+Consumer Durables,Home Furnishings,NQUSB40202015,3,Household Furnishings,HIGH,Exact match
+Consumer Durables,Automotive Aftermarket,NQUSB40101025,3,Auto Parts,HIGH,Aftermarket = auto parts
+Consumer Durables,Other Consumer Specialties,NQUSB40201070,3,Consumer Services: Misc.,MEDIUM,Other specialties = misc services
+Energy Minerals,Oil & Gas Production,NQUSB60101010,3,Oil: Crude Producers,HIGH,Oil/gas production
+Energy Minerals,Coal,NQUSB60101040,3,Coal,HIGH,Exact match
+Energy Minerals,Integrated Oil,NQUSB60101000,3,Integrated Oil and Gas,HIGH,Exact match
+Energy Minerals,Oil Refining/Marketing,NQUSB60101020,3,Oil Refining and Marketing,HIGH,Exact match
+Consumer Services,Restaurants,NQUSB40501040,3,Restaurants and Bars,HIGH,Exact match
+Consumer Services,Hotels/Resorts/Cruise lines,NQUSB40501025,3,Hotels and Motels,HIGH,Hotels/resorts match
+Consumer Services,Other Consumer Services,NQUSB40201070,3,Consumer Services: Misc.,HIGH,Miscellaneous consumer services
+Consumer Services,Movies/Entertainment,NQUSB40301010,3,Entertainment,HIGH,Movies/entertainment
+Consumer Services,Cable/Satellite TV,NQUSB15102010,3,Cable Television Services,HIGH,Cable/satellite TV
+Consumer Services,Casinos/Gaming,NQUSB40501020,3,Casinos and Gambling,HIGH,Casinos/gaming match
+Consumer Services,Broadcasting,NQUSB40301035,3,Radio and TV Broadcasters,HIGH,Exact match
+Consumer Services,Publishing: Newspapers,NQUSB40301030,3,Publishing,HIGH,Newspapers = publishing
+Consumer Services,Publishing: Books/Magazines,NQUSB40301030,3,Publishing,HIGH,Books/magazines = publishing
+Consumer Services,Media Conglomerates,NQUSB40301010,3,Entertainment,MEDIUM,Media conglomerates = entertainment
+Utilities,Electric Utilities,NQUSB651010,2,Electricity,HIGH,Electric = electricity
+Utilities,Gas Distributors,NQUSB65102020,3,Gas Distribution,HIGH,Gas distributors
+Utilities,Water Utilities,NQUSB65102030,3,Water,HIGH,Exact match
+Utilities,Alternative Power Generation,NQUSB65101010,3,Alternative Electricity,HIGH,Alternative power = alternative electricity
+Non-Energy Minerals,Precious Metals,NQUSB551030,2,Precious Metals and Mining,HIGH,Exact match
+Non-Energy Minerals,Other Metals/Minerals,NQUSB551010,2,Industrial Materials,MEDIUM,Other metals = industrial materials
+Non-Energy Minerals,Steel,NQUSB55102010,3,Iron and Steel,HIGH,Steel = iron and steel
+Non-Energy Minerals,Construction Materials,NQUSB50101035,3,Building Materials: Other,HIGH,Construction = building materials
+Non-Energy Minerals,Forest Products,NQUSB55101015,3,Paper,HIGH,Forest products = paper
+Non-Energy Minerals,Aluminum,NQUSB55102010,3,Iron and Steel,MEDIUM,Aluminum = metals (iron/steel category)
+Industrial Services,Oil & Gas Pipeline,NQUSB60101035,3,Pipelines,HIGH,Oil/gas pipelines
+Industrial Services,Engineering & Construction,NQUSB50101015,3,Engineering and Contracting Services,HIGH,Engineering/construction services
+Industrial Services,Environmental Services,NQUSB651030,2,Waste and Disposal Services,HIGH,Environmental = waste services
+Industrial Services,Contract Drilling,NQUSB60101015,3,Offshore Drilling and Other Services,HIGH,Contract drilling
+Industrial Services,Oilfield Services/Equipment,NQUSB60101030,3,Oil Equipment and Services,HIGH,Oilfield services/equipment
+Transportation,Air Freight & Logistics,NQUSB50206040,3,Delivery Services,HIGH,Air freight/logistics = delivery
+Transportation,Airlines,NQUSB40501010,3,Airlines,HIGH,Exact match
+Transportation,Marine Transportation,NQUSB50206030,3,Marine Transportation,HIGH,Exact match
+Transportation,Railroads,NQUSB50206020,3,Railroads,HIGH,Exact match
+Transportation,Trucking,NQUSB50206010,3,Trucking,HIGH,Exact match
+Commercial Services,Miscellaneous Commercial Services,NQUSB50205020,3,Professional Business Support Services,MEDIUM,Miscellaneous = professional services
+Commercial Services,Financial Publishing/Services,NQUSB30201030,3,Financial Data Providers,HIGH,Financial publishing = data providers
+Commercial Services,Advertising/Marketing Services,NQUSB40301020,3,Media Agencies,HIGH,Advertising = media agencies
+Commercial Services,Commercial Printing/Forms,NQUSB50205030,3,Forms and Bulk Printing Services,HIGH,Exact match
+Commercial Services,Personnel Services,NQUSB50205025,3,Business Training and Employment Agencies,HIGH,Personnel = employment agencies
+Process Industries,Chemicals: Specialty,NQUSB55201020,3,Specialty Chemicals,HIGH,Exact match
+Process Industries,Industrial Specialties,NQUSB50203000,3,Diversified Industrials,MEDIUM,Industrial specialties = diversified
+Process Industries,Containers/Packaging,NQUSB50203030,3,Containers and Packaging,HIGH,Exact match
+Process Industries,Agricultural Commodities/Milling,NQUSB45102010,3,"Farming, Fishing, Ranching and Plantations",HIGH,Agriculture production
+Process Industries,Chemicals: Agricultural,NQUSB55201015,3,Fertilizers,HIGH,Agricultural chemicals = fertilizers
+Process Industries,Pulp & Paper,NQUSB55101015,3,Paper,HIGH,Pulp & paper
+Process Industries,Chemicals: Major Diversified,NQUSB55201000,3,Chemicals: Diversified,HIGH,Major diversified chemicals
+Process Industries,Textiles,NQUSB40204020,3,Clothing and Accessories,MEDIUM,Textiles = clothing industry
+Communications,Wireless Telecommunications,NQUSB151020,2,Telecommunications Service Providers,HIGH,Wireless telecom
+Communications,Major Telecommunications,NQUSB151020,2,Telecommunications Service Providers,HIGH,Major telecom
+Communications,Speciality Telecommunications,NQUSB15102015,3,Telecommunications Services,HIGH,Specialty telecom services
+Health Services,Managed Health Care,NQUSB20101020,3,Health Care Management Services,HIGH,Managed care = management services
+Health Services,Medical/Nursing Services,NQUSB20101020,3,Health Care Management Services,HIGH,Medical/nursing services
+Health Services,Hospital/Nursing Management,NQUSB20101010,3,Health Care Facilities,HIGH,Hospital management = facilities
+Health Services,Services to the Health Industry,NQUSB20101025,3,Health Care Services,HIGH,Health industry services
+Distribution Services,Wholesale Distributors,NQUSB45201010,3,Food Retailers and Wholesalers,MEDIUM,Wholesalers (food context)
+Distribution Services,Medical Distributors,NQUSB20102015,3,Medical Supplies,HIGH,Medical distributors = supplies
+Distribution Services,Food Distributors,NQUSB45201010,3,Food Retailers and Wholesalers,HIGH,Food distributors
+Distribution Services,Electronics Distributors,NQUSB10102015,3,Electronic Components,MEDIUM,Electronics distributors = components
+Miscellaneous,Miscellaneous,NQUSB40201070,3,Consumer Services: Misc.,LOW,Unclassifiable - default to misc
+Miscellaneous,Unclassified,NQUSB40201070,3,Consumer Services: Misc.,LOW,Unclassifiable - default to misc
+Miscellaneous,Investment Trusts/Mutual Funds,NQUSB30202000,3,Diversified Financial Services,MEDIUM,Investment trusts = diversified financial

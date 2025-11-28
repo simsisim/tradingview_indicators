@@ -1,0 +1,483 @@
+//@version=6
+indicator("Custom Industry Strength v8", "CIS-v8", precision = 2)
+
+// ========================================
+// INPUT PARAMETERS
+// ========================================
+iSma = input.int(55,"SMA", display=display.none)
+sComparisonMode = input.string("ETF", "Compare Against:", options=["ETF", "Index Benchmark"], tooltip="Choose to compare against industry ETF or Nasdaq Index Benchmark")
+sIndexChoice = input.string("Primary", "Index Selection:", options=["Primary", "Secondary", "Tertiary", "Quaternary"], tooltip="Primary: Most specific level (e.g., NQUSB40401020)\nSecondary: Second level (e.g., NQUSB404010)\nTertiary: Third level (e.g., NQUSB4040)\nQuaternary: Broadest sector (e.g., NQUSB40)")
+bUseLM = input.bool(false, "Use Large Mid Cap (LM) Variant", tooltip="Use NQUSB index LM variants (Large Mid Cap) instead of regular indices")
+bSpy = input.bool(true,"Highlight Outpacing SPY", display=display.none)
+bIndOveride = input.bool(false,"Override Comparison", inline = "Override", display=display.none)
+sAltTicker = input.symbol("VOO", "Ticker: ", inline="Override", display= display.none)
+bClrOverride = input.bool(false,"Change Line Color" , inline = "cOver", display=display.none)
+cOverride = input.color(color.purple, "", inline = "cOver", display=display.none)
+bSmaCOveride = input.bool(false,"Change SMA Color", inline = "cSMA", display = display.none)
+cSMAOveride = input.color(#FF69B4, "", inline = "cSMA", display = display.none)
+
+// Get the industry information for the current ticker
+industry = syminfo.industry
+
+// ========================================
+// INDUSTRY TO ETF MAPPING
+// ========================================
+industryETF = switch (industry)
+    "Advertising/Marketing Services" => "PBS"
+    "Aerospace & Defense" => "ITA"
+    "Agricultural Commodities/Milling" => "DBA"
+    "Air Freight/Couriers" => "XTN"
+    "Airlines" => "JETS"
+    "Alternative Power Generation" => "TAN"
+    "Aluminum" => "AA"
+    "Apparel/Footwear" => "XRT"
+    "Apparel/Footwear Retail" => "XRT"
+    "Auto Parts: OEM" => "CARZ"
+    "Automotive Aftermarket" => "CARZ"
+    "Beverages: Alcoholic" =>  "PBJ"
+    "Beverages: Non-Alcoholic" => "PBJ"
+    "Biotechnology" => "IBB"
+    "Broadcasting" => "PBS"
+    "Building Products" => "WOOD"
+    "Cable/Satellite TV" => "PBS"
+    "Casinos/Gaming" => "BJK"
+    "Catalog/Specialty Distribution" => "XRT"
+    "Chemicals: Agricultural" => "MOO"
+    "Chemicals: Major Diversified" => "XLB"
+    "Chemicals: Specialty" => "XLB"
+    "Coal" => "COAL"
+    "Commercial Printing/Forms"=> "PSCI"
+    "Computer Communications" => "HACK"
+    "Computer Peripherals" => "HACK"
+    "Computer Processing Hardware" => "XSD"
+    "Consumer Sundries" =>"XRT"
+    "Containers/Packaging" => "XLB"
+    "Contract Drilling" => "OIH"
+    "Construction Materials" => "PKB"
+    "Data Processing Services" => "VGT"
+    "Department Stores" => "XRT"
+    "Discount Stores" => "RTH"
+    "Drugstore Chains" => "XRT"
+    "Electric Utilities" => "XLU"
+    "Electrical Products" => "XLI"
+    "Electrical Components" => "PAVE"
+    "Electronic Components" => "XSD"
+    "Electronic Equipment/Instruments" => "IGM"
+    "Electronic Production Equipment" => "IGM"
+    "Electronics Distributors" => "XSD"
+    "Electronics/Appliance Stores" => "XRT"
+    "Electronics/Appliances" => "PSCI"
+    "Engineering & Construction" => "PKB"
+    "Environmental Services" => "PHO"
+    "Finance/Rental/Leasing" => "XLF"
+    "Financial Conglomerates" => "XLF"
+    "Financial Publishing/Services" => "IHF"
+    "Food Distributors" => "PBJ"
+    "Food Retail" => "PBJ"
+    "Food: Major Diversified" => "PBJ"
+    "Food: Meat/Fish/Dairy" => "PBJ"
+    "Food: Specialty/Candy" => "PBJ"
+    "Forest Products" => "WOOD"
+    "Gas Distributors" => "UGA"
+    "General Government" => "ITA"
+    "Healthcare" => "XLV"
+    "Home Furnishings" => "ITB"
+    "Home Improvement Chains" => "XHB",
+    "Homebuilding" => "ITB"
+    "Hospital/Nursing Management" => "IHF"
+    "Hotels/Resorts/Cruise lines" => "PEJ"
+    "Household/Personal Care" => "XLP"
+    "Industrial Conglomerates" => "XLI"
+    "Industrial Machinery" => "AIRR"
+    "Industrial Specialties" => "AIRR"
+    "Information Technology Services" => "VGT"
+    "Insurance Brokers/Services" => "KIE"
+    "Integrated Oil" => "XOP"
+    "Internet Retail" => "IBUY"
+    "Internet Software/Services" => "FDN"
+    "Investment Banks/Brokers" => "XLF"
+    "Investment Managers" => "IYF"
+    "Investment Trusts/Mutual Funds" => "SPY"
+    "Life/Health Insurance" => "IAK"
+    "Major Banks" => "KBWB"
+    "Major Telecommunications" => "VOX"
+    "Managed Health Care" => "IHF"
+    "Marine Shipping" => "SEA"
+    "Media Conglomerates" => "PBS"
+    "Medical Distributors" => "IHF"
+    "Medical Specialties" => "XLV"
+    "Medical/Nursing Services" => "IHF"
+    "Metal Fabrication" => "SLX"
+    "Miscellaneous" => "XLY"
+    "Miscellaneous Commercial Services" => "PSCI"
+    "Miscellaneous Manufacturing" => "AIRR"
+    "Motor Vehicles" => "CARZ"
+    "Movies/Entertainment" => "PEJ"
+    "Multi-Line Insurance" => "KIE"
+    "Office Equipment/Supplies" => "XRX"
+    "Oil & Gas Pipelines" => "AMLP"
+    "Oil & Gas Production" => "XOP"
+    "Oil Refining/Marketing" => "CRAK"
+    "Oilfield Services/Equipment" => "OIH"
+    "Other Consumer Services" => "XLY"
+    "Other Consumer Specialties" => "XLY"
+    "Other Metals/Minerals" => "PICK"
+    "Other Transportation" => "XTN"
+    "Packaged Software" => "IGV"
+    "Personnel Services" => "RTH"
+    "Pharmaceuticals: Generic" => "PJP"
+    "Pharmaceuticals: Major" => "PPH"
+    "Pharmaceuticals: Other" => "IBB"
+    "Precious Metals" => "GLD"
+    "Property/Casualty Insurance" => "KIE"
+    "Publishing: Books/Magazines" => "PBS"
+    "Publishing: Newspapers" => "PBS"
+    "Pulp & Paper" => "WOOD"
+    "Railroads" => "IYT"
+    "Real Estate Development" => "VNQ"
+    "Real Estate Investment Trusts" => "VNQ"
+    "Recreational Products" => "PEJ"
+    "Regional Banks" => "KRE"
+    "Restaurants" => "EATZ"
+    "Savings Banks" => "KBE"
+    "Semiconductors" => "SOXX"
+    "Services to the Health Industry" => "IHF"
+    "Specialty Insurance" => "KIE"
+    "Specialty Stores" => "XRT"
+    "Specialty Telecommunications" => "IYZ"
+    "Steel" => "SLX"
+    "Telecommunications Equipment" => "IYZ"
+    "Textiles" => "XRT"
+    "Tobacco" => "FSTA"
+    "Tools & Hardware" => "PKB"
+    "Trucking" => "XTN"
+    "Trucks/Construction/Farm Machinery" => "XLI"
+    "Water Utilities" => "FIW"
+    "Wholesale Distributors" => "XLY"
+    "Wireless Telecommunications" => "IYZ"
+    => "SPY" // Default to SPY if industry is unknown
+
+// ========================================
+// INDUSTRY TO INDEX BENCHMARK MAPPING (V8 - WITH HIERARCHY)
+// Based on NQUSB_filtered_no_TR_grouping_v2.csv - 130 explicit mappings with full hierarchy
+// Format: "Industry" => "Level1,Level2,Level3,Level4" (comma-separated hierarchy)
+// Hierarchy order: Broadest (Quaternary) -> Most Specific (Primary)
+// CRITICAL FIX: "Apparel/Footwear Retail" mapping added with full 4-level hierarchy
+// ========================================
+industryIndexBenchmark = switch (industry)
+
+    // Commercial Services (5 mappings)
+    "Miscellaneous Commercial Services" => "NQUSB50,NQUSB5020,NQUSB502050,NQUSB50205020"
+    "Financial Publishing/Services" => "NQUSB30,NQUSB3020,NQUSB302010,NQUSB30201030"
+    "Advertising/Marketing Services" => "NQUSB40,NQUSB4030,NQUSB40301020"
+    "Commercial Printing/Forms" => "NQUSB50,NQUSB5020,NQUSB502050,NQUSB50205030"
+    "Personnel Services" => "NQUSB50,NQUSB5020,NQUSB502050,NQUSB50205025"
+
+    // Communications (3 mappings)
+    "Wireless Telecommunications" => "NQUSB15,NQUSB151020"
+    "Major Telecommunications" => "NQUSB15,NQUSB151020"
+    "Speciality Telecommunications" => "NQUSB15,NQUSB151020,NQUSB15102015"
+
+    // Consumer Durables (8 mappings)
+    "Motor Vehicles" => "NQUSB40,NQUSB4010,NQUSB40101020"
+    "Homebuilding" => "NQUSB40,NQUSB4020,NQUSB402020,NQUSB40202010"
+    "Recreational Products" => "NQUSB40,NQUSB4020,NQUSB402030,NQUSB40203050"
+    "Tools & Hardware" => "NQUSB50,NQUSB5020,NQUSB502040,NQUSB50204000"
+    "Electronics/Appliances" => "NQUSB40,NQUSB4020,NQUSB402020,NQUSB40202025"
+    "Home Furnishings" => "NQUSB40,NQUSB4020,NQUSB402020,NQUSB40202015"
+    "Automotive Aftermarket" => "NQUSB40,NQUSB4010,NQUSB40101025"
+    "Other Consumer Specialties" => "NQUSB40,NQUSB4020,NQUSB402010,NQUSB40201070"
+
+    // Consumer Non-Durables (9 mappings)
+    "Household/Personal Care" => "NQUSB45,NQUSB4520,NQUSB45201030"
+    "Beverages: Non-Alcoholic" => "NQUSB45,NQUSB4510,NQUSB451010,NQUSB45101020"
+    "Food: Specialty/Candy" => "NQUSB45,NQUSB4510,NQUSB451020,NQUSB45102020"
+    "Tobacco" => "NQUSB45,NQUSB4510,NQUSB451030"
+    "Beverages: Alcoholic" => "NQUSB45,NQUSB4510,NQUSB451010,NQUSB45101015"
+    "Apparel/Footwear" => "NQUSB40,NQUSB4020,NQUSB402040,NQUSB40204020"
+    "Food: Major Diversified" => "NQUSB45,NQUSB4510,NQUSB451020,NQUSB45102020"
+    "Food: Meat/Fish/Dairy" => "NQUSB45,NQUSB4510,NQUSB451020,NQUSB45102020"
+    "Consumer Sundries" => "NQUSB45,NQUSB4520,NQUSB45201030"
+
+    // Consumer Services (10 mappings)
+    "Restaurants" => "NQUSB40,NQUSB4050,NQUSB40501040"
+    "Hotels/Resorts/Cruise lines" => "NQUSB40,NQUSB4050,NQUSB40501025"
+    "Other Consumer Services" => "NQUSB40,NQUSB4020,NQUSB402010,NQUSB40201070"
+    "Movies/Entertainment" => "NQUSB40,NQUSB4030,NQUSB40301010"
+    "Cable/Satellite TV" => "NQUSB15,NQUSB151020,NQUSB15102010"
+    "Casinos/Gaming" => "NQUSB40,NQUSB4050,NQUSB40501020"
+    "Broadcasting" => "NQUSB40,NQUSB4030,NQUSB40301035"
+    "Publishing: Newspapers" => "NQUSB40,NQUSB4030,NQUSB40301030"
+    "Publishing: Books/Magazines" => "NQUSB40,NQUSB4030,NQUSB40301030"
+    "Media Conglomerates" => "NQUSB40,NQUSB4030,NQUSB40301010"
+
+    // Distribution Services (4 mappings)
+    "Wholesale Distributors" => "NQUSB45,NQUSB4520,NQUSB45201010"
+    "Medical Distributors" => "NQUSB20,NQUSB201020,NQUSB20102015"
+    "Food Distributors" => "NQUSB45,NQUSB4520,NQUSB45201010"
+    "Electronics Distributors" => "NQUSB10,NQUSB101020,NQUSB10102015"
+
+    // Electronic Technology (9 mappings)
+    "Semiconductors" => "NQUSB10,NQUSB101020,NQUSB10102010"
+    "Telecommunications Equipment" => "NQUSB15,NQUSB151010"
+    "Aerospace & Defense" => "NQUSB50,NQUSB5020,NQUSB502010"
+    "Electronic Equipment/Instruments" => "NQUSB50,NQUSB5020,NQUSB502020,NQUSB50202025"
+    "Computer Processing Hardware" => "NQUSB10,NQUSB101020,NQUSB10102030"
+    "Computer Peripherals" => "NQUSB10,NQUSB101020,NQUSB10102030"
+    "Electronic Components" => "NQUSB10,NQUSB101020,NQUSB10102015"
+    "Electronic Production Equipment" => "NQUSB10,NQUSB101020,NQUSB10102020"
+    "Computer Communications" => "NQUSB10,NQUSB101020,NQUSB10102020"
+
+    // Energy Minerals (4 mappings)
+    "Oil & Gas Production" => "NQUSB60,NQUSB601010,NQUSB60101010"
+    "Coal" => "NQUSB60,NQUSB601010,NQUSB60101040"
+    "Integrated Oil" => "NQUSB60,NQUSB601010,NQUSB60101000"
+    "Oil Refining/Marketing" => "NQUSB60,NQUSB601010,NQUSB60101020"
+
+    // Finance (14 mappings)
+    "Major Banks" => "NQUSB30,NQUSB3010"
+    "Property/Casualty Insurance" => "NQUSB30,NQUSB3030,NQUSB303020,NQUSB30302025"
+    "Finance/Rental/Leasing" => "NQUSB30,NQUSB3020,NQUSB302010,NQUSB30201020"
+    "Investment Managers" => "NQUSB30,NQUSB3020,NQUSB302020,NQUSB30202010"
+    "Real Estate Investment Trusts" => "NQUSB35,NQUSB351020"
+    "Investment Banks/Brokers" => "NQUSB30,NQUSB3020,NQUSB302020"
+    "Regional Banks" => "NQUSB30,NQUSB3010"
+    "Multi-Line Insurance" => "NQUSB30,NQUSB3030,NQUSB303020,NQUSB30302010"
+    "Insurance Brokers/Services" => "NQUSB30,NQUSB3030,NQUSB303020,NQUSB30302015"
+    "Life/Health Insurance" => "NQUSB30,NQUSB3030,NQUSB303010"
+    "Real Estate Development" => "NQUSB35,NQUSB351010,NQUSB35101010"
+    "Specialty Insurance" => "NQUSB30,NQUSB3030,NQUSB303020"
+    "Financial Conglomerates" => "NQUSB30,NQUSB3020,NQUSB302020,NQUSB30202000"
+    "Savings Banks" => "NQUSB30,NQUSB3010"
+
+    // Health Services (4 mappings)
+    "Managed Health Care" => "NQUSB20,NQUSB201010,NQUSB20101020"
+    "Medical/Nursing Services" => "NQUSB20,NQUSB201010,NQUSB20101020"
+    "Hospital/Nursing Management" => "NQUSB20,NQUSB201010,NQUSB20101010"
+    "Services to the Health Industry" => "NQUSB20,NQUSB201010,NQUSB20101025"
+
+    // Health Technology (5 mappings)
+    "Pharmaceuticals: Major" => "NQUSB20,NQUSB201030,NQUSB20103015"
+    "Medical Specialties" => "NQUSB20,NQUSB201020,NQUSB20102010"
+    "Biotechnology" => "NQUSB20,NQUSB201030,NQUSB20103010"
+    "Pharmaceuticals: Other" => "NQUSB20,NQUSB201030,NQUSB20103015"
+    "Pharmaceuticals: Generic" => "NQUSB20,NQUSB201030,NQUSB20103015"
+
+    // Industrial Services (5 mappings)
+    "Oil & Gas Pipeline" => "NQUSB60,NQUSB601010,NQUSB60101035"
+    "Engineering & Construction" => "NQUSB50,NQUSB5010,NQUSB50101015"
+    "Environmental Services" => "NQUSB65,NQUSB651030"
+    "Contract Drilling" => "NQUSB60,NQUSB601010,NQUSB60101015"
+    "Oilfield Services/Equipment" => "NQUSB60,NQUSB601010,NQUSB60101030"
+
+    // Miscellaneous (3 mappings)
+    "Miscellaneous" => "NQUSB40,NQUSB4020,NQUSB402010,NQUSB40201070"
+    "Unclassified" => "NQUSB40,NQUSB4020,NQUSB402010,NQUSB40201070"
+    "Investment Trusts/Mutual Funds" => "NQUSB30,NQUSB3020,NQUSB302020,NQUSB30202000"
+
+    // Non-Energy Minerals (6 mappings)
+    "Precious Metals" => "NQUSB55,NQUSB5510,NQUSB551030"
+    "Other Metals/Minerals" => "NQUSB55,NQUSB5510,NQUSB551010"
+    "Steel" => "NQUSB55,NQUSB5510,NQUSB551020,NQUSB55102010"
+    "Construction Materials" => "NQUSB50,NQUSB5010,NQUSB50101035"
+    "Forest Products" => "NQUSB55,NQUSB5510,NQUSB551010,NQUSB55101015"
+    "Aluminum" => "NQUSB55,NQUSB5510,NQUSB551020,NQUSB55102010"
+
+    // Process Industries (8 mappings)
+    "Chemicals: Specialty" => "NQUSB55,NQUSB5520,NQUSB55201020"
+    "Industrial Specialties" => "NQUSB50,NQUSB5020,NQUSB502030,NQUSB50203000"
+    "Containers/Packaging" => "NQUSB50,NQUSB5020,NQUSB502030,NQUSB50203030"
+    "Agricultural Commodities/Milling" => "NQUSB45,NQUSB4510,NQUSB451020,NQUSB45102010"
+    "Chemicals: Agricultural" => "NQUSB55,NQUSB5520,NQUSB55201015"
+    "Pulp & Paper" => "NQUSB55,NQUSB5510,NQUSB551010,NQUSB55101015"
+    "Chemicals: Major Diversified" => "NQUSB55,NQUSB5520,NQUSB55201000"
+    "Textiles" => "NQUSB40,NQUSB4020,NQUSB402040,NQUSB40204020"
+
+    // Producer Manufacturing (9 mappings)
+    "Industrial Machinery" => "NQUSB50,NQUSB5020,NQUSB502040,NQUSB50204000"
+    "Electrical Products" => "NQUSB50,NQUSB5020,NQUSB502020,NQUSB50202010"
+    "Trucks/Construction/Farm Machinery" => "NQUSB50,NQUSB5020,NQUSB502040,NQUSB50204020"
+    "Auto Parts: OEM" => "NQUSB40,NQUSB4010,NQUSB40101025"
+    "Building Products" => "NQUSB50,NQUSB5010,NQUSB50101035"
+    "Industrial Conglomerates" => "NQUSB50,NQUSB5020,NQUSB502030,NQUSB50203000"
+    "Metal Fabrication" => "NQUSB55,NQUSB5510,NQUSB551020,NQUSB55102015"
+    "Miscellaneous Manufacturing" => "NQUSB50,NQUSB5020,NQUSB502030,NQUSB50203000"
+    "Office Equipment/Supplies" => "NQUSB50,NQUSB5020,NQUSB502050,NQUSB50205010"
+
+    // Retail Trade (10 mappings)
+    "Internet Retail" => "NQUSB40,NQUSB4040,NQUSB404010,NQUSB40401010"
+    "Specialty Stores" => "NQUSB40,NQUSB4040,NQUSB404010,NQUSB40401030"
+    "Home Improvement Chains" => "NQUSB40,NQUSB4040,NQUSB404010,NQUSB40401025"
+    "Department Stores" => "NQUSB40,NQUSB4040,NQUSB404010,NQUSB40401010"
+    "Apparel/Footwear Retail" => "NQUSB40,NQUSB4040,NQUSB404010,NQUSB40401020"
+    "Drugstore Chains" => "NQUSB45,NQUSB4520,NQUSB45201015"
+    "Food Retail" => "NQUSB45,NQUSB4520,NQUSB45201010"
+    "Discount Stores" => "NQUSB40,NQUSB4040,NQUSB404010,NQUSB40401010"
+    "Electronics/Appliance Stores" => "NQUSB40,NQUSB4040,NQUSB404010,NQUSB40401030"
+    "Catalog/Specialty Distribution" => "NQUSB40,NQUSB4040,NQUSB404010,NQUSB40401030"
+
+    // Technology Services (4 mappings)
+    "Data Processing Services" => "NQUSB10,NQUSB101010,NQUSB10101010"
+    "Internet Software/Services" => "NQUSB10,NQUSB101010,NQUSB10101020"
+    "Information Technology Services" => "NQUSB10,NQUSB101010,NQUSB10101010"
+    "Packaged Software" => "NQUSB10,NQUSB101010,NQUSB10101015"
+
+    // Transportation (5 mappings)
+    "Air Freight & Logistics" => "NQUSB50,NQUSB5020,NQUSB502060,NQUSB50206040"
+    "Airlines" => "NQUSB40,NQUSB4050,NQUSB40501010"
+    "Marine Transportation" => "NQUSB50,NQUSB5020,NQUSB502060,NQUSB50206030"
+    "Railroads" => "NQUSB50,NQUSB5020,NQUSB502060,NQUSB50206020"
+    "Trucking" => "NQUSB50,NQUSB5020,NQUSB502060,NQUSB50206010"
+
+    // Utilities (4 mappings)
+    "Electric Utilities" => "NQUSB65,NQUSB651010"
+    "Gas Distributors" => "NQUSB65,NQUSB651020,NQUSB65102020"
+    "Water Utilities" => "NQUSB65,NQUSB651020,NQUSB65102030"
+    "Alternative Power Generation" => "NQUSB65,NQUSB651010,NQUSB65101010"
+    => "" // Empty string if no index benchmark exists
+
+// ========================================
+// INDEX PARSING AND SELECTION LOGIC
+// ========================================
+// Function to select appropriate hierarchy level from comma-separated hierarchy string
+// Hierarchy format: "NQUSB40,NQUSB4040,NQUSB404010,NQUSB40401020" (broadest to most specific)
+// User selection: Primary=most specific (last), Quaternary=broadest (first)
+selectIndex(string indexString, string choice) =>
+    string result = ""
+
+    if indexString == ""
+        result := ""
+    else
+        // All mappings are now comma-separated hierarchies
+        // Split the hierarchy string
+        hierarchyArray = str.split(indexString, ",")
+        arraySize = array.size(hierarchyArray)
+
+        // Determine which level to use based on user choice
+        // Hierarchy order in string: Broadest (0) -> Most Specific (arraySize-1)
+        // User wants: Primary=Most Specific, Quaternary=Broadest
+        levelPosition = switch choice
+            "Primary" => arraySize - 1                   // Last element (most specific)
+            "Secondary" => math.max(0, arraySize - 2)    // Second-to-last (or fallback to first)
+            "Tertiary" => math.max(0, arraySize - 3)     // Third-to-last (or fallback to first)
+            "Quaternary" => 0                            // First element (broadest sector)
+            => arraySize - 1 // Default to primary (most specific)
+
+        // Get the level (always valid due to math.max fallback)
+        selectedIndex = array.get(hierarchyArray, levelPosition)
+
+        // Trim whitespace from the selected index
+        result := str.trim(selectedIndex)
+
+    result
+
+// ========================================
+// TICKER SELECTION LOGIC
+// ========================================
+// Priority: Manual Override > Comparison Mode Selection > Default (ETF)
+var string sTickerToUse = na
+var string sComparisonType = na
+var int iIndexNumber = na
+
+if bIndOveride
+    // User manually overrode with custom ticker
+    sTickerToUse := sAltTicker
+    sComparisonType := "Custom"
+    iIndexNumber := 0
+else if sComparisonMode == "Index Benchmark"
+    // User wants Index Benchmark
+    if industryIndexBenchmark != ""
+        // Parse and select the appropriate index
+        selectedIndexTicker = selectIndex(industryIndexBenchmark, sIndexChoice)
+
+        // Apply LM suffix if user selected Large Mid Cap variant
+        if bUseLM and not str.contains(selectedIndexTicker, "LM")
+            selectedIndexTicker := selectedIndexTicker + "LM"
+
+        sTickerToUse := selectedIndexTicker
+
+        // Determine actual level used and display accordingly
+        // All mappings are now comma-separated hierarchies
+        hierarchyArray = str.split(industryIndexBenchmark, ",")
+        arraySize = array.size(hierarchyArray)
+
+        // Calculate which level was actually selected
+        levelPosition = switch sIndexChoice
+            "Primary" => arraySize - 1                   // Last element (most specific)
+            "Secondary" => math.max(0, arraySize - 2)    // Second-to-last
+            "Tertiary" => math.max(0, arraySize - 3)     // Third-to-last
+            "Quaternary" => 0                            // First element (broadest)
+            => arraySize - 1
+
+        // Determine actual level number (1=broadest, 4=most specific)
+        actualLevel = levelPosition + 1
+
+        // Generate display name based on actual level used
+        levelName = "L" + str.tostring(actualLevel)
+        sComparisonType := bUseLM ? "Index-" + levelName + "-LM" : "Index-" + levelName
+        iIndexNumber := actualLevel
+    else
+        // No index benchmark available, fall back to ETF
+        sTickerToUse := industryETF
+        sComparisonType := "ETF (No Index)"
+        iIndexNumber := 0
+else
+    // Default to ETF
+    sTickerToUse := industryETF
+    sComparisonType := "ETF"
+    iIndexNumber := 0
+
+// ========================================
+// PRICE DATA RETRIEVAL
+// ========================================
+// Get the price of the stock and industry ETF/Index
+stockPrice = close
+spyTicker = ticker.new(syminfo.prefix("SPY"), "SPY", session = syminfo.session)
+compTicker = ticker.new(syminfo.prefix(sTickerToUse), sTickerToUse, session = syminfo.session)
+compPrice = request.security(compTicker, timeframe.period, close)
+
+// Get the full name/description of the comparison ticker
+compTickerName = request.security(compTicker, timeframe.period, syminfo.description)
+
+// Get SPY information for coloring
+spyClose = request.security(spyTicker, timeframe.period, close)
+vSpy = nz(stockPrice/spyClose)
+vSpySma = ta.sma(vSpy, iSma)
+
+// ========================================
+// CALCULATIONS
+// ========================================
+// Calculate the stock-to-comparison ratio
+sir = compPrice != 0 ? stockPrice / compPrice : na
+sirSMA = ta.sma(sir, iSma)
+
+// ========================================
+// PLOTTING COLORS
+// ========================================
+mainColor = bClrOverride ? cOverride : color.new(chart.fg_color, 60)
+sirColor = bSpy ? (vSpy >= vSpySma ? color.new(color.green, 0) : mainColor) : mainColor
+
+// ========================================
+// DISPLAY TABLE
+// ========================================
+var textIndustry = table.new(position.top_center, 1, 4)
+// Split at ":" and keep last part
+tickerParts = str.split(sTickerToUse, ":")
+compTickerOnly = array.size(tickerParts) > 1 ? tickerParts.get(1) : sTickerToUse
+
+// Use full name if available, otherwise use ticker code
+displayNameToUse = not na(compTickerName) and compTickerName != "" ? compTickerName : compTickerOnly
+vsIndustry = syminfo.ticker + " vs. " + compTickerOnly
+
+// Update table on the last bar (where request.security data is available)
+if barstate.islast
+    table.cell(textIndustry, 0, 0, text=industry, text_size=size.small)
+    table.cell(textIndustry, 0, 1, text=vsIndustry, text_size=size.small)
+    table.cell(textIndustry, 0, 2, text=displayNameToUse, text_size=size.tiny, text_color=color.gray)
+    table.cell(textIndustry, 0, 3, text="[" + sComparisonType + "]", text_size=size.tiny, text_color=color.gray)
+
+// ========================================
+// PLOTTING
+// ========================================
+plot(sir, color=sirColor, title="SvI", linewidth=2, display=display.all)
+plot(sirSMA, color = bSmaCOveride ? cSMAOveride : color.blue, title="SMA", display = display.all)

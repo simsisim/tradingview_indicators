@@ -1,0 +1,138 @@
+[b]Original idea from[/b] [url=https://de.tradingview.com/script/EO9DkXLk-Stock-versus-Industry/]Stock versus Industry[/url] [b]by[/b] [url=https://de.tradingview.com/u/Tr33man/]Tr33man[/url].
+
+Since this improvement may not be accepted as an update to the original TradingView script, the complete Pine Script code and supporting data pipeline are available on GitHub:
+
+[b]GitHub Repository:[/b] [url=https://github.com/simsisim/tradingview_indicators]https://github.com/simsisim/tradingview_indicators[/url]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+[b][size=large]PRIMARY IMPROVEMENT: NQUSB Hierarchical Index Benchmarks[/size][/b]
+
+[b]The KEY improvement:[/b] Multi-Level Industry Granularity with Drill-Down/Drill-Up Navigation
+
+[b]From:[/b] Simple ETF Comparison (1 Level)
+Stock → Industry ETF (e.g., "SOXX" for all semiconductors)
+
+[b]To:[/b] NQUSB Hierarchical Comparison (4 Levels)
+[list]
+[*] [b]Level 4 (Primary):[/b] NQUSB10102010 → Semiconductors (most specific)
+[*] [b]Level 3 (Secondary):[/b] NQUSB101020 → Technology Hardware and Equipment
+[*] [b]Level 2 (Tertiary):[/b] NQUSB101010 → Software and Computer Services
+[*] [b]Level 1 (Quaternary):[/b] NQUSB10 → Technology (broadest sector)
+[/list]
+
+[b]Users can now drill up and down the industry hierarchy[/b] to see how their stock performs against different levels of industry classification!
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+[b][size=large]WHY THIS MATTERS[/size][/b]
+
+[b]Original Limitations:[/b]
+[list]
+[*] Single comparison level - ETF only
+[*] No drill-down capability - Can't zoom in to more specific industries
+[*] No drill-up capability - Can't zoom out to broader sectors
+[*] ETF limitations - Not all industries have dedicated ETFs
+[*] Arbitrary mappings - Manual ETF selection may not represent true industry
+[/list]
+
+[b]Improved Capabilities:[/b]
+[list]
+[*] [b]4-level hierarchical navigation[/b] - Drill-down and drill-up through industry classifications
+[*] [b]361 NQUSB official indices[/b] - NASDAQ US Benchmark Index structure
+[*] [b]Official NASDAQ classification[/b] - Industry-standard taxonomy
+[*] [b]Large Mid Cap (LM) option[/b] - Focus on larger companies when needed
+[*] [b]Enhanced UI[/b] - Clear level indicators and full index descriptions
+[/list]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+[b][size=large]EXAMPLE: ANALYZING NVDA (Semiconductors)[/size][/b]
+
+[b]Level 4 - Primary (Most Specific):[/b]
+NQUSB10102010 - Semiconductors
+→ NVDA vs. AMD, AVGO, QCOM, TXN, etc. (direct competitors)
+
+[b]Level 3 - Secondary (Broader):[/b]
+NQUSB101020 - Tech Hardware & Equipment
+→ NVDA vs. AAPL, CSCO + semiconductors
+
+[b]Level 2 - Tertiary (Even Broader):[/b]
+NQUSB101010 - Software and Computer Services
+→ NVDA vs. all tech hardware
+
+[b]Level 1 - Quaternary (Broadest):[/b]
+NQUSB10 - Technology Sector
+→ NVDA vs. entire technology sector
+
+[b]You can now zoom in to see direct competitors or zoom out to understand macro sector trends - all in one indicator![/b]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+[b][size=large]COMPARISON SUMMARY[/size][/b]
+
+[b]Original Version:[/b]
+[list]
+[*] Comparison System: Industry ETFs
+[*] Industry Levels: 1 (flat ETF mapping)
+[*] Total Classifications: ~140 industries
+[*] Hierarchy Navigation: ❌ No
+[*] Data Source: Manual ETF curation
+[/list]
+
+[b]Improved Version:[/b]
+[list]
+[*] Comparison System: NQUSB Official Indices
+[*] Industry Levels: [b]4 (hierarchical drill-down/up)[/b]
+[*] Total Classifications: [b]361 NQUSB indices[/b]
+[*] Hierarchy Navigation: ✅ [b]4-level drill navigation[/b]
+[*] Data Source: [b]NASDAQ official taxonomy[/b]
+[*] Large/Mid Cap Option: ✅ [b]LM variant toggle[/b]
+[*] Level Indicator: ✅ [b][Index-L1] to [Index-L4] labels[/b]
+[/list]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+[b][size=large]REAL-WORLD USE CASES[/size][/b]
+
+[b]For Day Traders:[/b]
+[list]
+[*] Start with Primary (L4) → See how stock compares to direct competitors
+[*] If sector is weak overall → Drill up to Tertiary (L2) to see if all tech is down
+[/list]
+
+[b]For Swing Traders:[/b]
+[list]
+[*] Monitor at Secondary (L3) → Track stock vs broader industry group
+[*] Identify divergences → Outperformance at L4 but underperformance at L2 signals sector rotation
+[/list]
+
+[b]For Position Traders/Investors:[/b]
+[list]
+[*] Analyze all 4 levels → Understand if stock strength is industry-specific or sector-wide
+[*] Sector rotation signals → Outperformance at L1 (sector) but underperformance at L4 (industry) = consider sector ETFs
+[/list]
+
+[b]For Sector Rotation Strategies:[/b]
+[list]
+[*] Compare L1 (Quaternary) across different stocks → Identify strongest/weakest sectors
+[*] Drill down to L4 → Find best stocks within winning sectors
+[/list]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+[b][size=large]ADDITIONAL FEATURES[/size][/b]
+
+[list]
+[*] [b]Dual Comparison System[/b] - Toggle between ETF mode (original) and Index Benchmark mode (NQUSB hierarchy)
+[*] [b]Better Fallback Logic[/b] - Manual Override > NQUSB Index > ETF > SPY default
+[*] [b]Enhanced Display[/b] - 4-row information table with full NQUSB index description
+[*] [b]Backward Compatible[/b] - All original ETF mappings still work, existing charts won't break
+[*] [b]Large Mid Cap Toggle[/b] - Optional "LM" suffix for focusing on larger companies only
+[/list]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+[b]For complete documentation, data files, technical details, and the full NQUSB hierarchy structure, visit the GitHub repository.[/b]
+
+[b]The result:[/b] More accurate, more flexible, and more comprehensive industry strength analysis - enabling traders to understand exactly where their stock's performance comes from by drilling through multiple levels of industry classification.
