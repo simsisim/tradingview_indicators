@@ -6,7 +6,7 @@ Since this improvement may not be accepted as an update to the original TradingV
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-[b][size=large]PRIMARY IMPROVEMENT: NQUSB Hierarchical Index Benchmarks[/size][/b]
+[b]═══ PRIMARY IMPROVEMENT: NQUSB Hierarchical Index Benchmarks ═══[/b]
 
 [b]The KEY improvement:[/b] Multi-Level Industry Granularity with Drill-Down/Drill-Up Navigation
 
@@ -25,7 +25,7 @@ Stock → Industry ETF (e.g., "SOXX" for all semiconductors)
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-[b][size=large]WHY THIS MATTERS[/size][/b]
+[b]═══ WHY THIS MATTERS ═══[/b]
 
 [b]Original Limitations:[/b]
 [list]
@@ -47,7 +47,7 @@ Stock → Industry ETF (e.g., "SOXX" for all semiconductors)
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-[b][size=large]EXAMPLE: ANALYZING NVDA (Semiconductors)[/size][/b]
+[b]═══ EXAMPLE: ANALYZING NVDA (Semiconductors) ═══[/b]
 
 [b]Level 4 - Primary (Most Specific):[/b]
 NQUSB10102010 - Semiconductors
@@ -69,7 +69,7 @@ NQUSB10 - Technology Sector
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-[b][size=large]COMPARISON SUMMARY[/size][/b]
+[b]═══ COMPARISON SUMMARY ═══[/b]
 
 [b]Original Version:[/b]
 [list]
@@ -93,7 +93,7 @@ NQUSB10 - Technology Sector
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-[b][size=large]REAL-WORLD USE CASES[/size][/b]
+[b]═══ REAL-WORLD USE CASES ═══[/b]
 
 [b]For Day Traders:[/b]
 [list]
@@ -121,7 +121,7 @@ NQUSB10 - Technology Sector
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-[b][size=large]ADDITIONAL FEATURES[/size][/b]
+[b]═══ ADDITIONAL FEATURES ═══[/b]
 
 [list]
 [*] [b]Dual Comparison System[/b] - Toggle between ETF mode (original) and Index Benchmark mode (NQUSB hierarchy)

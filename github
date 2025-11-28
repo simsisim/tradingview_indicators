@@ -1,17 +1,11 @@
- Step-by-Step Guide to Push to GitHub
-Here's how to push the 
-Industry_Group_Strength_Indicator_improvement
- directory to your new tradingview_indicator repository:
+
 
 Step 1: Navigate to the directory
-bash
 cd /home/imagda/_invest2024/tradingview/myIndicators/stock_vs_industry_industry_vs_SPY/Industry_Group_Strength_Indicator_improvement
 Step 2: Initialize Git repository (if not already initialized)
-bash
 git init
 Step 3: Add your GitHub remote
 Replace YOUR_USERNAME with your actual GitHub username:
-
 bash
 git remote add origin https://github.com/YOUR_USERNAME/tradingview_indicator.git
 Step 4: Add all files to staging
