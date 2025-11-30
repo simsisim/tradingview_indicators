@@ -1,5 +1,5 @@
 //@version=5
-indicator('Industry Group Strength Improved', shorttitle='Ind-Gr-Str-Imp', overlay = false, dynamic_requests = true, max_labels_count = 80)
+indicator('Industry Group Strength Improved V5', shorttitle='Ind-Gr-Str-V5', overlay = false, dynamic_requests = true, max_labels_count = 80)
 
 if timeframe.isintraday
     runtime.error('Switch to Daily or Weekly Chart')
@@ -23,7 +23,7 @@ type industry
 
 var indArr = array.from(
      industry.new('Advertising/Marketing Services', array.from('OMC', 'IPG', 'WPP', 'WSHP', 'DJT', 'PTRN', 'SBET', 'CRTO', 'CCO', 'QNST', 'IBEX', 'NCMI', 'VERI', 'BOC', 'LZMH', 'ADV', 'GAMB', 'NUKK', 'IZEA', 'MCHX', 'UBXG', 'BLNE', 'CPOP', 'SWAG', 'CREX', 'FCUV', 'EDHL', 'SGRP', 'DLPN', 'YHC', 'VSME', 'YDKG', 'LDWY', 'BAOS', 'CNET', 'DRCT', 'HAO', 'STFS')),
-     industry.new('Aerospace & Defense', array.from('GE', 'RTX', 'BA', 'HON', 'LMT', 'GD', 'HWM', 'NOC', 'TDG', 'LHX', 'AXON', 'HEI.A', 'HEI', 'TDY', 'RKLB', 'ESLT', 'CW', 'FTAI', 'BWXT', 'TXT', 'AVAV', 'JOBY', 'KTOS', 'HII', 'EMBJ', 'CR', 'DRS', 'KRMN', 'MOG.A', 'AMTM', 'MOG.B', 'MIR', 'LOAR', 'HXL', 'BETA', 'ACHR', 'OSIS', 'SPR', 'MRCY')),
+     industry.new('Aerospace & Defense', array.from('GE', 'RTX', 'BA', 'HON', 'LMT', 'GD', 'HWM', 'NOC', 'TDG', 'LHX', 'AXON', 'HEI.A', 'HEI', 'TDY', 'RKLB', 'ESLT', 'CW', 'FTAI', 'BWXT', 'TXT', 'AVAV', 'JOBY', 'KTOS', 'HII', 'EMBJ', 'CR', 'DRS', 'KRMN', 'MOG.A', 'AMTM', 'MOG.B', 'MIR', 'LOAR', 'HXL', 'BETA', 'ACHR', 'OSIS', 'SPR')),
      industry.new('Agricultural Commodities/Milling', array.from('CTVA', 'ADM', 'BG', 'PPC', 'SEB', 'CALM', 'FDP', 'VITL', 'TLRY', 'AVO', 'AGRO', 'CRESY', 'MGPI', 'VFF', 'SNDL', 'CGC', 'CVGW', 'ALCO', 'AFRI', 'ACB', 'LMNR', 'OGI', 'BHST', 'BARK', 'OMEX', 'SEED', 'IMCC', 'EDBL', 'FAMI', 'IVP', 'AKAN')),
      industry.new('Air Freight/Couriers', array.from('DASH', 'UPS', 'FDX', 'GRAB', 'EXPD', 'CHRW', 'ZTO', 'CART', 'R', 'GXO', 'HUBG', 'CYRX', 'RLGT', 'FLX', 'MATH', 'SFWL', 'SLGB', 'AIRT', 'ELOG', 'LSH', 'PSIG', 'BANL', 'CJMB', 'JYD', 'HKPD', 'GVH', 'SGLY', 'ETS')),
      industry.new('Airlines', array.from('DAL', 'RYAAY', 'UAL', 'LUV', 'LTM', 'AAL', 'CPA', 'ALK', 'SKYW', 'AERO', 'JBLU', 'ALGT', 'VTOL', 'ULCC', 'VLRS', 'SNCY', 'UP', 'FLYX', 'SRFM', 'BAER', 'RJET', 'NCEW', 'SOAR', 'JTAI')),
@@ -35,7 +35,7 @@ var indArr = array.from(
      industry.new('Automotive Aftermarket', array.from('LKQ', 'DORM', 'GT', 'XPEL', 'SMP')),
      industry.new('Beverages: Alcoholic', array.from('BUD', 'DEO', 'ABEV', 'STZ', 'BF.B', 'BF.A', 'TAP', 'TAP.A', 'CCU', 'SAM', 'IPST', 'WVVI', 'AMZE', 'IBG')),
      industry.new('Beverages: Non-Alcoholic', array.from('KO', 'MNST', 'CCEP', 'KDP', 'FMX', 'COKE', 'CELH', 'PRMB', 'KOF', 'AKO.A', 'AKO.B', 'FIZZ', 'ZVIA', 'BRFH')),
-     industry.new('Biotechnology', array.from('AMGN', 'GILD', 'ARGX', 'IQV', 'NTRA', 'BNTX', 'UTHR', 'NBIX', 'BBIO', 'SMMT', 'ELAN', 'RNA', 'BMRN', 'TECH', 'MRNA', 'HALO', 'ARWR', 'AXSM', 'MRUS', 'CAI', 'PCVX', 'KRYS', 'COGT', 'CRSP', 'KYMR', 'APGE', 'ADMA', 'SRRK', 'ACLX', 'IMVT', 'CGON', 'IRON', 'MLYS', 'TLX', 'RCUS', 'DYN', 'ADPT', 'DNLI', 'NUVB')),
+     industry.new('Biotechnology', array.from('AMGN', 'GILD', 'ARGX', 'IQV', 'NTRA', 'BNTX', 'UTHR', 'NBIX', 'BBIO', 'SMMT', 'ELAN', 'RNA', 'BMRN', 'TECH', 'MRNA', 'HALO', 'ARWR', 'AXSM', 'MRUS', 'CAI', 'PCVX', 'KRYS', 'COGT', 'CRSP', 'KYMR', 'APGE', 'ADMA', 'SRRK', 'ACLX', 'IMVT', 'CGON', 'IRON', 'MLYS', 'TLX', 'RCUS', 'DYN', 'ADPT', 'DNLI')),
      industry.new('Broadcasting', array.from('FOXA', 'FOX', 'SIRI', 'NXST', 'TGNA', 'SBGI', 'NMAX', 'GTN', 'GTN.A', 'IHRT', 'SSP', 'EVC', 'TSQ', 'MDIA', 'QVCGA', 'SGA', 'BBGI')),
      industry.new('Building Products', array.from('WSO', 'MAS', 'CSL', 'SPXC', 'AOS', 'MHK', 'SSD', 'FBIN', 'GFF', 'TGLS', 'TILE', 'NPKI', 'PLPC', 'JBI', 'AMWD', 'APOG', 'NX', 'LYTS', 'FGI', 'AEHL', 'CETY', 'INHD')),
      industry.new('Cable/Satellite TV', array.from('CMCSA', 'WBD', 'CHTR', 'PSKY', 'CABO', 'AMCX')),
@@ -43,7 +43,7 @@ var indArr = array.from(
      industry.new('Catalog/Specialty Distribution', array.from('YJ')),
      industry.new('Chemicals/ Agricultural', array.from('NTR', 'CF', 'MOS', 'ICL', 'SMG', 'FMC', 'UAN', 'SLI', 'ODC', 'LXU', 'IONR', 'AVD', 'BIOX', 'LITM', 'SNES', 'RKDA')),
      industry.new('Chemicals/ Major Diversified', array.from('DD', 'ESI', 'SSL', 'PRM', 'AVNT', 'NGVT', 'IOSP', 'HUN', 'ARQ', 'CTM', 'FSI', 'FTEK')),
-     industry.new('Chemicals/ Specialty', array.from('LIN', 'ECL', 'APD', 'DOW', 'SQM', 'LYB', 'ALB', 'WLK', 'SOLS', 'NEU', 'EMN', 'CE', 'CBT', 'HWKN', 'MEOH', 'KWR', 'DQ', 'GEL', 'CC', 'MTX', 'LAC', 'ROG', 'PRLB', 'BAK', 'REX', 'TTI', 'ECVT', 'SCL', 'CMP', 'GPRE', 'WLKP', 'TROX', 'KRNT', 'KRO', 'KOP', 'LWLG', 'GEVO', 'LTBR', 'RYAM')),
+     industry.new('Chemicals/ Specialty', array.from('LIN', 'ECL', 'APD', 'DOW', 'SQM', 'LYB', 'ALB', 'WLK', 'SOLS', 'NEU', 'EMN', 'CE', 'CBT', 'HWKN', 'MEOH', 'KWR', 'DQ', 'GEL', 'CC', 'MTX', 'LAC', 'ROG', 'PRLB', 'BAK', 'REX', 'TTI', 'ECVT', 'SCL', 'CMP', 'GPRE', 'WLKP', 'TROX', 'KRNT', 'KRO', 'KOP', 'LWLG', 'GEVO', 'LTBR')),
      industry.new('Coal', array.from('HCC', 'CNR', 'BTU', 'ARLP', 'AMR', 'NRP', 'METC', 'METCB', 'HNRG', 'NC', 'AREC')),
      industry.new('Commercial Printing/Forms', array.from('WMG', 'BZ', 'CMPO', 'CMPR', 'DLX', 'EBF', 'ANPA', 'QUAD', 'TZOO', 'LVO', 'DSS', 'CRE', 'IPDN')),
      industry.new('Computer Communications', array.from('RDWR', 'ALLT', 'SMRT', 'GNSS', 'SILC', 'SPCB', 'MSAI', 'FIEE', 'DTSS', 'PCLA', 'UUU', 'SYNX', 'OBLG', 'ASNS')),
@@ -53,28 +53,28 @@ var indArr = array.from(
      industry.new('Consumer Sundries', array.from('CENT', 'CENTA', 'DOGZ', 'FMFC')),
      industry.new('Containers/Packaging', array.from('AMCR', 'SW', 'PKG', 'BALL', 'CCK', 'OC', 'ATR', 'SEE', 'GPK', 'SLGN', 'SON', 'GEF.B', 'GEF', 'AMBP', 'OI', 'TRS', 'KRT', 'PACK', 'YYAI', 'MGIH', 'ITP')),
      industry.new('Contract Drilling', array.from('SLB', 'BKR', 'NE', 'RIG', 'VAL', 'HP', 'PTEN', 'SDRL', 'BORR', 'PDS', 'NBR')),
-     industry.new('Data Processing Services', array.from('MSCI', 'PAYX', 'VRSK', 'TYL', 'GDDY', 'J', 'IREN', 'AKAM', 'FDS', 'CIFR', 'DBX', 'APLD', 'GDS', 'EXLS', 'WULF', 'KD', 'CORZ', 'HUT', 'MARA', 'CLSK', 'ABTC', 'KC', 'JOYY', 'BTDR', 'VNET', 'DXC', 'CSGS', 'BITF', 'INOD', 'GLIBA', 'GLIBK', 'YEXT', 'CTEV', 'WYFI', 'FVRR', 'FRGE', 'FUFU', 'TTGT', 'DGXX')),
+     industry.new('Data Processing Services', array.from('MSCI', 'PAYX', 'VRSK', 'TYL', 'GDDY', 'J', 'IREN', 'AKAM', 'FDS', 'CIFR', 'DBX', 'APLD', 'GDS', 'EXLS', 'WULF', 'KD', 'CORZ', 'HUT', 'MARA', 'CLSK', 'ABTC', 'KC', 'JOYY', 'BTDR', 'VNET', 'DXC', 'CSGS', 'BITF', 'INOD', 'GLIBA', 'GLIBK', 'YEXT', 'CTEV', 'WYFI', 'FVRR', 'FRGE', 'FUFU', 'TTGT')),
      industry.new('Department Stores', array.from('PDD', 'DDS', 'OLLI', 'M', 'KSS', 'PSQH')),
      industry.new('Discount Stores', array.from('DG', 'DLTR', 'FIVE')),
      industry.new('Drugstore Chains', array.from('CVS', 'GRDN')),
-     industry.new('Electric Utilities', array.from('NEE', 'CEG', 'SO', 'DUK', 'NGG', 'AEP', 'VST', 'D', 'XEL', 'EXC', 'ETR', 'PEG', 'WEC', 'ED', 'PCG', 'NRG', 'AEE', 'DTE', 'AXIA', 'AXIA/P', 'FE', 'PPL', 'FTS', 'CNP', 'ES', 'CMS', 'KEP', 'EIX', 'LNT', 'EVRG', 'EMA', 'PNW', 'AES', 'OGE', 'BEP', 'ELP', 'ELPC', 'IDA', 'ORA')),
-     industry.new('Electrical Products', array.from('GEV', 'ETN', 'AME', 'ROK', 'HUBB', 'LITE', 'APTV', 'AYI', 'RRX', 'GNRC', 'QS', 'SMR', 'ENS', 'BDC', 'EOSE', 'POWL', 'FLNC', 'ATKR', 'SEDG', 'ENVX', 'NNE', 'AMPX', 'AMSC', 'THR', 'MVST', 'SLDP', 'ALNT', 'BLDP', 'TE', 'SES', 'ADSE', 'POET', 'NPWR', 'NRGV', 'EAF', 'INVZ', 'SKYX', 'ELVA', 'TGEN')),
+     industry.new('Electric Utilities', array.from('NEE', 'CEG', 'SO', 'DUK', 'NGG', 'AEP', 'VST', 'D', 'XEL', 'EXC', 'ETR', 'PEG', 'WEC', 'ED', 'PCG', 'NRG', 'AEE', 'DTE', 'AXIA', 'AXIA/P', 'FE', 'PPL', 'FTS', 'CNP', 'ES', 'CMS', 'KEP', 'EIX', 'LNT', 'EVRG', 'EMA', 'PNW', 'AES', 'OGE', 'BEP', 'ELP', 'ELPC', 'IDA')),
+     industry.new('Electrical Products', array.from('GEV', 'ETN', 'AME', 'ROK', 'HUBB', 'LITE', 'APTV', 'AYI', 'RRX', 'GNRC', 'QS', 'SMR', 'ENS', 'BDC', 'EOSE', 'POWL', 'FLNC', 'ATKR', 'SEDG', 'ENVX', 'NNE', 'AMPX', 'AMSC', 'THR', 'MVST', 'SLDP', 'ALNT', 'BLDP', 'TE', 'SES', 'ADSE', 'POET', 'NPWR', 'NRGV', 'EAF', 'INVZ', 'SKYX', 'ELVA')),
      industry.new('Electronic Components', array.from('APH', 'GLW', 'CLS', 'NVT', 'TTMI', 'CAMT', 'VICR', 'KN', 'BELFB', 'BELFA', 'RXST', 'VPG', 'LPTH', 'MEI', 'SENS', 'ESP', 'OPXS', 'BURU', 'RFIL', 'OPTX', 'ELTK', 'CCTG', 'POAS')),
-     industry.new('Electronic Equipment/Instruments', array.from('EMR', 'KEYS', 'FTV', 'Q', 'NXT', 'NVMI', 'ONTO', 'CGNX', 'RAL', 'ESE', 'ST', 'ITRI', 'NOVT', 'SXI', 'MTRN', 'DBD', 'PAR', 'EVLV', 'BW', 'TRNS', 'USBC', 'UMAC', 'NVX', 'FCEL', 'VUZI', 'SLNH', 'INTT', 'LASE', 'LAZR', 'FEMY', 'WBX', 'ACFN', 'PRZO', 'WETH', 'ELSE', 'MCTR', 'WLDS', 'CLWT', 'POLA')),
+     industry.new('Electronic Equipment/Instruments', array.from('EMR', 'KEYS', 'FTV', 'Q', 'NXT', 'NVMI', 'ONTO', 'CGNX', 'RAL', 'ESE', 'ST', 'ITRI', 'NOVT', 'SXI', 'MTRN', 'DBD', 'PAR', 'EVLV', 'BW', 'TRNS', 'USBC', 'UMAC', 'NVX', 'FCEL', 'VUZI', 'SLNH', 'INTT', 'LASE', 'LAZR', 'FEMY', 'WBX', 'ACFN', 'PRZO', 'WETH', 'ELSE', 'MCTR', 'WLDS', 'CLWT')),
      industry.new('Electronic Production Equipment', array.from('VRT', 'TER', 'BE', 'FLEX', 'SANM', 'AEIS', 'LFUS', 'OLED', 'LPL', 'PLXS', 'PLUG', 'VSH', 'VECO', 'BHE', 'PLAB', 'CTS', 'KE', 'AEHR', 'DVLT', 'AXTI', 'MPTI', 'RELL', 'TYGO', 'AMPG', 'LGL', 'CVV', 'LNKS', 'IMTE')),
      industry.new('Electronics Distributors', array.from('SNX', 'ARW', 'REZI', 'AVT', 'SCSC', 'CLMB', 'AENT', 'FOXX', 'RCON', 'TAIT')),
      industry.new('Electronics/Appliance Stores', array.from('BBY', 'GME', 'PLBL', 'RERE')),
      industry.new('Electronics/Appliances', array.from('SN', 'WHR', 'SONO', 'IMAX', 'SPB', 'RR', 'OWLT', 'GPRO', 'TBCH', 'HBB', 'VIOT', 'COOK', 'YIBO', 'IRBT', 'ODYS', 'KOSS', 'UEIC', 'MTEK', 'CLRO', 'FEBO', 'MITQ', 'RAY')),
-     industry.new('Engineering & Construction', array.from('PWR', 'FER', 'OTIS', 'FIX', 'EME', 'MTZ', 'APG', 'ACM', 'BLD', 'STN', 'STRL', 'DY', 'TTEK', 'IESC', 'IBP', 'FLR', 'PRIM', 'ROAD', 'AGX', 'LGN', 'GVA', 'ECG', 'VSEC', 'EXPO', 'TPC', 'MYRG', 'BBUC', 'IHS', 'FBYD', 'AMRC', 'GLDD', 'BWMN', 'ORN', 'MG', 'MTRX', 'BBCP', 'PHOE', 'MAGH', 'SLND')),
+     industry.new('Engineering & Construction', array.from('PWR', 'FER', 'OTIS', 'FIX', 'EME', 'MTZ', 'APG', 'ACM', 'BLD', 'STN', 'STRL', 'DY', 'TTEK', 'IESC', 'IBP', 'FLR', 'PRIM', 'ROAD', 'AGX', 'LGN', 'GVA', 'ECG', 'VSEC', 'EXPO', 'TPC', 'MYRG', 'BBUC', 'IHS', 'FBYD', 'AMRC', 'GLDD', 'BWMN', 'ORN', 'MG', 'MTRX', 'BBCP', 'PHOE', 'MAGH')),
      industry.new('Environmental Services', array.from('WM', 'RSG', 'WCN', 'GFL', 'CLH', 'CWST', 'PCT', 'NVRI', 'YDDL', 'PESI', 'ALTS', 'ESGL', 'SCWO', 'QRHC', 'DXST', 'AWX')),
-     industry.new('Finance/Rental/Leasing', array.from('V', 'MA', 'AXP', 'RKT', 'URI', 'SOFI', 'IX', 'SYF', 'AER', 'AFRM', 'KSPI', 'UHAL.B', 'UHAL', 'UWMC', 'FIGR', 'OMF', 'AL', 'PFSI', 'FCFS', 'OBDC', 'OTF', 'SLM', 'CACC', 'CAR', 'NNI', 'HRI', 'UPST', 'WSC', 'ENVA', 'BFH', 'MGRC', 'QFIN', 'LU', 'WD', 'BUR', 'AGM', 'AGM.A', 'HTZ', 'CTOS')),
-     industry.new('Financial Conglomerates', array.from('RPRX', 'BMNR', 'MAIN', 'KYIV', 'JCAP', 'IGIC', 'BCSF', 'CCCX', 'MTA', 'BEAG', 'CEPF', 'EVAC', 'BCSS', 'AEXA', 'TCPC', 'RMR', 'KRSP', 'FTW', 'AAM', 'GTEN', 'ANSC', 'MBVI', 'BCAR', 'KFII', 'APXT', 'NPAC', 'CCIX', 'GPAT', 'TACO', 'RDAG', 'ALF', 'MBAV', 'WENN', 'FCRS', 'BACQ', 'SDHI', 'CAEP', 'CCII', 'TACH')),
+     industry.new('Finance/Rental/Leasing', array.from('V', 'MA', 'AXP', 'RKT', 'URI', 'SOFI', 'IX', 'SYF', 'AER', 'AFRM', 'KSPI', 'UHAL.B', 'UHAL', 'UWMC', 'FIGR', 'OMF', 'AL', 'PFSI', 'FCFS', 'OBDC', 'OTF', 'SLM', 'CACC', 'CAR', 'NNI', 'HRI', 'UPST', 'WSC', 'ENVA', 'BFH', 'MGRC', 'QFIN', 'LU', 'WD', 'BUR', 'AGM', 'AGM.A', 'HTZ')),
+     industry.new('Financial Conglomerates', array.from('RPRX', 'BMNR', 'MAIN', 'KYIV', 'JCAP', 'IGIC', 'BCSF', 'CCCX', 'MTA', 'BEAG', 'CEPF', 'EVAC', 'BCSS', 'AEXA', 'TCPC', 'RMR', 'KRSP', 'FTW', 'AAM', 'GTEN', 'ANSC', 'MBVI', 'BCAR', 'KFII', 'APXT', 'NPAC', 'CCIX', 'GPAT', 'TACO', 'RDAG', 'ALF', 'MBAV', 'WENN', 'FCRS', 'BACQ', 'SDHI', 'CAEP', 'CCII')),
      industry.new('Financial Publishing/Services', array.from('SPGI', 'MCO', 'FICO', 'EFX', 'TRU')),
      industry.new('Food Distributors', array.from('SYY', 'USFD', 'CHEF', 'UNFI', 'DOLE', 'DNUT', 'WILC', 'AGCC', 'HFFG', 'EPSM', 'DTCK', 'TWG')),
      industry.new('Food Retail', array.from('KR', 'ACI', 'SFM', 'TBBB', 'WMK', 'IMKTA', 'GO', 'NGVC', 'ARKO', 'VLGEA', 'DDL', 'MSS', 'HCWC', 'WBUY')),
      industry.new('Food/ Major Diversified', array.from('KHC', 'GIS', 'CAG', 'CHA', 'SMPL', 'HLF', 'BYND', 'OTLY', 'BGS', 'ABVE', 'HAIN', 'ORIS')),
      industry.new('Food/ Meat/Fish/Dairy', array.from('TSN', 'JBS', 'HRL', 'SFD', 'MAMA', 'LWAY', 'WYHG', 'BTOG', 'STKH')),
-     industry.new('Food/ Specialty/Candy', array.from('PEP', 'MDLZ', 'HSY', 'K', 'MKC', 'MKC.V', 'IFF', 'SJM', 'CPB', 'LW', 'INGR', 'DAR', 'POST', 'BCPC', 'MZTI', 'SXT', 'COCO', 'FRPT', 'TR', 'ASH', 'FLO', 'NOMD', 'JJSF', 'UTZ', 'THS', 'JBSS', 'SENEB', 'SENEA', 'STKL', 'WEST', 'BRCC', 'BRID', 'BOF', 'IMG', 'FARM', 'LSF', 'PLAG', 'JVA', 'CHSN')),
+     industry.new('Food/ Specialty/Candy', array.from('PEP', 'MDLZ', 'HSY', 'K', 'MKC', 'MKC.V', 'IFF', 'SJM', 'CPB', 'LW', 'INGR', 'DAR', 'POST', 'BCPC', 'MZTI', 'SXT', 'COCO', 'FRPT', 'TR', 'ASH', 'FLO', 'NOMD', 'JJSF', 'UTZ', 'THS', 'JBSS', 'SENEB', 'SENEA', 'STKL', 'WEST', 'BRCC', 'BRID', 'BOF', 'IMG', 'FARM', 'LSF', 'PLAG', 'JVA')),
      industry.new('Forest Products', array.from('LPX', 'UFPI', 'WFG', 'TREX', 'JELD', 'NWGL')),
      industry.new('Gas Distributors', array.from('SRE', 'TRGP', 'ATO', 'CQP', 'NI', 'SWX', 'BKH', 'BIPC', 'SR', 'OGS', 'TGS', 'NJR', 'CSAN', 'MDU', 'CPK', 'EE', 'CTRI', 'NWN', 'CLNE', 'NFE', 'RGCO')),
      industry.new('Home Furnishings', array.from('SGI', 'LZB', 'ARHS', 'MBC', 'LEG', 'ETD', 'HELE', 'XWIN', 'FLXS', 'LOVE', 'BSET', 'HOFT', 'SNBR', 'PRPL', 'LCUT', 'REFR', 'CRWS', 'LIVE', 'NTZ', 'LBGJ')),
@@ -84,62 +84,62 @@ var indArr = array.from(
      industry.new('Hotels/Resorts/Cruise lines', array.from('MAR', 'RCL', 'ABNB', 'HLT', 'CUK', 'CCL', 'VIK', 'IHG', 'H', 'HTHT', 'NCLH', 'RRR', 'WH', 'ATAT', 'MTN', 'TNL', 'CHH', 'MLCO', 'MCRI', 'TH', 'LIND', 'CVEO', 'GHG', 'MRNO', 'INTG')),
      industry.new('Household/Personal Care', array.from('PG', 'UL', 'CL', 'KMB', 'EL', 'KVUE', 'CHD', 'CLX', 'REYN', 'ELF', 'COTY', 'IPAR', 'ENR', 'EPC', 'OLPX', 'YSG', 'NUS', 'WALD', 'SLSN', 'GROV', 'AXIL', 'NHTC', 'BYAH', 'NITO')),
      industry.new('Industrial Conglomerates', array.from('MMM', 'RLX', 'HI', 'ISPR')),
-     industry.new('Industrial Machinery', array.from('AMAT', 'LRCX', 'PH', 'TT', 'JCI', 'SYM', 'CARR', 'XYL', 'IR', 'DOV', 'VLTO', 'JBL', 'WWD', 'PNR', 'LII', 'OKLO', 'GGG', 'NDSN', 'LECO', 'IEX', 'ENTG', 'MKSI', 'WTS', 'GTLS', 'FLS', 'MOD', 'ZWS', 'AAON', 'JBTM', 'ESAB', 'MIDD', 'GTES', 'TKR', 'BMI', 'NPO', 'ALH', 'FELE', 'MWA', 'KAI')),
+     industry.new('Industrial Machinery', array.from('AMAT', 'LRCX', 'PH', 'TT', 'JCI', 'SYM', 'CARR', 'XYL', 'IR', 'DOV', 'VLTO', 'JBL', 'WWD', 'PNR', 'LII', 'OKLO', 'GGG', 'NDSN', 'LECO', 'IEX', 'ENTG', 'MKSI', 'WTS', 'GTLS', 'FLS', 'MOD', 'ZWS', 'AAON', 'JBTM', 'ESAB', 'MIDD', 'GTES', 'TKR', 'BMI', 'NPO', 'ALH', 'FELE', 'MWA')),
      industry.new('Industrial Specialties', array.from('SHW', 'PPG', 'RPM', 'AXTA', 'CSW', 'AZZ', 'FUL', 'WDFC', 'OLN', 'UFPT', 'MATV', 'OPAL', 'ASPN', 'MNTK', 'VGAS', 'NTIC', 'APT', 'GAUZ')),
-     industry.new('Information Technology Services', array.from('IBM', 'ACN', 'INFY', 'NET', 'FTNT', 'WDAY', 'CTSH', 'WIT', 'CRDO', 'BR', 'HPQ', 'SSNC', 'GIB', 'CDW', 'GWRE', 'CACI', 'RBRK', 'BSY', 'EPAM', 'PEGA', 'PSN', 'DOX', 'APPF', 'NICE', 'RIOT', 'WK', 'KBR', 'INGM', 'QTWO', 'BOX', 'VIAV', 'SAIC', 'SEI', 'XMTR', 'GLOB', 'NSIT', 'HTFL', 'QUBT', 'FORTY')),
+     industry.new('Information Technology Services', array.from('IBM', 'ACN', 'INFY', 'NET', 'FTNT', 'WDAY', 'CTSH', 'WIT', 'CRDO', 'BR', 'HPQ', 'SSNC', 'GIB', 'CDW', 'GWRE', 'CACI', 'RBRK', 'BSY', 'EPAM', 'PEGA', 'PSN', 'DOX', 'APPF', 'NICE', 'RIOT', 'WK', 'KBR', 'INGM', 'QTWO', 'BOX', 'VIAV', 'SAIC', 'SEI', 'XMTR', 'GLOB', 'NSIT', 'HTFL', 'QUBT')),
      industry.new('Insurance Brokers/Services', array.from('MMC', 'AON', 'AJG', 'WTW', 'BRO', 'RYAN', 'CRVL', 'NP', 'GSHD', 'TWFG', 'ROOT', 'WDH', 'CRD.A', 'CRD.B', 'KINS', 'GOCO', 'HUIZ', 'ZBAO', 'TIRX', 'RELI')),
-     industry.new('Integrated Oil', array.from('XOM', 'CVX', 'SHEL', 'TTE', 'BP', 'PBR', 'PBR.A', 'CNQ', 'EOG', 'EQNR', 'SU', 'IMO', 'OXY', 'EQT', 'CVE', 'EXE', 'DVN', 'EC', 'CTRA', 'YPF', 'PR', 'OVV', 'APA', 'NFG', 'HESM', 'CHRD', 'MTDR', 'CRC', 'BTE', 'CIVI', 'BKV', 'CRGY', 'MNR', 'DEC', 'INR', 'TXO', 'SOC', 'REPX', 'GFR')),
+     industry.new('Integrated Oil', array.from('XOM', 'CVX', 'SHEL', 'TTE', 'BP', 'PBR', 'PBR.A', 'CNQ', 'EOG', 'EQNR', 'SU', 'IMO', 'OXY', 'EQT', 'CVE', 'EXE', 'DVN', 'EC', 'CTRA', 'YPF', 'PR', 'OVV', 'APA', 'NFG', 'HESM', 'CHRD', 'MTDR', 'CRC', 'BTE', 'CIVI', 'BKV', 'CRGY', 'MNR', 'DEC', 'INR', 'TXO', 'SOC', 'REPX')),
      industry.new('Internet Retail', array.from('AMZN', 'BABA', 'MELI', 'SE', 'CPNG', 'JD', 'EBAY', 'CHWY', 'VIPS', 'GLBE', 'ETSY', 'RVLV', 'REAL', 'NEGG', 'LUXE', 'GIC', 'WOOF', 'TDUP', 'LQDT', 'AHG', 'GRPN', 'BBBY', 'FLWS', 'DIBS', 'BZUN', 'AKA', 'DLTH', 'HOUR', 'RENT', 'LVLU', 'IZM', 'TKLF', 'IPW', 'LUCY', 'ATER', 'BQ', 'WNW')),
-     industry.new('Internet Software/Services', array.from('GOOGL', 'GOOG', 'META', 'NFLX', 'SPOT', 'TRI', 'MSTR', 'BIDU', 'RDDT', 'FWONA', 'FWONK', 'CSGP', 'TME', 'VRSN', 'CHKP', 'RBA', 'ZG', 'Z', 'PINS', 'IT', 'MTCH', 'LLYVK', 'LLYVA', 'MMYT', 'STUB', 'CARG', 'ARX', 'BRZE', 'RUM', 'ATHM', 'IAC', 'GENI', 'MRX', 'WB', 'GRND', 'IQ', 'YELP', 'WBTN', 'JMIA')),
-     industry.new('Investment Banks/Brokers', array.from('GS', 'SCHW', 'HOOD', 'IBKR', 'CME', 'ICE', 'BCS', 'BK', 'COIN', 'DB', 'NDAQ', 'AMP', 'STT', 'LPLA', 'CBOE', 'TW', 'FUTU', 'NMR', 'HLI', 'EVR', 'JEF', 'GLXY', 'XP', 'PJT', 'FRHC', 'MKTX', 'PIPR', 'VIRT', 'MC', 'LAZ', 'SNEX', 'BGC', 'MIAX', 'TIGR', 'GEMI', 'AMTD', 'BRBI', 'AXG', 'OPY')),
-     industry.new('Investment Managers', array.from('MS', 'BX', 'BLK', 'UBS', 'BN', 'KKR', 'BAM', 'APO', 'ARES', 'RJF', 'NTRS', 'OWL', 'TROW', 'TPG', 'CG', 'PFG', 'ARCC', 'SF', 'BEN', 'IVZ', 'SEIC', 'HQY', 'MORN', 'AMG', 'STEP', 'CIGI', 'HLNE', 'JHG', 'HASI', 'VCTR', 'FHI', 'AB', 'GBDC', 'APAM', 'CNS', 'HTGC', 'PAX', 'SII', 'GCMG')),
-     industry.new('Investment Trusts/Mutual Funds', array.from('TPL', 'VNOM', 'BXSL', 'FSK', 'BSM', 'TSLX', 'WT', 'KRP', 'CSWC', 'OCSL', 'SBR', 'GSBD', 'TRIN', 'DMLP', 'BBDC', 'ASST', 'CGBD', 'PFLT', 'SLRC', 'PBT', 'FDUS', 'MSIF', 'GAIN', 'CION', 'GLAD', 'PSBD', 'SCM', 'SJT', 'TPVG', 'SSSS', 'BCIC', 'WHF', 'OXSQ', 'MRCC', 'GECC', 'PFX', 'OFS', 'PVL', 'NRT')),
+     industry.new('Internet Software/Services', array.from('GOOGL', 'GOOG', 'META', 'NFLX', 'SPOT', 'TRI', 'MSTR', 'BIDU', 'RDDT', 'FWONA', 'FWONK', 'CSGP', 'TME', 'VRSN', 'CHKP', 'RBA', 'ZG', 'Z', 'PINS', 'IT', 'MTCH', 'LLYVK', 'LLYVA', 'MMYT', 'STUB', 'CARG', 'ARX', 'BRZE', 'RUM', 'ATHM', 'IAC', 'GENI', 'MRX', 'WB', 'GRND', 'IQ', 'YELP', 'WBTN')),
+     industry.new('Investment Banks/Brokers', array.from('GS', 'SCHW', 'HOOD', 'IBKR', 'CME', 'ICE', 'BCS', 'BK', 'COIN', 'DB', 'NDAQ', 'AMP', 'STT', 'LPLA', 'CBOE', 'TW', 'FUTU', 'NMR', 'HLI', 'EVR', 'JEF', 'GLXY', 'XP', 'PJT', 'FRHC', 'MKTX', 'PIPR', 'VIRT', 'MC', 'LAZ', 'SNEX', 'BGC', 'MIAX', 'TIGR', 'GEMI', 'AMTD', 'BRBI', 'AXG')),
+     industry.new('Investment Managers', array.from('MS', 'BX', 'BLK', 'UBS', 'BN', 'KKR', 'BAM', 'APO', 'ARES', 'RJF', 'NTRS', 'OWL', 'TROW', 'TPG', 'CG', 'PFG', 'ARCC', 'SF', 'BEN', 'IVZ', 'SEIC', 'HQY', 'MORN', 'AMG', 'STEP', 'CIGI', 'HLNE', 'JHG', 'HASI', 'VCTR', 'FHI', 'AB', 'GBDC', 'APAM', 'CNS', 'HTGC', 'PAX', 'SII')),
+     industry.new('Investment Trusts/Mutual Funds', array.from('TPL', 'VNOM', 'BXSL', 'FSK', 'BSM', 'TSLX', 'WT', 'KRP', 'CSWC', 'OCSL', 'SBR', 'GSBD', 'TRIN', 'DMLP', 'BBDC', 'ASST', 'CGBD', 'PFLT', 'SLRC', 'PBT', 'FDUS', 'MSIF', 'GAIN', 'CION', 'GLAD', 'PSBD', 'SCM', 'SJT', 'TPVG', 'SSSS', 'BCIC', 'WHF', 'OXSQ', 'MRCC', 'GECC', 'PFX', 'OFS', 'PVL')),
      industry.new('Life/Health Insurance', array.from('PRU', 'CRBG', 'EQH', 'RGA', 'PRI', 'VOYA', 'JXN', 'BHF', 'PRVA', 'CLOV', 'CIA', 'EHTH')),
-     industry.new('Major Banks', array.from('JPM', 'BAC', 'WFC', 'HSBC', 'RY', 'C', 'MUFG', 'HDB', 'SAN', 'TD', 'COF', 'BBVA', 'SMFG', 'BMO', 'MFG', 'BNS', 'ITUB', 'ING', 'PNC', 'LYG', 'NWG', 'BBDO', 'BBD', 'HBAN', 'SHG', 'BSBR', 'CFG', 'RF', 'BAP', 'KEY', 'BCH', 'WF', 'CMA', 'ONB', 'UMBF', 'ZION', 'CADE', 'BOKF', 'VLY')),
+     industry.new('Major Banks', array.from('JPM', 'BAC', 'WFC', 'HSBC', 'RY', 'C', 'MUFG', 'HDB', 'SAN', 'TD', 'COF', 'BBVA', 'SMFG', 'BMO', 'MFG', 'BNS', 'ITUB', 'ING', 'PNC', 'LYG', 'NWG', 'BBDO', 'BBD', 'HBAN', 'SHG', 'BSBR', 'CFG', 'RF', 'BAP', 'KEY', 'BCH', 'WF', 'CMA', 'ONB', 'UMBF', 'ZION', 'CADE', 'BOKF')),
      industry.new('Major Telecommunications', array.from('CHT', 'BCE', 'FYBR', 'LUMN', 'KT', 'TEO', 'LBTYB', 'LBTYK', 'LBTYA', 'LILAK', 'LILA', 'TV', 'IDT', 'CCOI', 'OPTU', 'SHEN', 'WOW', 'ATNI', 'OOMA', 'ELWT')),
      industry.new('Managed Health Care', array.from('UNH', 'ELV', 'CI', 'HUM', 'CNC', 'MOH', 'OSCR', 'ALHC', 'TBRG')),
-     industry.new('Marine Shipping', array.from('KEX', 'FRO', 'MATX', 'HAFN', 'STNG', 'CMBT', 'INSW', 'TDW', 'ZIM', 'SBLK', 'TRMD', 'DHT', 'TNK', 'BWLP', 'CMRE', 'DAC', 'NMM', 'FLNG', 'ECO', 'GSL', 'NVGS', 'CCEC', 'SFL', 'LPG', 'TK', 'GNK', 'NAT', 'TEN', 'SB', 'ASC', 'HSHP', 'ESEA', 'CMDB', 'KNOP', 'GASS', 'SHIP', 'IMPP', 'DSX', 'DLNG')),
+     industry.new('Marine Shipping', array.from('KEX', 'FRO', 'MATX', 'HAFN', 'STNG', 'CMBT', 'INSW', 'TDW', 'ZIM', 'SBLK', 'TRMD', 'DHT', 'TNK', 'BWLP', 'CMRE', 'DAC', 'NMM', 'FLNG', 'ECO', 'GSL', 'NVGS', 'CCEC', 'SFL', 'LPG', 'TK', 'GNK', 'NAT', 'TEN', 'SB', 'ASC', 'HSHP', 'ESEA', 'CMDB', 'KNOP', 'GASS', 'SHIP', 'IMPP', 'DSX')),
      industry.new('Media Conglomerates', array.from('SPHR', 'THH', 'FTRK')),
      industry.new('Medical Distributors', array.from('MCK', 'COR', 'CAH', 'HSIC', 'POM', 'WGRX', 'MYO', 'YI', 'RDGT', 'JWEL')),
-     industry.new('Medical Specialties', array.from('ABT', 'TMO', 'ISRG', 'DHR', 'BSX', 'SYK', 'MDT', 'IDXX', 'BDX', 'EW', 'A', 'ALC', 'RMD', 'GEHC', 'MTD', 'PHG', 'STE', 'DXCM', 'WAT', 'PODD', 'WST', 'ILMN', 'ZBH', 'EXAS', 'HOLX', 'COO', 'SNN', 'GMED', 'RVTY', 'PEN', 'ALGN', 'QGEN', 'BAX', 'BIO', 'BIO.B', 'AVTR', 'MASI', 'BRKR', 'STVN')),
-     industry.new('Medical/Nursing Services', array.from('LH', 'SOLV', 'GH', 'FMS', 'EHC', 'ENSG', 'HIMS', 'DVA', 'BTSG', 'RDNT', 'BLLN', 'OPCH', 'WGS', 'CON', 'LFST', 'ADUS', 'MD', 'AVAH', 'AZTA', 'ACHC', 'NEO', 'TDOC', 'USPH', 'OPK', 'PNTG', 'PSNL', 'FLGT', 'NUTX', 'SNDA', 'TALK', 'DNA', 'EHAB', 'SRTA', 'AUNA', 'TOI', 'AGL', 'BNR', 'NAKA', 'LFMD')),
+     industry.new('Medical Specialties', array.from('ABT', 'TMO', 'ISRG', 'DHR', 'BSX', 'SYK', 'MDT', 'IDXX', 'BDX', 'EW', 'A', 'ALC', 'RMD', 'GEHC', 'MTD', 'PHG', 'STE', 'DXCM', 'WAT', 'PODD', 'WST', 'ILMN', 'ZBH', 'EXAS', 'HOLX', 'COO', 'SNN', 'GMED', 'RVTY', 'PEN', 'ALGN', 'QGEN', 'BAX', 'BIO', 'BIO.B', 'AVTR', 'MASI', 'BRKR')),
+     industry.new('Medical/Nursing Services', array.from('LH', 'SOLV', 'GH', 'FMS', 'EHC', 'ENSG', 'HIMS', 'DVA', 'BTSG', 'RDNT', 'BLLN', 'OPCH', 'WGS', 'CON', 'LFST', 'ADUS', 'MD', 'AVAH', 'AZTA', 'ACHC', 'NEO', 'TDOC', 'USPH', 'OPK', 'PNTG', 'PSNL', 'FLGT', 'NUTX', 'SNDA', 'TALK', 'DNA', 'EHAB', 'SRTA', 'AUNA', 'TOI', 'AGL', 'BNR', 'NAKA')),
      industry.new('Metal Fabrication', array.from('RBC', 'MLI', 'VMI', 'USAR', 'ROCK', 'IIIN', 'ZEUS', 'ASTL', 'PKOH', 'NL', 'CIX', 'ZJK', 'GIFI', 'HLP', 'NNBR', 'CPSH', 'SGBX', 'CVR', 'ATXG')),
      industry.new('Miscellaneous', array.from('LMB', 'PANL', 'INV', 'ALPS', 'YOUL', 'TWNP', 'GAME', 'DAIC', 'DSY')),
-     industry.new('Miscellaneous Commercial Services', array.from('SHOP', 'RELX', 'PYPL', 'XYZ', 'FISV', 'ROL', 'CPAY', 'ULS', 'GPN', 'MEDP', 'ICLR', 'RTO', 'KLAR', 'BAH', 'CRL', 'CAE', 'G', 'TAL', 'ADT', 'FOUR', 'BFAM', 'WEX', 'FCN', 'MMS', 'BCO', 'LAUR', 'LOPE', 'LB', 'STNE', 'PAY', 'PAGS', 'MH', 'EEFT', 'BBU', 'HURN', 'TNET', 'RELY', 'CBZ', 'ABM')),
+     industry.new('Miscellaneous Commercial Services', array.from('SHOP', 'RELX', 'PYPL', 'XYZ', 'FISV', 'ROL', 'CPAY', 'ULS', 'GPN', 'MEDP', 'ICLR', 'RTO', 'KLAR', 'BAH', 'CRL', 'CAE', 'G', 'TAL', 'ADT', 'FOUR', 'BFAM', 'WEX', 'FCN', 'MMS', 'BCO', 'LAUR', 'LOPE', 'LB', 'STNE', 'PAY', 'PAGS', 'MH', 'EEFT', 'BBU', 'HURN', 'TNET', 'RELY', 'CBZ')),
      industry.new('Miscellaneous Manufacturing', array.from('WMS', 'AWI', 'BRC', 'YETI', 'LCII', 'DAKT', 'SWIM', 'MATW', 'MYE', 'OFLX', 'CAPT', 'YHGJ', 'HIHO')),
-     industry.new('Motor Vehicles', array.from('TSLA', 'TM', 'RACE', 'GM', 'F', 'HMC', 'STLA', 'XPEV', 'RIVN', 'LI', 'NIO', 'OSK', 'VFS', 'FSS', 'ZK', 'LCID', 'HOG', 'REVG', 'BLBD', 'PSNY', 'PSNYW', 'AEBI', 'LOT', 'MLR', 'NIU', 'AIIO', 'FFAI', 'EMPD', 'DPRO', 'SEV', 'SCAG', 'KNDI', 'GGR', 'XOS', 'WKHS', 'CENN', 'UCAR', 'SSM', 'FLYE')),
-     industry.new('Movies/Entertainment', array.from('DIS', 'TKO', 'LYV', 'DKNG', 'CHDN', 'MSGS', 'CNK', 'MANU', 'BATRA', 'BATRK', 'MSGE', 'LION', 'PRKS', 'FUN', 'AMC', 'LUCK', 'PRSU', 'ACEL', 'ANGX', 'GDEN', 'PLAY', 'MCS', 'VENU', 'CDRO', 'CURI', 'SEG', 'SLMT', 'STRZ', 'NOMA', 'SEAT', 'CPHC', 'AGH', 'RDIB', 'CNVS', 'RDI', 'UONEK', 'UONE', 'TOON', 'AGAE')),
-     industry.new('Multi-Line Insurance', array.from('PGR', 'MFC', 'AFL', 'ALL', 'MET', 'AIG', 'PUK', 'ACGL', 'SLF', 'WRB', 'CINF', 'BNT', 'UNM', 'CNA', 'AEG', 'GL', 'KNSL', 'AXS', 'LNC', 'RLI', 'ACT', 'WTM', 'FG', 'CNO', 'GNW', 'AHL', 'BWIN', 'HG', 'FIHL', 'SKWD', 'TRUP', 'BOW', 'DGICA', 'DGICB', 'KFS', 'NODK', 'JRVR', 'SLQT', 'AAME')),
+     industry.new('Motor Vehicles', array.from('TSLA', 'TM', 'RACE', 'GM', 'F', 'HMC', 'STLA', 'XPEV', 'RIVN', 'LI', 'NIO', 'OSK', 'VFS', 'FSS', 'ZK', 'LCID', 'HOG', 'REVG', 'BLBD', 'PSNY', 'PSNYW', 'AEBI', 'LOT', 'MLR', 'NIU', 'AIIO', 'FFAI', 'EMPD', 'DPRO', 'SEV', 'SCAG', 'KNDI', 'GGR', 'XOS', 'WKHS', 'CENN', 'UCAR', 'SSM')),
+     industry.new('Movies/Entertainment', array.from('DIS', 'TKO', 'LYV', 'DKNG', 'CHDN', 'MSGS', 'CNK', 'MANU', 'BATRA', 'BATRK', 'MSGE', 'LION', 'PRKS', 'FUN', 'AMC', 'LUCK', 'PRSU', 'ACEL', 'ANGX', 'GDEN', 'PLAY', 'MCS', 'VENU', 'CDRO', 'CURI', 'SEG', 'SLMT', 'STRZ', 'NOMA', 'SEAT', 'CPHC', 'AGH', 'RDIB', 'CNVS', 'RDI', 'UONEK', 'UONE', 'TOON')),
+     industry.new('Multi-Line Insurance', array.from('PGR', 'MFC', 'AFL', 'ALL', 'MET', 'AIG', 'PUK', 'ACGL', 'SLF', 'WRB', 'CINF', 'BNT', 'UNM', 'CNA', 'AEG', 'GL', 'KNSL', 'AXS', 'LNC', 'RLI', 'ACT', 'WTM', 'FG', 'CNO', 'GNW', 'AHL', 'BWIN', 'HG', 'FIHL', 'SKWD', 'TRUP', 'BOW', 'DGICA', 'DGICB', 'KFS', 'NODK', 'JRVR', 'SLQT')),
      industry.new('Office Equipment/Supplies', array.from('HNI', 'SCS', 'MLKN', 'ACCO', 'VIRC')),
      industry.new('Oil & Gas Pipelines', array.from('ENB', 'WMB', 'EPD', 'KMI', 'ET', 'TRP', 'MPLX', 'OKE', 'LNG', 'PBA', 'VG', 'WES', 'PAA', 'DTM', 'AM', 'SOBO', 'KNTK', 'GLNG', 'PAGP', 'DKL', 'SUNC', 'NGL', 'CLCO', 'SMC', 'MMLP', 'HMR')),
-     industry.new('Oil & Gas Production', array.from('COP', 'FANG', 'WDS', 'AR', 'RRC', 'CRK', 'CNX', 'VIST', 'MUR', 'MGY', 'GPOR', 'SM', 'NOG', 'TALO', 'NEXT', 'XPRO', 'VET', 'WTTR', 'HPK', 'VTS', 'CLB', 'GRNT', 'VTLE', 'SD', 'GPRK', 'OBE', 'EGY', 'PNRG', 'WTI', 'BRY', 'GTE', 'KGEI', 'EPM', 'EP', 'SLNG', 'HUSA', 'USEG', 'KLXE', 'BATL')),
+     industry.new('Oil & Gas Production', array.from('COP', 'FANG', 'WDS', 'AR', 'RRC', 'CRK', 'CNX', 'VIST', 'MUR', 'MGY', 'GPOR', 'SM', 'NOG', 'TALO', 'NEXT', 'XPRO', 'VET', 'WTTR', 'HPK', 'VTS', 'CLB', 'GRNT', 'VTLE', 'SD', 'GPRK', 'OBE', 'EGY', 'PNRG', 'WTI', 'BRY', 'GTE', 'KGEI', 'EPM', 'EP', 'SLNG', 'HUSA', 'USEG', 'KLXE')),
      industry.new('Oil Refining/Marketing', array.from('MPC', 'E', 'PSX', 'VLO', 'DINO', 'IEP', 'PBF', 'CVI', 'DK', 'PARR', 'CLMT', 'SGU')),
      industry.new('Oilfield Services/Equipment', array.from('HAL', 'FTI', 'NOV', 'WFRD', 'AROC', 'WHD', 'USAC', 'KGS', 'LBRT', 'INVX', 'FLOC', 'NESR', 'RES', 'AESI', 'PUMP', 'HLX', 'ACDC', 'FTK', 'OIS', 'FET', 'RNGR', 'OMSE', 'GEOS', 'BOOM', 'NCSM', 'LSE', 'TUSK', 'MIND', 'PED', 'NINE', 'STAK')),
-     industry.new('Other Consumer Services', array.from('BKNG', 'CTAS', 'TCOM', 'EXPE', 'SCI', 'PLNT', 'EDU', 'LTH', 'HRB', 'GHC', 'BGSI', 'GBTG', 'VVV', 'ATGE', 'UNF', 'PTON', 'LRN', 'DRVN', 'OSW', 'VAC', 'STRA', 'PRDO', 'MCW', 'TRIP', 'AFYA', 'CSV', 'APEI', 'FIP', 'KLC', 'XPOF', 'WW', 'SDA', 'EWCZ', 'BLNK', 'LGCY', 'YTRA', 'TOUR', 'RGS', 'BODI')),
+     industry.new('Other Consumer Services', array.from('BKNG', 'CTAS', 'TCOM', 'EXPE', 'SCI', 'PLNT', 'EDU', 'LTH', 'HRB', 'GHC', 'BGSI', 'GBTG', 'VVV', 'ATGE', 'UNF', 'PTON', 'LRN', 'DRVN', 'OSW', 'VAC', 'STRA', 'PRDO', 'MCW', 'TRIP', 'AFYA', 'CSV', 'APEI', 'FIP', 'KLC', 'XPOF', 'WW', 'SDA', 'EWCZ', 'BLNK', 'LGCY', 'YTRA', 'TOUR', 'RGS')),
      industry.new('Other Consumer Specialties', array.from('MSA', 'FWDI', 'ZEPP', 'MOV', 'FOSL')),
-     industry.new('Other Metals/Minerals', array.from('RIO', 'SCCO', 'FCX', 'CCJ', 'TECK', 'CRS', 'ATI', 'MP', 'HBM', 'UEC', 'NXE', 'LEU', 'UUUU', 'AUGO', 'ERO', 'TMC', 'DNN', 'IE', 'TGB', 'ALM', 'SLSR', 'SGML', 'USAS', 'NAK', 'CNL', 'NEXA', 'LAR', 'UAMY', 'GSM', 'NB', 'GROY', 'TMQ', 'ELVR', 'EU', 'UROY', 'URG', 'WRN', 'ISOU', 'ABAT')),
+     industry.new('Other Metals/Minerals', array.from('RIO', 'SCCO', 'FCX', 'CCJ', 'TECK', 'CRS', 'ATI', 'MP', 'HBM', 'UEC', 'NXE', 'LEU', 'UUUU', 'AUGO', 'ERO', 'TMC', 'DNN', 'IE', 'TGB', 'ALM', 'SLSR', 'SGML', 'USAS', 'NAK', 'CNL', 'NEXA', 'LAR', 'UAMY', 'GSM', 'NB', 'GROY', 'TMQ', 'ELVR', 'EU', 'UROY', 'URG', 'WRN', 'ISOU')),
      industry.new('Other Transportation', array.from('UBER', 'PFGC', 'PAC', 'ASR', 'SARO', 'LYFT', 'VNT', 'OMAB', 'CAAP', 'VRRM', 'SMHI', 'CCEL', 'SWVL', 'BTOC', 'RVSN', 'WETO', 'PTLE')),
-     industry.new('Packaged Software', array.from('MSFT', 'ORCL', 'PLTR', 'SAP', 'CRM', 'APP', 'INTU', 'NOW', 'ADBE', 'PANW', 'CRWD', 'ADP', 'NTES', 'SNOW', 'CDNS', 'SNPS', 'RBLX', 'ADSK', 'DDOG', 'EA', 'ROP', 'TTWO', 'ZS', 'VEEV', 'TEAM', 'CRWV', 'FIS', 'MDB', 'ZM', 'LDOS', 'NBIS', 'CYBR', 'IOT', 'PTC', 'TOST', 'TRMB', 'TWLO', 'HUBS', 'TTD')),
+     industry.new('Packaged Software', array.from('MSFT', 'ORCL', 'PLTR', 'SAP', 'CRM', 'APP', 'INTU', 'NOW', 'ADBE', 'PANW', 'CRWD', 'ADP', 'NTES', 'SNOW', 'CDNS', 'SNPS', 'RBLX', 'ADSK', 'DDOG', 'EA', 'ROP', 'TTWO', 'ZS', 'VEEV', 'TEAM', 'CRWV', 'FIS', 'MDB', 'ZM', 'LDOS', 'NBIS', 'CYBR', 'IOT', 'PTC', 'TOST', 'TRMB', 'TWLO', 'HUBS')),
      industry.new('Personnel Services', array.from('KFY', 'RHI', 'UPWK', 'MAN', 'HSII', 'BBSI', 'AMN', 'KFRC', 'CCRN', 'KELYB', 'KELYA', 'TBI', 'RCMT', 'HQI', 'MHH', 'DLHC', 'DHX', 'BGSF', 'STRR', 'NIXX', 'JOB', 'LGCL', 'CLIK', 'BIYA')),
      industry.new('Pharmaceuticals: Generic', array.from('TEVA')),
-     industry.new('Pharmaceuticals: Major', array.from('LLY', 'JNJ', 'ABBV', 'AZN', 'MRK', 'NVS', 'NVO', 'PFE', 'SNY', 'VRTX', 'BMY', 'GSK', 'REGN', 'ALNY', 'ZTS', 'TAK', 'HLN', 'INSM', 'ONC', 'BIIB', 'INCY', 'GMAB', 'ROIV', 'MDGL', 'IONS', 'ASND', 'VTRS', 'EXEL', 'RDY', 'JAZZ', 'RGEN', 'CORT', 'CYTK', 'NUVL', 'GRFS', 'RYTM', 'PTCT', 'PTGX', 'RGC')),
+     industry.new('Pharmaceuticals: Major', array.from('LLY', 'JNJ', 'ABBV', 'AZN', 'MRK', 'NVS', 'NVO', 'PFE', 'SNY', 'VRTX', 'BMY', 'GSK', 'REGN', 'ALNY', 'ZTS', 'TAK', 'HLN', 'INSM', 'ONC', 'BIIB', 'INCY', 'GMAB', 'ROIV', 'MDGL', 'IONS', 'ASND', 'VTRS', 'EXEL', 'RDY', 'JAZZ', 'RGEN', 'CORT', 'CYTK', 'NUVL', 'GRFS', 'RYTM', 'PTCT', 'PTGX')),
      industry.new('Pharmaceuticals: Other', array.from('RVMD', 'ABVX', 'CDTX', 'BRBR', 'BHC', 'AVBP', 'CRON', 'NAGE', 'USNA', 'NATR', 'FTLF', 'UPXI', 'SCLX', 'LFVN', 'ATPC', 'MIRA', 'PAVS', 'BNKK', 'IBIO', 'SNYR', 'NAII', 'MTEX', 'CURX', 'AIXC', 'PRPH', 'FLGC', 'PMCB', 'ASBP', 'YCBD', 'ENVB', 'MEHA', 'SCNI')),
-     industry.new('Precious Metals', array.from('NEM', 'AEM', 'B', 'WPM', 'AU', 'FNV', 'GFI', 'KGC', 'PAAS', 'RGLD', 'AGI', 'HMY', 'HL', 'EQX', 'CDE', 'IAG', 'SBSW', 'TFPM', 'AG', 'OR', 'NGD', 'EGO', 'BTG', 'BVN', 'SSRM', 'ORLA', 'NG', 'PPTA', 'FSM', 'ARMN', 'SA', 'CGAU', 'EXK', 'DRD', 'AAUC', 'SKE', 'VZLA', 'SVM', 'IPX')),
-     industry.new('Property/Casualty Insurance', array.from('BRK.A', 'BRK.B', 'CB', 'TRV', 'HIG', 'MKL', 'L', 'ERIE', 'EG', 'RNR', 'AFG', 'AIZ', 'THG', 'MTG', 'LMND', 'MCY', 'SIGI', 'HGTY', 'PLMR', 'NMIH', 'SPNT', 'KMPR', 'HCI', 'HMN', 'PRA', 'SAFT', 'PRCH', 'UFCS', 'UVE', 'ASIC', 'EIG', 'HRTG', 'HIPO', 'AMSF', 'ACIC', 'GLRE', 'AII', 'GBLI', 'FGNX')),
+     industry.new('Precious Metals', array.from('NEM', 'AEM', 'B', 'WPM', 'AU', 'FNV', 'GFI', 'KGC', 'PAAS', 'RGLD', 'AGI', 'HMY', 'HL', 'EQX', 'CDE', 'IAG', 'SBSW', 'TFPM', 'AG', 'OR', 'NGD', 'EGO', 'BTG', 'BVN', 'SSRM', 'ORLA', 'NG', 'PPTA', 'FSM', 'ARMN', 'SA', 'CGAU', 'EXK', 'DRD', 'AAUC', 'SKE', 'VZLA', 'SVM')),
+     industry.new('Property/Casualty Insurance', array.from('BRK.A', 'BRK.B', 'CB', 'TRV', 'HIG', 'MKL', 'L', 'ERIE', 'EG', 'RNR', 'AFG', 'AIZ', 'THG', 'MTG', 'LMND', 'MCY', 'SIGI', 'HGTY', 'PLMR', 'NMIH', 'SPNT', 'KMPR', 'HCI', 'HMN', 'PRA', 'SAFT', 'PRCH', 'UFCS', 'UVE', 'ASIC', 'EIG', 'HRTG', 'HIPO', 'AMSF', 'ACIC', 'GLRE', 'AII', 'GBLI')),
      industry.new('Publishing: Books/Magazines', array.from('PSO', 'WLY', 'WLYB', 'SCHL', 'VALU', 'EDUC')),
      industry.new('Publishing: Newspapers', array.from('NWS', 'NWSA', 'NYT', 'TDAY', 'DJCO', 'CUB', 'LEE')),
      industry.new('Pulp & Paper', array.from('IP', 'AVY', 'SUZ', 'SLVM', 'CLW', 'MERC')),
      industry.new('Railroads', array.from('UNP', 'NSC', 'CSX', 'CP', 'CNI', 'GATX')),
-     industry.new('Real Estate Development', array.from('CBRE', 'BEKE', 'JLL', 'OPEN', 'FSV', 'HHH', 'MTH', 'MRP', 'MRP/I', 'CWK', 'HGV', 'JOE', 'NMRK', 'VTMX', 'HBNB', 'EXPI', 'HOUS', 'KW', 'FOR', 'IRS', 'MMI', 'SKYH', 'FPH', 'CDZI', 'FRPH', 'NLOP', 'TRC', 'TCI', 'LND', 'MLP', 'RMAX', 'ARL', 'PINE', 'NEN', 'DOUG', 'OZ', 'SRG', 'STRS', 'MAMO')),
-     industry.new('Real Estate Investment Trusts', array.from('WELL', 'PLD', 'AMT', 'EQIX', 'SPG', 'DLR', 'O', 'PSA', 'CCI', 'VTR', 'VICI', 'EXR', 'AVB', 'IRM', 'EQR', 'SBAC', 'INVH', 'ESS', 'WY', 'SUI', 'MAA', 'NLY', 'CPT', 'WPC', 'KIM', 'OHI', 'LAMR', 'REG', 'DOC', 'GLPI', 'HST', 'ELS', 'UDR', 'AMH', 'BXP', 'AGNC', 'FRMI', 'REXR', 'EGP')),
+     industry.new('Real Estate Development', array.from('CBRE', 'BEKE', 'JLL', 'OPEN', 'FSV', 'HHH', 'MTH', 'MRP', 'MRP/I', 'CWK', 'HGV', 'JOE', 'NMRK', 'VTMX', 'HBNB', 'EXPI', 'HOUS', 'KW', 'FOR', 'IRS', 'MMI', 'SKYH', 'FPH', 'CDZI', 'FRPH', 'NLOP', 'TRC', 'TCI', 'LND', 'MLP', 'RMAX', 'ARL', 'PINE', 'NEN', 'DOUG', 'OZ', 'SRG', 'STRS')),
+     industry.new('Real Estate Investment Trusts', array.from('WELL', 'PLD', 'AMT', 'EQIX', 'SPG', 'DLR', 'O', 'PSA', 'CCI', 'VTR', 'VICI', 'EXR', 'AVB', 'IRM', 'EQR', 'SBAC', 'INVH', 'ESS', 'WY', 'SUI', 'MAA', 'NLY', 'CPT', 'WPC', 'KIM', 'OHI', 'LAMR', 'REG', 'DOC', 'GLPI', 'HST', 'ELS', 'UDR', 'AMH', 'BXP', 'AGNC', 'FRMI', 'REXR')),
      industry.new('Recreational Products', array.from('AS', 'HAS', 'MAT', 'THO', 'GOLF', 'PII', 'HAYW', 'MODG', 'WGO', 'LVWR', 'MBUU', 'TRON', 'RGR', 'JOUT', 'MCFT', 'HERE', 'MPX', 'JAKK', 'ESCA', 'FNKO', 'CLAR', 'AOUT', 'BHAT', 'NWTG', 'VEEE', 'VMAR', 'JFBR')),
-     industry.new('Regional Banks', array.from('IBN', 'NU', 'CM', 'USB', 'TFC', 'KB', 'MTB', 'FITB', 'FCNCA', 'CIB', 'EWBC', 'BSAC', 'ALLY', 'FHN', 'SSB', 'WTFC', 'WAL', 'GGAL', 'COLB', 'CFR', 'BPOP', 'CHYM', 'PNFP', 'CBSH', 'SNV', 'PB', 'GBCI', 'HOMB', 'UBSI', 'OZK', 'CBC', 'ABCB', 'HWC', 'AUB', 'IFS', 'EBC', 'IBOC', 'SFBS', 'UCB')),
-     industry.new('Restaurants', array.from('MCD', 'SBUX', 'CMG', 'YUM', 'QSR', 'DRI', 'YUMC', 'DPZ', 'TXRH', 'ARMK', 'BROS', 'WING', 'EAT', 'CAVA', 'SHAK', 'CAKE', 'WEN', 'ARCO', 'PZZA', 'FWRG', 'HDL', 'BH', 'BH.A', 'BJRI', 'CNNE', 'SG', 'CBRL', 'BLMN', 'KRUS', 'DIN', 'PTLO', 'BRCB', 'NATH', 'JACK', 'LOCO', 'DENN', 'RICK', 'CCHH', 'MB')),
-     industry.new('Savings Banks', array.from('WBS', 'TFSL', 'WSFS', 'PFS', 'NWBI', 'CLBK', 'TFIN', 'OCFC', 'CFFN', 'TRST', 'HIFS', 'SMBC', 'TCBX', 'NFBK', 'KRNY', 'GCBC', 'PDLB', 'AVBC', 'FSBW', 'TSBK', 'WNEB', 'BLFY', 'FCAP', 'FNWD', 'BVFL', 'CFBK', 'AFBI', 'LSBK', 'RVSB', 'BSBK', 'MGYR', 'PROV', 'FNWB', 'IROQ', 'FDSB', 'CLST', 'FSEA', 'BYFC', 'NSTS')),
-     industry.new('Semiconductors', array.from('NVDA', 'AVGO', 'TSM', 'ASML', 'AMD', 'MU', 'QCOM', 'INTC', 'KLAC', 'TXN', 'ARM', 'ADI', 'MRVL', 'TEL', 'NXPI', 'MPWR', 'ASX', 'FSLR', 'MCHP', 'ALAB', 'COHR', 'STM', 'ON', 'GFS', 'UMC', 'FN', 'MTSI', 'TSEM', 'RMBS', 'SWKS', 'LSCC', 'AMKR', 'QRVO', 'SITM', 'SMTC', 'CRUS', 'PI', 'ALGM', 'RUN')),
+     industry.new('Regional Banks', array.from('IBN', 'NU', 'CM', 'USB', 'TFC', 'KB', 'MTB', 'FITB', 'FCNCA', 'CIB', 'EWBC', 'BSAC', 'ALLY', 'FHN', 'SSB', 'WTFC', 'WAL', 'GGAL', 'COLB', 'CFR', 'BPOP', 'CHYM', 'PNFP', 'CBSH', 'SNV', 'PB', 'GBCI', 'HOMB', 'UBSI', 'OZK', 'CBC', 'ABCB', 'HWC', 'AUB', 'IFS', 'EBC', 'IBOC', 'SFBS')),
+     industry.new('Restaurants', array.from('MCD', 'SBUX', 'CMG', 'YUM', 'QSR', 'DRI', 'YUMC', 'DPZ', 'TXRH', 'ARMK', 'BROS', 'WING', 'EAT', 'CAVA', 'SHAK', 'CAKE', 'WEN', 'ARCO', 'PZZA', 'FWRG', 'HDL', 'BH', 'BH.A', 'BJRI', 'CNNE', 'SG', 'CBRL', 'BLMN', 'KRUS', 'DIN', 'PTLO', 'BRCB', 'NATH', 'JACK', 'LOCO', 'DENN', 'RICK', 'CCHH')),
+     industry.new('Savings Banks', array.from('WBS', 'TFSL', 'WSFS', 'PFS', 'NWBI', 'CLBK', 'TFIN', 'OCFC', 'CFFN', 'TRST', 'HIFS', 'SMBC', 'TCBX', 'NFBK', 'KRNY', 'GCBC', 'PDLB', 'AVBC', 'FSBW', 'TSBK', 'WNEB', 'BLFY', 'FCAP', 'FNWD', 'BVFL', 'CFBK', 'AFBI', 'LSBK', 'RVSB', 'BSBK', 'MGYR', 'PROV', 'FNWB', 'IROQ', 'FDSB', 'CLST', 'FSEA', 'BYFC')),
+     industry.new('Semiconductors', array.from('NVDA', 'AVGO', 'TSM', 'ASML', 'AMD', 'MU', 'QCOM', 'INTC', 'KLAC', 'TXN', 'ARM', 'ADI', 'MRVL', 'TEL', 'NXPI', 'MPWR', 'ASX', 'FSLR', 'MCHP', 'ALAB', 'COHR', 'STM', 'ON', 'GFS', 'UMC', 'FN', 'MTSI', 'TSEM', 'RMBS', 'SWKS', 'LSCC', 'AMKR', 'QRVO', 'SITM', 'SMTC', 'CRUS', 'PI', 'ALGM')),
      industry.new('Services to the Health Industry', array.from('DGX', 'ASTH', 'NRC', 'QIPT')),
      industry.new('Specialty Insurance', array.from('FNF', 'ORI', 'FAF', 'ESNT', 'RDN', 'AGO', 'STC', 'TIPT', 'ITIC', 'OSG', 'MBI', 'OXBR')),
-     industry.new('Specialty Stores', array.from('WMT', 'COST', 'ORLY', 'CVNA', 'AZO', 'TGT', 'CPRT', 'TSCO', 'ULTA', 'WSM', 'CASY', 'DKS', 'W', 'BJ', 'PAG', 'LAD', 'AN', 'MUSA', 'MNSO', 'KMX', 'GPI', 'ABG', 'UGP', 'SIG', 'RUSHB', 'RUSHA', 'PSMT', 'BBWI', 'ASO', 'AAP', 'RH', 'WRBY', 'EYE', 'SAH', 'SBH', 'SVV', 'CWH', 'EVGO', 'ODP')),
+     industry.new('Specialty Stores', array.from('WMT', 'COST', 'ORLY', 'CVNA', 'AZO', 'TGT', 'CPRT', 'TSCO', 'ULTA', 'WSM', 'CASY', 'DKS', 'W', 'BJ', 'PAG', 'LAD', 'AN', 'MUSA', 'MNSO', 'KMX', 'GPI', 'ABG', 'UGP', 'SIG', 'RUSHB', 'RUSHA', 'PSMT', 'BBWI', 'ASO', 'AAP', 'RH', 'WRBY', 'EYE', 'SAH', 'SBH', 'SVV', 'CWH', 'EVGO')),
      industry.new('Specialty Telecommunications', array.from('TEF', 'SATS', 'ASTS', 'PHI', 'IRDM', 'ITRN', 'TSAT', 'CMBM', 'IQST', 'PMAX')),
      industry.new('Steel', array.from('BHP', 'VALE', 'NUE', 'MT', 'STLD', 'TS', 'PKX', 'RS', 'CLF', 'TX', 'CMC', 'GGB', 'SIM', 'SID', 'WS', 'RYI', 'MTUS', 'SXC', 'MSB', 'LUD', 'FRD', 'ACNT', 'SRL', 'AP', 'HUDI')),
      industry.new('Telecommunications Equipment', array.from('AAPL', 'CSCO', 'MSI', 'GRMN', 'UI', 'NOK', 'ERIC', 'CIEN', 'VSAT', 'COMM', 'CALX', 'ONDS', 'DGII', 'ARLO', 'HLIT', 'GILT', 'AIOT', 'CLFD', 'AVNW', 'FEIM', 'AUDC', 'BKTI', 'CRNT', 'SANG', 'INSG', 'KVHI', 'CMTL', 'OCC', 'FKWL', 'APWC', 'SIDU', 'UTSI', 'IVDA', 'SONM', 'WTO')),
@@ -149,7 +149,7 @@ var indArr = array.from(
      industry.new('Trucking', array.from('ODFL', 'XPO', 'JBHT', 'SAIA', 'KNX', 'TFII', 'LSTR', 'SNDR', 'WERN', 'ARCB', 'MRTN', 'FWRD', 'HTLD', 'CVLG', 'ULH', 'PAL', 'PAMT', 'TOPP', 'ZDAI', 'HXHX', 'YGMZ')),
      industry.new('Trucks/Construction/Farm Machinery', array.from('CAT', 'DE', 'PCAR', 'WAB', 'CNH', 'BWA', 'AGCO', 'TTC', 'DOOO', 'BC', 'TEX', 'TRN', 'ALG', 'CDLR', 'GBX', 'LNN', 'ASTE', 'PLOW', 'CMCO', 'MTW', 'WNC', 'FSTR', 'BNC', 'TWIN', 'GENC', 'RAIL', 'CVGI', 'RYM', 'WPRT', 'PFAI', 'ARTW', 'HYFM')),
      industry.new('Water Utilities', array.from('AWK', 'SBS', 'WTRG', 'AWR', 'CWT', 'HTO', 'WBI', 'MSEX', 'CWCO', 'YORW', 'ARTNA', 'PCYO', 'GWRS')),
-     industry.new('Wholesale Distributors', array.from('FERG', 'FAST', 'GWW', 'GPC', 'WCC', 'QXO', 'AIT', 'CNM', 'POOL', 'SUN', 'UGI', 'SITE', 'MSM', 'BCC', 'DNOW', 'HLMN', 'GLP', 'DXPE', 'GCT', 'WKC', 'UVV', 'DSGR', 'SPH', 'CRCT', 'CAPL', 'BXC', 'TITN', 'EVI', 'ASLE', 'HDSN', 'CANG', 'ALTG', 'ACU', 'NPT', 'LVRO', 'GRWG', 'SORA', 'DIT', 'ZONE')),
+     industry.new('Wholesale Distributors', array.from('FERG', 'FAST', 'GWW', 'GPC', 'WCC', 'QXO', 'AIT', 'CNM', 'POOL', 'SUN', 'UGI', 'SITE', 'MSM', 'BCC', 'DNOW', 'HLMN', 'GLP', 'DXPE', 'GCT', 'WKC', 'UVV', 'DSGR', 'SPH', 'CRCT', 'CAPL', 'BXC', 'TITN', 'EVI', 'ASLE', 'HDSN', 'CANG', 'ALTG', 'ACU', 'NPT', 'LVRO', 'GRWG', 'SORA', 'DIT')),
      industry.new('Wireless Telecommunications', array.from('TMUS', 'T', 'VZ', 'AMX', 'VOD', 'TLK', 'RCI', 'VIV', 'TU', 'TIMB', 'TIGO', 'SKM', 'GSAT', 'LBRDA', 'LBRDK', 'TKC', 'TDS', 'AD', 'VEON', 'GOGO', 'ATEX', 'SPOK'))
      )
 
@@ -223,7 +223,7 @@ f_normalized_rs(indexSymbol, length) =>
 if barstate.islast
     data.cell(0, 0, '')
     string detectedIndustry = syminfo.industry
-    data.cell(0, 1, detectedIndustry + ' (' + performanceMetric + ' - ' + timePeriod + ')', text_color = txtCol, text_size = size.large)
+    string titleText = detectedIndustry + ' (' + performanceMetric + ' - ' + timePeriod + ')'
     
     bool industryFound = false
     int industryIdx = -1
@@ -269,21 +269,21 @@ if barstate.islast
                 float currentValue = na
                 
                 if timePeriod == 'YTD'
-                    currentValue := f_ytd_change()
+                    currentValue := request.security(syminfo.ticker, timeframe.period, f_ytd_change(), lookahead=barmerge.lookahead_on, ignore_invalid_symbol=true)
                     showPercent := true
                 else if timePeriod == 'MTD'
-                    currentValue := f_mtd_change()
+                    currentValue := request.security(syminfo.ticker, timeframe.period, f_mtd_change(), lookahead=barmerge.lookahead_on, ignore_invalid_symbol=true)
                     showPercent := true
                 else if timePeriod == 'QTD'
-                    currentValue := f_qtd_change()
+                    currentValue := request.security(syminfo.ticker, timeframe.period, f_qtd_change(), lookahead=barmerge.lookahead_on, ignore_invalid_symbol=true)
                     showPercent := true
                 else
                     days = getDays(timePeriod)
                     if performanceMetric == 'RS Rating'
-                        currentValue := f_normalized_rs(rsIndex, days)
+                        currentValue := request.security(syminfo.ticker, timeframe.period, f_normalized_rs(rsIndex, days), lookahead=barmerge.lookahead_on, ignore_invalid_symbol=true)
                         showPercent := false
                     else  // % Return
-                        currentValue := ta.roc(close, days)
+                        currentValue := request.security(syminfo.ticker, timeframe.period, ta.roc(close, days), lookahead=barmerge.lookahead_on, ignore_invalid_symbol=true)
                         showPercent := true
                 
                 outputArr.push(currentValue)
@@ -295,13 +295,29 @@ if barstate.islast
     if industryFound and outputArr.size() > 0
         sorted = outputArr.sort_indices(order.descending)
         
-        // Find current stock index in the arrays
+        // Find current stock index in the arrays and calculate rank
         int currentStockIndex = -1
+        int currentStockRank = -1
+        int totalStocks = outputArr.size()
+        
         if showCurrentStock
             for j = 0 to filteredSymbols.size() - 1
                 if filteredSymbols.get(j) == syminfo.ticker or str.contains(filteredSymbols.get(j), syminfo.ticker)
                     currentStockIndex := j
                     break
+            
+            // Calculate rank (1 = best)
+            if currentStockIndex >= 0
+                for i = 0 to sorted.size() - 1
+                    if sorted.get(i) == currentStockIndex
+                        currentStockRank := i + 1
+                        break
+        
+        // Update title with rank if current stock found
+        if currentStockRank > 0
+            titleText := titleText + ' | ' + syminfo.ticker + ' ranks #' + str.tostring(currentStockRank) + ' of ' + str.tostring(totalStocks)
+        
+        data.cell(0, 1, titleText, text_color = txtCol, text_size = size.large)
         
         // Check if current stock is in top N
         bool currentInTopN = false
@@ -327,9 +343,10 @@ if barstate.islast
             string displaySymbol = isCurrentStock ? symbol + ' ' + highlightMarker : symbol
             
             if not compact
-                label.new(bar_pos, 0, displaySymbol, textcolor = txtCol, style = label.style_label_up, color = color.new(color.white,100))
+                label.new(bar_pos, 0, displaySymbol, textcolor = isCurrentStock ? color.new(#9C27B0, 0) : txtCol, style = label.style_label_up, color = color.new(color.white,100))
                 line.new(bar_pos, 0, bar_pos, rank, width = 8, color = col)
-                label.new(bar_pos, rank, str.tostring(outputArr.get(si), '#.#') + (showPercent ? '%' : ''), textcolor = txtCol, color = color.new(color.white,100))
+                valueLabel = str.tostring(outputArr.get(si), '#.#') + (showPercent ? '%' : '') + (isCurrentStock ? ' ●' : '')
+                label.new(bar_pos, rank, valueLabel, textcolor = isCurrentStock ? color.new(#9C27B0, 0) : txtCol, color = color.new(color.white,100))
             else
                 list.cell(0, 0, '')
                 cell = math.abs(i - (math.min(outputArr.size()-1, showMax)))
@@ -346,9 +363,9 @@ if barstate.islast
             displaySymbol = symbol + ' ✕'  // ✕ marker for below top N
             
             if not compact
-                label.new(bar_pos, 0, displaySymbol, textcolor = txtCol, style = label.style_label_up, color = color.new(color.white,100))
+                label.new(bar_pos, 0, displaySymbol, textcolor = color.new(#9C27B0, 0), style = label.style_label_up, color = color.new(color.white,100))
                 line.new(bar_pos, 0, bar_pos, rank, width = 8, color = col)
-                label.new(bar_pos, rank, str.tostring(outputArr.get(currentStockIndex), '#.#') + (showPercent ? '%' : ''), textcolor = txtCol, color = color.new(color.white,100))
+                label.new(bar_pos, rank, str.tostring(outputArr.get(currentStockIndex), '#.#') + (showPercent ? '%' : ''), textcolor = color.new(#9C27B0, 0), color = color.new(color.white,100))
             else
                 list.cell(displayCount, 1, displaySymbol + (results ? '\n' + str.tostring(outputArr.get(currentStockIndex), '#.#') + (showPercent ? '%' : '') : ''), text_color = txtCol)
     else

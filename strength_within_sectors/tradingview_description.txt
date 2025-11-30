@@ -1,0 +1,134 @@
+[b]A Comprehensive Multi-Industry Performance Comparison Tool[/b]
+The complete Pine Script code and supporting Python automation scripts are available on GitHub:
+[b]GitHub Repository:[/b] [url=https://github.com/simsisim/tradingview_indicators]https://github.com/simsisim/tradingview_indicators[/url]
+
+[b]Original idea from[/b] [url=https://www.tradingview.com/script/5NsvcOVp-Industry-Group-Strength/]Industry Group Strength[/url] [b]by[/b] [url=https://www.tradingview.com/u/Amphibiantrading/]Amphibiantrading[/url]
+
+[b]═══ WHAT'S NEW ═══[/b]
+[b]4-Level Hierarchical Navigation:[/b]
+[list]
+[*] [b]Primary:[/b] All 11 NQUSB sectors (NQUSB10, NQUSB15, NQUSB20, etc.)
+[*] [b]Secondary (Default):[/b] Broad sectors like Technology, Energy
+[*] [b]Tertiary:[/b] Industry groups within sectors
+[*] [b]Quaternary:[/b] Individual stocks within industries (37 semiconductors)
+[/list]
+[b]Enhanced Stock Coverage:[/b]
+[list]
+[*] [b]1,176 total stocks[/b] across 129 industries
+[*] [b]37 semiconductor stocks[/b]
+[*] Market-cap weighted selection: 60% tech / 35% others
+[*] Range: 1-37 stocks per industry
+[/list]
+
+[b]═══ CORE FEATURES ═══[/b]
+[b]1. Drill-Down/Drill-Up Navigation[/b]
+View NVDA at different granularity levels:
+[list]
+[*] [b]Quaternary:[/b] ● NVDA ranks #3 of 37 semiconductors
+[*] [b]Tertiary:[/b] ✓ Semiconductors at 85% (strongest in tech hardware)
+[*] [b]Secondary:[/b] ✓ Tech Hardware at 82% (stronger than software)
+[*] [b]Primary:[/b] ✓ Technology at 78% (#1 sector overall)
+[/list]
+[b]Insight:[/b] One indicator, one stock, four perspectives - instantly see if strength is stock-specific, industry-specific, or sector-wide.
+
+[b]2. Visual Current Stock Identification[/b]
+[b]Violet Markers - Instant Recognition:[/b]
+[list]
+[*] [b]●[/b] (dot) marker when current stock is in [b]top N performers[/b]
+[*] [b]✕[/b] (cross) marker when current stock is [b]below top N[/b]
+[*] Violet color (#9C27B0) on both symbol and value labels
+[*] Example: "NVDA ● ranks #3 of 37"
+[/list]
+
+[b]3. Rank Display in Title[/b]
+Dynamic title shows performance context:
+[list]
+[*] "Semiconductors (RS Rating - 3 Months) | NVDA ranks #3 of 37"
+[*] #1 = Best performer, higher number = lower rank
+[*] Total adjusts if current stock auto-added
+[/list]
+
+[b]4. Auto-Add Current Stock[/b]
+[b]Always Included:[/b]
+[list]
+[*] Current stock automatically added if not in predefined list
+[*] Example: Viewing PRSO → "PRSO ranks #37 of 39 ✕"
+[*] Works for any stock - from NVDA to obscure small-caps
+[*] Violet markers ensure visibility even when ranked low
+[/list]
+
+[b]═══ DUAL PERFORMANCE METRICS ═══[/b]
+[b]RS Rating (Relative Strength):[/b]
+[list]
+[*] Normalized strength score 1-99
+[*] Compare stocks across different price ranges
+[*] Default benchmark: SPX
+[/list]
+[b]% Return:[/b]
+[list]
+[*] Simple percentage price change
+[*] Direct performance comparison
+[/list]
+[b]11 Time Periods:[/b]
+1 Week, 2 Weeks, 1 Month, 2 Months, [b]3 Months (Default)[/b], 6 Months, 1 Year, YTD, MTD, QTD, Custom (1-500 days)
+[b]Result: 22 analytical combinations[/b] (2 metrics × 11 periods)
+
+[b]═══ USE CASES ═══[/b]
+[b]Sector Rotation Analysis:[/b]
+[list]
+[*] Is NVDA's strength semiconductors-specific or tech-wide?
+[*] Drill through all 4 levels to find answer
+[*] Identify which industry groups are leading/lagging
+[/list]
+[b]Finding Hidden Gems:[/b]
+[list]
+[*] JPM ranks #3 of 13 in Major Banks
+[*] But Financials sector weak overall (68%)
+[*] = Relative strength play in weak sector
+[/list]
+[b]Cross-Industry Comparison:[/b]
+[list]
+[*] 129 industries covered
+[*] Market-wide scan capability
+[*] Find strongest performers across all sectors
+[/list]
+
+[b]═══ TECHNICAL SPECIFICATIONS ═══[/b]
+[b]V32 Stats:[/b]
+[list]
+[*] Total Industries: 129
+[*] Total Stocks: 1,176
+[*] File Size: 82,032 bytes (80.1 KB)
+[*] Request Limit: 39 max (Semiconductors), 10-16 typical
+[*] Granularity Levels: 4 (Primary → Quaternary)
+[/list]
+[b]Smart Stock Allocation:[/b]
+[list]
+[*] Technology industries: 60% coverage
+[*] Other industries: 35% coverage
+[*] Market-cap weighted selection
+[*] Formula: MIN(39, MAX(5, CEILING(total × percentage)))
+[/list]
+
+[b]═══ KEY ADVANTAGES ═══[/b]
+[b]vs. Single Industry Tools:[/b]
+[list]
+[*] ✓ 129 industries vs 1
+[*] ✓ Market-wide perspective
+[*] ✓ Hierarchical navigation
+[*] ✓ Sector rotation detection
+[/list]
+[b]vs. Manual Comparison:[/b]
+[list]
+[*] ✓ No ETF research needed
+[*] ✓ Instant visual markers
+[*] ✓ Automatic ranking
+[*] ✓ One-click drill-down
+[/list]
+
+[b]For complete documentation, Python automation scripts, and CSV data files:[/b]
+[url=https://github.com/simsisim/tradingview_indicators]https://github.com/simsisim/tradingview_indicators[/url]
+
+[b]Version:[/b] V32
+[b]Last Updated:[/b] 2025-11-30
+[b]Pine Script Version:[/b] v5

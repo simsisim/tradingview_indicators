@@ -6,16 +6,26 @@ Since this improvement may not be accepted as an update to the original TradingV
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-[b][size=large]PRIMARY IMPROVEMENT: Smart Stock Selection[/size][/b]
+[b]═══ PRIMARY IMPROVEMENT: Smart Stock Selection (V5) ═══[/b]
 
-[b]39 Pre-selected Stocks[/b] - Top industry leaders by market capitalization
+[b]38 Pre-selected Stocks[/b] - Top industry leaders by market capitalization
 [b]+1 Current Stock[/b] - Always includes the stock you're analyzing
+[b]+1 Index Request[/b] - For RS Rating calculation (when selected)
 [b]= 40 Total[/b] - Perfectly optimized for TradingView's request limit
+
+[b]Visual Enhancements:[/b]
+[list]
+[*] [b]Violet Markers[/b] - Current stock shows ● when in top performers, ✕ when below
+[*] [b]Rank Display[/b] - Title shows "TICKER ranks #X of Y" (e.g., "PRSO ranks #37 of 39")
+[*] [b]Example:[/b] Viewing PRSO (not in predefined 38) auto-adds it as 39th, displays violet ✕ marker
+[/list]
 
 [b]Why This Matters:[/b]
 [list]
 [*] Market-cap weighted relevance - Only the most significant companies
 [*] Always includes your stock - No matter what you're viewing
+[*] Instant visual identification - Violet markers on both labels
+[*] Know your rank immediately - #1 = best, higher = worse
 [*] Industry leaders focus - Most representative of sector trends
 [*] No micro-cap noise - Eliminates distortion from small stocks
 [*] Maximizes TradingView limits - Uses all 40 allowed requests
@@ -24,7 +34,7 @@ Since this improvement may not be accepted as an update to the original TradingV
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-[b][size=large]ADDITIONAL IMPROVEMENTS[/size][/b]
+[b]═══ ADDITIONAL IMPROVEMENTS ═══[/b]
 
 [b]1. Enhanced Time Period Flexibility[/b]
 [list]
@@ -42,7 +52,7 @@ Since this improvement may not be accepted as an update to the original TradingV
 [b]3. Improved User Interface[/b]
 [list]
 [*] Better tooltips explaining each metric
-[*] Dynamic title showing both metric and period
+[*] Dynamic title showing metric, period, AND rank
 [*] Clearer input organization
 [/list]
 
@@ -56,3 +66,4 @@ Since this improvement may not be accepted as an update to the original TradingV
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 [b]For more details, full documentation, and Python automation scripts, visit the GitHub repository.[/b]
+

@@ -1,0 +1,1405 @@
+//@version=5
+indicator('NQUSB Sector Industry Strength (No LM)', shorttitle='S-I-S', overlay=false, dynamic_requests=true, max_labels_count=80)
+
+if timeframe.isintraday
+    runtime.error('Switch to Daily or Weekly Chart')
+
+performanceMetric=input.string('RS Rating', 'Performance Metric', ['RS Rating', '% Return'], tooltip='RS Rating: Normalized strength (1-99) vs benchmark\n% Return: Simple price percentage change')
+timePeriod=input.string('3 Months (63d)', 'Time Period', ['1 Week (5d)', '2 Weeks (10d)', '1 Month (21d)', '2 Months (42d)', '3 Months (63d)', '6 Months (126d)', '1 Year (252d)', 'YTD', 'MTD', 'QTD', 'Custom'], tooltip='YTD: Since Jan 1 | MTD: Since month start | QTD: Since quarter start')
+customDays=input.int(90, 'Custom Days', minval=1, maxval=500, tooltip='Only used when "Custom" period is selected')
+showMax=input.int(20, 'Number of Industries to Show', minval=1, maxval=40, display=display.none) - 1
+theme=input.string('Dark', 'Color Mode', ['Dark', 'Light'], display=display.none)
+rsIndex=input.symbol('SPX', 'RS Benchmark Symbol', tooltip='Symbol to compare against for RS Rating (default: SPX)')
+compact=input.bool(false, 'Compact Mode', display=display.none, tooltip='Show results as table instead of bar chart')
+results=input.bool(true, 'Show Values in Compact Mode', display=display.none)
+fallbackLevel=input.string('Secondary', 'Granularity Level', ['Auto', 'Primary', 'Secondary', 'Tertiary', 'Quaternary'], tooltip='Auto: Adaptive selection\nPrimary: All sectors (NQUSB)\nSecondary: Broad sectors like Technology, Energy (2-5 industries)\nTertiary: Industry groups (1-6 industries)\nQuaternary: Specific industries (1-10 industries, most granular)')
+showCurrentStock=input.bool(true, 'Display Current Stock Performance', tooltip='Always show current stock even if not in top performers. Uses ✕ marker when below top N.')
+
+displayMode=input.string('Name', 'Display Mode', ['Code', 'Name', 'Both'], tooltip='Code: Show NQUSB symbol (e.g., NQUSB601010)\nName: Show clean name (e.g., Oil, Gas and Coal)\nBoth: Show both (e.g., NQUSB601010: Oil, Gas and Coal)')
+highlightMarker=input.string('✓', 'Current Stock Marker', tooltip='Symbol to show next to the industry containing the current stock')
+
+type sector
+    string name
+    string displayName
+    string [] symbols
+
+type industry
+    string name
+    string [] symbols
+
+var sectorArr=array.from(
+     sector.new('NQUSB10', 'Technology', array.from('NQUSB101010', 'NQUSB101020', 'NQUSB10102015', 'NQUSB10101010', 'NQUSB10101020', 'NQUSB10101015', 'NQUSB10102030', 'NQUSB10102010', 'NQUSB10102020')),
+     sector.new('NQUSB15', 'Telecommunications', array.from('NQUSB151020', 'NQUSB15102010', 'NQUSB151010', 'NQUSB15102015')),
+     sector.new('NQUSB20', 'Health Care', array.from('NQUSB201020', 'NQUSB201030', 'NQUSB20101020', 'NQUSB20102010', 'NQUSB20102015', 'NQUSB20103010', 'NQUSB20103015', 'NQUSB201010', 'NQUSB20101010', 'NQUSB20101025', 'NQUSB20102020')),
+     sector.new('NQUSB30', 'Financials', array.from('NQUSB3010', 'NQUSB3030', 'NQUSB3020', 'NQUSB303020', 'NQUSB303010', 'NQUSB302020', 'NQUSB30302010', 'NQUSB30302025', 'NQUSB30302020', 'NQUSB30203020', 'NQUSB30202010', 'NQUSB30201020', 'NQUSB30202000', 'NQUSB30202015', 'NQUSB30201025', 'NQUSB30302015', 'NQUSB302030', 'NQUSB302010', 'NQUSB30201030', 'NQUSB30203000', 'NQUSB30203010')),
+     sector.new('NQUSB35', 'Real Estate', array.from('NQUSB351010', 'NQUSB351020', 'NQUSB35101010', 'NQUSB35101015', 'NQUSB35102030', 'NQUSB35102045', 'NQUSB35102040', 'NQUSB35102000', 'NQUSB35102070', 'NQUSB35102015', 'NQUSB35102010', 'NQUSB35102020', 'NQUSB35102025', 'NQUSB35102050')),
+     sector.new('NQUSB40', 'Consumer Discretionary', array.from('NQUSB4010', 'NQUSB4020', 'NQUSB4040', 'NQUSB4030', 'NQUSB4050', 'NQUSB402020', 'NQUSB402030', 'NQUSB402040', 'NQUSB404010', 'NQUSB40101025', 'NQUSB40202025', 'NQUSB40202015', 'NQUSB40202010', 'NQUSB40203010', 'NQUSB40203050', 'NQUSB40203045', 'NQUSB40204020', 'NQUSB40204025', 'NQUSB40401020', 'NQUSB40401010', 'NQUSB40401025', 'NQUSB40201070', 'NQUSB40401030', 'NQUSB40301020', 'NQUSB40301030', 'NQUSB40501010', 'NQUSB40501020', 'NQUSB40501025', 'NQUSB40501030', 'NQUSB40501040', 'NQUSB40501015', 'NQUSB40101020', 'NQUSB402010', 'NQUSB40201010', 'NQUSB40201040', 'NQUSB40203040', 'NQUSB40203055', 'NQUSB40204035', 'NQUSB40301010', 'NQUSB40301035')),
+     sector.new('NQUSB45', 'Consumer Staples', array.from('NQUSB4510', 'NQUSB451010', 'NQUSB451020', 'NQUSB451030', 'NQUSB45101020', 'NQUSB45102010', 'NQUSB45102020', 'NQUSB45201030', 'NQUSB45201020', 'NQUSB45201015', 'NQUSB45201010', 'NQUSB45101015', 'NQUSB4520')),
+     sector.new('NQUSB50', 'Industrials', array.from('NQUSB5010', 'NQUSB5020', 'NQUSB502010', 'NQUSB502030', 'NQUSB502020', 'NQUSB502040', 'NQUSB502060', 'NQUSB502050', 'NQUSB50101035', 'NQUSB50101010', 'NQUSB50201010', 'NQUSB50201020', 'NQUSB50203030', 'NQUSB50203000', 'NQUSB50202025', 'NQUSB50206015', 'NQUSB50204000', 'NQUSB50206040', 'NQUSB50206020', 'NQUSB50206060', 'NQUSB50206010', 'NQUSB50205020', 'NQUSB50205025', 'NQUSB50205015', 'NQUSB50205010', 'NQUSB50206030', 'NQUSB50101015', 'NQUSB50101020', 'NQUSB50101025', 'NQUSB50202010', 'NQUSB50202020', 'NQUSB50202040', 'NQUSB50203010', 'NQUSB50204010', 'NQUSB50204020', 'NQUSB50204050', 'NQUSB50205030', 'NQUSB50205040', 'NQUSB50206025', 'NQUSB50206050')),
+     sector.new('NQUSB55', 'Basic Materials', array.from('NQUSB5520', 'NQUSB5510', 'NQUSB551010', 'NQUSB551020', 'NQUSB551030', 'NQUSB55201000', 'NQUSB55201020', 'NQUSB55101015', 'NQUSB55102010', 'NQUSB55103025', 'NQUSB55102000', 'NQUSB55101000', 'NQUSB55102015', 'NQUSB55201015')),
+     sector.new('NQUSB60', 'Energy', array.from('NQUSB601010', 'NQUSB601020', 'NQUSB60101010', 'NQUSB60101000', 'NQUSB60101030', 'NQUSB60101035', 'NQUSB60102020', 'NQUSB60101040', 'NQUSB60102010', 'NQUSB60101015', 'NQUSB60101020')),
+     sector.new('NQUSB65', 'Utilities', array.from('NQUSB651010', 'NQUSB651020', 'NQUSB651030', 'NQUSB65101015', 'NQUSB65102020', 'NQUSB65102000', 'NQUSB65102030', 'NQUSB65101010'))
+     )
+
+var indArr=array.from(
+     industry.new('Advertising/Marketing Services', array.from('OMC', 'IPG', 'WPP', 'WSHP', 'DJT', 'PTRN', 'SBET', 'CRTO', 'CCO', 'QNST', 'IBEX', 'NCMI', 'VERI')),
+     industry.new('Aerospace & Defense', array.from('GE', 'RTX', 'BA', 'HON', 'LMT', 'GD', 'HWM', 'NOC', 'TDG', 'LHX', 'AXON', 'HEI.A', 'HEI')),
+     industry.new('Agricultural Commodities/Milling', array.from('CTVA', 'ADM', 'BG', 'PPC', 'SEB', 'CALM', 'FDP', 'VITL', 'TLRY', 'AVO')),
+     industry.new('Air Freight/Couriers', array.from('DASH', 'UPS', 'FDX', 'GRAB', 'EXPD', 'CHRW', 'ZTO', 'CART', 'R')),
+     industry.new('Airlines', array.from('DAL', 'RYAAY', 'UAL', 'LUV', 'LTM', 'AAL', 'CPA', 'ALK')),
+     industry.new('Alternative Power Generation', array.from('TLN', 'BIP', 'CWEN.A', 'CWEN')),
+     industry.new('Aluminum', array.from('AA', 'CENX', 'CSTM', 'KALU')),
+     industry.new('Apparel/Footwear', array.from('NKE', 'RL', 'LULU', 'ONON', 'DECK', 'LEVI', 'GIL', 'BIRK', 'VFC', 'CROX', 'ZGN', 'KTB')),
+     industry.new('Apparel/Footwear Retail', array.from('TJX', 'ROST', 'TPR', 'BURL', 'GAP', 'URBN', 'BOOT', 'ANF', 'AEO', 'VSCO', 'CPRI')),
+     industry.new('Auto Parts/ OEM', array.from('ITW', 'CMI', 'ITT', 'MGA', 'DCI', 'ALV', 'ALSN', 'LEA', 'GNTX', 'ATMU', 'GTX', 'VC')),
+     industry.new('Automotive Aftermarket', array.from('LKQ', 'DORM', 'GT', 'XPEL')),
+     industry.new('Beverages/ Alcoholic', array.from('BUD', 'DEO', 'ABEV', 'STZ')),
+     industry.new('Beverages/ Non-Alcoholic', array.from('KO', 'MNST', 'CCEP', 'KDP')),
+     industry.new('Biotechnology', array.from('AMGN', 'GILD', 'ARGX', 'IQV', 'NTRA', 'BNTX', 'UTHR', 'NBIX', 'BBIO', 'SMMT', 'ELAN', 'RNA', 'BMRN')),
+     industry.new('Broadcasting', array.from('FOXA', 'FOX', 'SIRI', 'NXST', 'TGNA')),
+     industry.new('Building Products', array.from('WSO', 'MAS', 'CSL', 'SPXC', 'AOS', 'MHK', 'SSD')),
+     industry.new('Cable/Satellite TV', array.from('CMCSA', 'WBD', 'CHTR', 'PSKY')),
+     industry.new('Casinos/Gaming', array.from('LVS', 'FLUT', 'WYNN', 'MGM')),
+     industry.new('Catalog/Specialty Distribution', array.from('YJ')),
+     industry.new('Chemicals/ Agricultural', array.from('NTR', 'CF', 'MOS', 'ICL', 'SMG')),
+     industry.new('Chemicals/ Major Diversified', array.from('DD', 'ESI', 'SSL', 'PRM')),
+     industry.new('Chemicals/ Specialty', array.from('LIN', 'ECL', 'APD', 'DOW', 'SQM', 'LYB', 'ALB', 'WLK', 'SOLS', 'NEU', 'EMN', 'CE', 'CBT')),
+     industry.new('Coal', array.from('HCC', 'CNR', 'BTU', 'ARLP')),
+     industry.new('Commercial Printing/Forms', array.from('WMG', 'BZ', 'CMPO', 'CMPR')),
+     industry.new('Computer Communications', array.from('RDWR', 'ALLT', 'SMRT', 'GNSS')),
+     industry.new('Computer Peripherals', array.from('ANET', 'STX', 'WDC', 'SNDK', 'PSTG', 'NTAP', 'LOGI')),
+     industry.new('Computer Processing Hardware', array.from('SONY', 'DELL', 'HPE', 'SMCI')),
+     industry.new('Construction Materials', array.from('CRH', 'VMC', 'MLM', 'AMRZ', 'CX')),
+     industry.new('Consumer Sundries', array.from('CENT', 'CENTA', 'DOGZ')),
+     industry.new('Containers/Packaging', array.from('AMCR', 'SW', 'PKG', 'BALL', 'CCK', 'OC', 'ATR')),
+     industry.new('Contract Drilling', array.from('SLB', 'BKR', 'NE', 'RIG')),
+     industry.new('Data Processing Services', array.from('MSCI', 'PAYX', 'VRSK', 'TYL', 'GDDY', 'J', 'IREN', 'AKAM', 'FDS', 'CIFR', 'DBX', 'APLD', 'GDS')),
+     industry.new('Department Stores', array.from('PDD', 'DDS', 'OLLI', 'M')),
+     industry.new('Discount Stores', array.from('DG', 'DLTR')),
+     industry.new('Drugstore Chains', array.from('CVS')),
+     industry.new('Electric Utilities', array.from('NEE', 'CEG', 'SO', 'DUK', 'NGG', 'AEP', 'VST', 'D', 'XEL', 'EXC', 'ETR', 'PEG', 'WEC')),
+     industry.new('Electrical Products', array.from('GEV', 'ETN', 'AME', 'ROK', 'HUBB', 'LITE', 'APTV', 'AYI', 'RRX', 'GNRC', 'QS', 'SMR', 'ENS')),
+     industry.new('Electronic Components', array.from('APH', 'GLW', 'CLS', 'NVT', 'TTMI', 'CAMT', 'VICR', 'KN')),
+     industry.new('Electronic Equipment/Instruments', array.from('EMR', 'KEYS', 'FTV', 'Q', 'NXT', 'NVMI', 'ONTO', 'CGNX', 'RAL', 'ESE', 'ST', 'ITRI', 'NOVT')),
+     industry.new('Electronic Production Equipment', array.from('VRT', 'TER', 'BE', 'FLEX', 'SANM', 'AEIS', 'LFUS', 'OLED', 'LPL')),
+     industry.new('Electronics Distributors', array.from('SNX', 'ARW', 'REZI', 'AVT')),
+     industry.new('Electronics/Appliance Stores', array.from('BBY', 'GME', 'PLBL')),
+     industry.new('Electronics/Appliances', array.from('SN', 'WHR', 'SONO', 'IMAX', 'SPB', 'RR', 'OWLT')),
+     industry.new('Engineering & Construction', array.from('PWR', 'FER', 'OTIS', 'FIX', 'EME', 'MTZ', 'APG', 'ACM', 'BLD', 'STN', 'STRL', 'DY', 'TTEK')),
+     industry.new('Environmental Services', array.from('WM', 'RSG', 'WCN', 'GFL', 'CLH')),
+     industry.new('Finance/Rental/Leasing', array.from('V', 'MA', 'AXP', 'RKT', 'URI', 'SOFI', 'IX', 'SYF', 'AER', 'AFRM', 'KSPI', 'UHAL.B', 'UHAL')),
+     industry.new('Financial Conglomerates', array.from('RPRX', 'BMNR', 'MAIN', 'KYIV', 'JCAP', 'IGIC', 'BCSF', 'CCCX', 'MTA', 'BEAG', 'CEPF', 'EVAC', 'BCSS')),
+     industry.new('Financial Publishing/Services', array.from('SPGI', 'MCO', 'FICO', 'EFX')),
+     industry.new('Food Distributors', array.from('SYY', 'USFD', 'CHEF', 'UNFI')),
+     industry.new('Food Retail', array.from('KR', 'ACI', 'SFM', 'TBBB')),
+     industry.new('Food/ Major Diversified', array.from('KHC', 'GIS', 'CAG', 'CHA')),
+     industry.new('Food/ Meat/Fish/Dairy', array.from('TSN', 'JBS', 'HRL', 'SFD')),
+     industry.new('Food/ Specialty/Candy', array.from('PEP', 'MDLZ', 'HSY', 'K', 'MKC', 'MKC.V', 'IFF', 'SJM', 'CPB', 'LW', 'INGR', 'DAR', 'POST')),
+     industry.new('Forest Products', array.from('LPX', 'UFPI', 'WFG', 'TREX')),
+     industry.new('Gas Distributors', array.from('SRE', 'TRGP', 'ATO', 'CQP', 'NI', 'SWX', 'BKH')),
+     industry.new('Home Furnishings', array.from('SGI', 'LZB', 'ARHS', 'MBC', 'LEG', 'ETD')),
+     industry.new('Home Improvement Chains', array.from('HD', 'LOW', 'BLDR', 'FND')),
+     industry.new('Homebuilding', array.from('DHI', 'LEN', 'LEN.B', 'PHM', 'NVR', 'TOL', 'TMHC', 'SKY')),
+     industry.new('Hospital/Nursing Management', array.from('HCA', 'THC', 'UHS', 'CHE')),
+     industry.new('Hotels/Resorts/Cruise lines', array.from('MAR', 'RCL', 'ABNB', 'HLT', 'CUK', 'CCL', 'VIK', 'IHG')),
+     industry.new('Household/Personal Care', array.from('PG', 'UL', 'CL', 'KMB', 'EL', 'KVUE', 'CHD', 'CLX')),
+     industry.new('Industrial Conglomerates', array.from('MMM', 'RLX', 'HI')),
+     industry.new('Industrial Machinery', array.from('AMAT', 'LRCX', 'PH', 'TT', 'JCI', 'SYM', 'CARR', 'XYL', 'IR', 'DOV', 'VLTO', 'JBL', 'WWD')),
+     industry.new('Industrial Specialties', array.from('SHW', 'PPG', 'RPM', 'AXTA', 'CSW', 'AZZ')),
+     industry.new('Information Technology Services', array.from('IBM', 'ACN', 'INFY', 'NET', 'FTNT', 'WDAY', 'CTSH', 'WIT', 'CRDO', 'BR', 'HPQ', 'SSNC', 'GIB')),
+     industry.new('Insurance Brokers/Services', array.from('MMC', 'AON', 'AJG', 'WTW', 'BRO', 'RYAN')),
+     industry.new('Integrated Oil', array.from('XOM', 'CVX', 'SHEL', 'TTE', 'BP', 'PBR', 'PBR.A', 'CNQ', 'EOG', 'EQNR', 'SU', 'IMO', 'OXY')),
+     industry.new('Internet Retail', array.from('AMZN', 'BABA', 'MELI', 'SE', 'CPNG', 'JD', 'EBAY', 'CHWY', 'VIPS', 'GLBE', 'ETSY', 'RVLV')),
+     industry.new('Internet Software/Services', array.from('GOOGL', 'GOOG', 'META', 'NFLX', 'SPOT', 'TRI', 'MSTR', 'BIDU', 'RDDT', 'FWONA', 'FWONK', 'CSGP', 'TME')),
+     industry.new('Investment Banks/Brokers', array.from('GS', 'SCHW', 'HOOD', 'IBKR', 'CME', 'ICE', 'BCS', 'BK', 'COIN', 'DB', 'NDAQ', 'AMP', 'STT')),
+     industry.new('Investment Managers', array.from('MS', 'BX', 'BLK', 'UBS', 'BN', 'KKR', 'BAM', 'APO', 'ARES', 'RJF', 'NTRS', 'OWL', 'TROW')),
+     industry.new('Investment Trusts/Mutual Funds', array.from('TPL', 'VNOM', 'BXSL', 'FSK', 'BSM', 'TSLX', 'WT', 'KRP', 'CSWC', 'OCSL', 'SBR', 'GSBD', 'TRIN')),
+     industry.new('Life/Health Insurance', array.from('PRU', 'CRBG', 'EQH', 'RGA')),
+     industry.new('Major Banks', array.from('JPM', 'BAC', 'WFC', 'HSBC', 'RY', 'C', 'MUFG', 'HDB', 'SAN', 'TD', 'COF', 'BBVA', 'SMFG')),
+     industry.new('Major Telecommunications', array.from('CHT', 'BCE', 'FYBR', 'LUMN', 'KT', 'TEO')),
+     industry.new('Managed Health Care', array.from('UNH', 'ELV', 'CI', 'HUM')),
+     industry.new('Marine Shipping', array.from('KEX', 'FRO', 'MATX', 'HAFN', 'STNG', 'CMBT', 'INSW', 'TDW', 'ZIM', 'SBLK', 'TRMD', 'DHT', 'TNK')),
+     industry.new('Media Conglomerates', array.from('SPHR', 'THH')),
+     industry.new('Medical Distributors', array.from('MCK', 'COR', 'CAH', 'HSIC')),
+     industry.new('Medical Specialties', array.from('ABT', 'TMO', 'ISRG', 'DHR', 'BSX', 'SYK', 'MDT', 'IDXX', 'BDX', 'EW', 'A', 'ALC', 'RMD')),
+     industry.new('Medical/Nursing Services', array.from('LH', 'SOLV', 'GH', 'FMS', 'EHC', 'ENSG', 'HIMS', 'DVA', 'BTSG', 'RDNT', 'BLLN', 'OPCH', 'WGS')),
+     industry.new('Metal Fabrication', array.from('RBC', 'MLI', 'VMI', 'USAR', 'ROCK', 'IIIN')),
+     industry.new('Miscellaneous', array.from('LMB', 'PANL', 'INV', 'ALPS')),
+     industry.new('Miscellaneous Commercial Services', array.from('SHOP', 'RELX', 'PYPL', 'XYZ', 'FISV', 'ROL', 'CPAY', 'ULS', 'GPN', 'MEDP', 'ICLR', 'RTO', 'KLAR')),
+     industry.new('Miscellaneous Manufacturing', array.from('WMS', 'AWI', 'BRC', 'YETI')),
+     industry.new('Motor Vehicles', array.from('TSLA', 'TM', 'RACE', 'GM', 'F', 'HMC', 'STLA', 'XPEV', 'RIVN', 'LI', 'NIO', 'OSK', 'VFS')),
+     industry.new('Movies/Entertainment', array.from('DIS', 'TKO', 'LYV', 'DKNG', 'CHDN', 'MSGS', 'CNK', 'MANU', 'BATRA', 'BATRK', 'MSGE', 'LION', 'PRKS')),
+     industry.new('Multi-Line Insurance', array.from('PGR', 'MFC', 'AFL', 'ALL', 'MET', 'AIG', 'PUK', 'ACGL', 'SLF', 'WRB', 'CINF', 'BNT', 'UNM')),
+     industry.new('Office Equipment/Supplies', array.from('HNI', 'SCS', 'MLKN', 'ACCO')),
+     industry.new('Oil & Gas Pipelines', array.from('ENB', 'WMB', 'EPD', 'KMI', 'ET', 'TRP', 'MPLX', 'OKE', 'LNG')),
+     industry.new('Oil & Gas Production', array.from('COP', 'FANG', 'WDS', 'AR', 'RRC', 'CRK', 'CNX', 'VIST', 'MUR', 'MGY', 'GPOR', 'SM', 'NOG')),
+     industry.new('Oil Refining/Marketing', array.from('MPC', 'E', 'PSX', 'VLO')),
+     industry.new('Oilfield Services/Equipment', array.from('HAL', 'FTI', 'NOV', 'WFRD', 'AROC', 'WHD', 'USAC', 'KGS', 'LBRT', 'INVX')),
+     industry.new('Other Consumer Services', array.from('BKNG', 'CTAS', 'TCOM', 'EXPE', 'SCI', 'PLNT', 'EDU', 'LTH', 'HRB', 'GHC', 'BGSI', 'GBTG', 'VVV')),
+     industry.new('Other Consumer Specialties', array.from('MSA', 'FWDI', 'ZEPP', 'MOV')),
+     industry.new('Other Metals/Minerals', array.from('RIO', 'SCCO', 'FCX', 'CCJ', 'TECK', 'CRS', 'ATI', 'MP', 'HBM', 'UEC', 'NXE', 'LEU', 'UUUU')),
+     industry.new('Other Transportation', array.from('UBER', 'PFGC', 'PAC', 'ASR', 'SARO')),
+     industry.new('Packaged Software', array.from('MSFT', 'ORCL', 'PLTR', 'SAP', 'CRM', 'APP', 'INTU', 'NOW', 'ADBE', 'PANW', 'CRWD', 'ADP', 'NTES')),
+     industry.new('Personnel Services', array.from('KFY', 'RHI', 'UPWK', 'MAN', 'HSII', 'BBSI', 'AMN', 'KFRC')),
+     industry.new('Pharmaceuticals/ Generic', array.from('TEVA')),
+     industry.new('Pharmaceuticals/ Major', array.from('LLY', 'JNJ', 'ABBV', 'AZN', 'MRK', 'NVS', 'NVO', 'PFE', 'SNY', 'VRTX', 'BMY', 'GSK', 'REGN')),
+     industry.new('Pharmaceuticals/ Other', array.from('RVMD', 'ABVX', 'CDTX', 'BRBR', 'BHC', 'AVBP', 'CRON', 'NAGE', 'USNA', 'NATR', 'FTLF')),
+     industry.new('Precious Metals', array.from('NEM', 'AEM', 'B', 'WPM', 'AU', 'FNV', 'GFI', 'KGC', 'PAAS', 'RGLD', 'AGI', 'HMY', 'HL')),
+     industry.new('Property/Casualty Insurance', array.from('BRK.A', 'BRK.B', 'CB', 'TRV', 'HIG', 'MKL', 'L', 'ERIE', 'EG', 'RNR', 'AFG', 'AIZ', 'THG')),
+     industry.new('Publishing/ Books/Magazines', array.from('PSO', 'WLY', 'WLYB', 'SCHL')),
+     industry.new('Publishing/ Newspapers', array.from('NWS', 'NWSA', 'NYT', 'TDAY')),
+     industry.new('Pulp & Paper', array.from('IP', 'AVY', 'SUZ', 'SLVM')),
+     industry.new('Railroads', array.from('UNP', 'NSC', 'CSX', 'CP')),
+     industry.new('Real Estate Development', array.from('CBRE', 'BEKE', 'JLL', 'OPEN', 'FSV', 'HHH', 'MTH', 'MRP', 'MRP/I', 'CWK', 'HGV', 'JOE', 'NMRK')),
+     industry.new('Real Estate Investment Trusts', array.from('WELL', 'PLD', 'AMT', 'EQIX', 'SPG', 'DLR', 'O', 'PSA', 'CCI', 'VTR', 'VICI', 'EXR', 'AVB')),
+     industry.new('Recreational Products', array.from('AS', 'HAS', 'MAT', 'THO', 'GOLF', 'PII', 'HAYW', 'MODG', 'WGO')),
+     industry.new('Regional Banks', array.from('IBN', 'NU', 'CM', 'USB', 'TFC', 'KB', 'MTB', 'FITB', 'FCNCA', 'CIB', 'EWBC', 'BSAC', 'ALLY')),
+     industry.new('Restaurants', array.from('MCD', 'SBUX', 'CMG', 'YUM', 'QSR', 'DRI', 'YUMC', 'DPZ', 'TXRH', 'ARMK', 'BROS', 'WING', 'EAT')),
+     industry.new('Savings Banks', array.from('WBS', 'TFSL', 'WSFS', 'PFS', 'NWBI', 'CLBK', 'TFIN', 'OCFC', 'CFFN', 'TRST', 'HIFS', 'SMBC', 'TCBX')),
+     industry.new('Semiconductors', array.from('NVDA', 'AVGO', 'TSM', 'ASML', 'AMD', 'MU', 'QCOM', 'INTC', 'KLAC', 'TXN', 'ARM', 'ADI', 'MRVL', 'TEL', 'NXPI', 'MPWR', 'ASX', 'FSLR', 'MCHP', 'ALAB', 'COHR', 'STM', 'ON', 'GFS', 'UMC', 'FN', 'MTSI', 'TSEM', 'RMBS', 'SWKS', 'LSCC', 'AMKR', 'QRVO', 'SITM', 'SMTC', 'CRUS', 'PI')),
+     industry.new('Services to the Health Industry', array.from('DGX', 'ASTH', 'NRC')),
+     industry.new('Specialty Insurance', array.from('FNF', 'ORI', 'FAF', 'ESNT')),
+     industry.new('Specialty Stores', array.from('WMT', 'COST', 'ORLY', 'CVNA', 'AZO', 'TGT', 'CPRT', 'TSCO', 'ULTA', 'WSM', 'CASY', 'DKS', 'W')),
+     industry.new('Specialty Telecommunications', array.from('TEF', 'SATS', 'ASTS', 'PHI')),
+     industry.new('Steel', array.from('BHP', 'VALE', 'NUE', 'MT', 'STLD', 'TS', 'PKX', 'RS')),
+     industry.new('Telecommunications Equipment', array.from('AAPL', 'CSCO', 'MSI', 'GRMN', 'UI', 'NOK', 'ERIC', 'CIEN', 'VSAT', 'COMM', 'CALX', 'ONDS')),
+     industry.new('Textiles', array.from('AIN', 'MAGN', 'MAMK', 'UFI')),
+     industry.new('Tobacco', array.from('PM', 'BTI', 'MO')),
+     industry.new('Tools & Hardware', array.from('SNA', 'ALLE', 'SWK', 'EML')),
+     industry.new('Trucking', array.from('ODFL', 'XPO', 'JBHT', 'SAIA', 'KNX', 'TFII', 'LSTR')),
+     industry.new('Trucks/Construction/Farm Machinery', array.from('CAT', 'DE', 'PCAR', 'WAB', 'CNH', 'BWA', 'AGCO', 'TTC', 'DOOO', 'BC', 'TEX')),
+     industry.new('Water Utilities', array.from('AWK', 'SBS', 'WTRG', 'AWR')),
+     industry.new('Wholesale Distributors', array.from('FERG', 'FAST', 'GWW', 'GPC', 'WCC', 'QXO', 'AIT', 'CNM', 'POOL', 'SUN', 'UGI', 'SITE', 'MSM')),
+     industry.new('Wireless Telecommunications', array.from('TMUS', 'T', 'VZ', 'AMX', 'VOD', 'TLK', 'RCI', 'VIV'))
+     )
+
+var symbolToName=map.new<string, string>()
+
+initSymbolToName() =>
+    symbolToName.put("NQUSB", "All Sectors")
+    symbolToName.put("NQUSB10", "Technology")
+    symbolToName.put("NQUSB101010", "Software and Computer Services")
+    symbolToName.put("NQUSB10101010", "Computer Services")
+    symbolToName.put("NQUSB10101010LM", "Computer Services")
+    symbolToName.put("NQUSB10101015", "Software")
+    symbolToName.put("NQUSB10101015LM", "Software")
+    symbolToName.put("NQUSB10101020", "Consumer Digital Services")
+    symbolToName.put("NQUSB10101020LM", "Consumer Digital Services")
+    symbolToName.put("NQUSB101010LM", "Software and Computer Services")
+    symbolToName.put("NQUSB101020", "Technology Hardware and Equipment")
+    symbolToName.put("NQUSB10102010", "Semiconductors")
+    symbolToName.put("NQUSB10102010LM", "Semiconductors")
+    symbolToName.put("NQUSB10102015", "Electronic Components")
+    symbolToName.put("NQUSB10102015LM", "Electronic Components")
+    symbolToName.put("NQUSB10102020", "Production Technology Equipment")
+    symbolToName.put("NQUSB10102020LM", "Production Technology Equipment")
+    symbolToName.put("NQUSB10102030", "Computer Hardware")
+    symbolToName.put("NQUSB10102030LM", "Computer Hardware")
+    symbolToName.put("NQUSB101020LM", "Technology Hardware and Equipment")
+    symbolToName.put("NQUSB10LM", "Technology")
+    symbolToName.put("NQUSB15", "Telecommunications")
+    symbolToName.put("NQUSB151010", "Telecommunications Equipment")
+    symbolToName.put("NQUSB151010LM", "Telecommunications Equipment")
+    symbolToName.put("NQUSB151020", "Telecommunications Service Providers")
+    symbolToName.put("NQUSB15102010", "Cable Television Services")
+    symbolToName.put("NQUSB15102010LM", "Cable Television Services")
+    symbolToName.put("NQUSB15102015", "Telecommunications Services")
+    symbolToName.put("NQUSB15102015LM", "Telecommunications Services")
+    symbolToName.put("NQUSB151020LM", "Telecommunications Service Provider")
+    symbolToName.put("NQUSB15LM", "Telecommunications")
+    symbolToName.put("NQUSB20", "Health Care")
+    symbolToName.put("NQUSB201010", "Health Care Providers")
+    symbolToName.put("NQUSB20101010", "Health Care Facilities")
+    symbolToName.put("NQUSB20101010LM", "Health Care Facilities")
+    symbolToName.put("NQUSB20101020", "Health Care Management Services")
+    symbolToName.put("NQUSB20101020LM", "Health Care Management Services")
+    symbolToName.put("NQUSB20101025", "Health Care Services")
+    symbolToName.put("NQUSB20101025LM", "Health Care Services")
+    symbolToName.put("NQUSB201010LM", "Health Care Providers")
+    symbolToName.put("NQUSB201020", "Medical Equipment and Services")
+    symbolToName.put("NQUSB20102010", "Medical Equipment")
+    symbolToName.put("NQUSB20102010LM", "Medical Equipment")
+    symbolToName.put("NQUSB20102015", "Medical Supplies")
+    symbolToName.put("NQUSB20102015LM", "Medical Supplies")
+    symbolToName.put("NQUSB20102020", "Medical Services")
+    symbolToName.put("NQUSB20102020LM", "Medical Services")
+    symbolToName.put("NQUSB201020LM", "Medical Equipment and Services")
+    symbolToName.put("NQUSB201030", "Pharmaceuticals and Biotechnology")
+    symbolToName.put("NQUSB20103010", "Biotechnology")
+    symbolToName.put("NQUSB20103010LM", "Biotechnology")
+    symbolToName.put("NQUSB20103015", "Pharmaceuticals")
+    symbolToName.put("NQUSB20103015LM", "Pharmaceuticals")
+    symbolToName.put("NQUSB201030LM", "Pharmaceuticals and Biotechnology")
+    symbolToName.put("NQUSB20LM", "Health Care")
+    symbolToName.put("NQUSB30", "Financials")
+    symbolToName.put("NQUSB3010", "Banks")
+    symbolToName.put("NQUSB3010LM", "Banks")
+    symbolToName.put("NQUSB3020", "Financial Services")
+    symbolToName.put("NQUSB302010", "Finance and Credit Services")
+    symbolToName.put("NQUSB30201020", "Consumer Lending")
+    symbolToName.put("NQUSB30201020LM", "Consumer Lending")
+    symbolToName.put("NQUSB30201025", "Mortgage Finance")
+    symbolToName.put("NQUSB30201030", "Financial Data Providers")
+    symbolToName.put("NQUSB30201030LM", "Financial Data Providers")
+    symbolToName.put("NQUSB302010LM", "Finance and Credit Services")
+    symbolToName.put("NQUSB302020", "Investment Banking and Brokerage Services")
+    symbolToName.put("NQUSB30202000", "Diversified Financial Services")
+    symbolToName.put("NQUSB30202000LM", "Diversified Financial Services")
+    symbolToName.put("NQUSB30202010", "Asset Managers and Custodians")
+    symbolToName.put("NQUSB30202010LM", "Asset Managers and Custodians")
+    symbolToName.put("NQUSB30202015", "Investment Services")
+    symbolToName.put("NQUSB30202015LM", "Investment Services")
+    symbolToName.put("NQUSB302020LM", "Investment Banking and Brokerage Services")
+    symbolToName.put("NQUSB302030", "Mortgage Real Estate Investment Trusts")
+    symbolToName.put("NQUSB30203000", "Mortgage REITs: Diversified")
+    symbolToName.put("NQUSB30203010", "Mortgage REITs: Commercial")
+    symbolToName.put("NQUSB30203020", "Mortgage REITs: Residential")
+    symbolToName.put("NQUSB30203020LM", "Mortgage REITs: Residential")
+    symbolToName.put("NQUSB302030LM", "Mortgage Real Estate Investment Trusts")
+    symbolToName.put("NQUSB3020LM", "Financial Services")
+    symbolToName.put("NQUSB3030", "Insurance")
+    symbolToName.put("NQUSB303010", "Life Insurance")
+    symbolToName.put("NQUSB303010LM", "Life Insurance")
+    symbolToName.put("NQUSB303020", "Non-life Insurance")
+    symbolToName.put("NQUSB30302010", "Full Line Insurance")
+    symbolToName.put("NQUSB30302010LM", "Full Line Insurance")
+    symbolToName.put("NQUSB30302015", "Insurance Brokers")
+    symbolToName.put("NQUSB30302020", "Reinsurance")
+    symbolToName.put("NQUSB30302020LM", "Reinsurance")
+    symbolToName.put("NQUSB30302025", "Property and Casualty Insurance")
+    symbolToName.put("NQUSB30302025LM", "Property and Casualty Insurance")
+    symbolToName.put("NQUSB303020LM", "Non-life Insurance")
+    symbolToName.put("NQUSB3030LM", "Insurance")
+    symbolToName.put("NQUSB30LM", "Financials")
+    symbolToName.put("NQUSB35", "Real Estate")
+    symbolToName.put("NQUSB351010", "Real Estate Investment and Services")
+    symbolToName.put("NQUSB35101010", "Real Estate Holding and Development")
+    symbolToName.put("NQUSB35101015", "Real Estate Services")
+    symbolToName.put("NQUSB35101015LM", "Real Estate Services")
+    symbolToName.put("NQUSB351010LM", "Real Estate Investment and Services")
+    symbolToName.put("NQUSB351020", "Real Estate Investment Trusts")
+    symbolToName.put("NQUSB35102000", "Diversified REITs")
+    symbolToName.put("NQUSB35102010", "Health Care REITs")
+    symbolToName.put("NQUSB35102010LM", "Health Care REITs")
+    symbolToName.put("NQUSB35102015", "Hotel and Lodging REITs")
+    symbolToName.put("NQUSB35102015LM", "Hotel and Lodging REITs")
+    symbolToName.put("NQUSB35102020", "Industrial REITs")
+    symbolToName.put("NQUSB35102020LM", "Industrial REITs")
+    symbolToName.put("NQUSB35102025", "Infrastructure REITs")
+    symbolToName.put("NQUSB35102030", "Office REITs")
+    symbolToName.put("NQUSB35102030LM", "Office REITs")
+    symbolToName.put("NQUSB35102040", "Residential REITs")
+    symbolToName.put("NQUSB35102040LM", "Residential REITs")
+    symbolToName.put("NQUSB35102045", "Retail REITs")
+    symbolToName.put("NQUSB35102045LM", "Retail REITs")
+    symbolToName.put("NQUSB35102050", "Storage REITs")
+    symbolToName.put("NQUSB35102050AUD", "Storage REITs AUD")
+    symbolToName.put("NQUSB35102050CAD", "Storage REITs CAD")
+    symbolToName.put("NQUSB35102050EUR", "Storage REITs EUR")
+    symbolToName.put("NQUSB35102050GBP", "Storage REITs GBP")
+    symbolToName.put("NQUSB35102050JPY", "Storage REITs JPY")
+    symbolToName.put("NQUSB35102070", "Other Specialty REITs")
+    symbolToName.put("NQUSB35102070LM", "Other Specialty REITs")
+    symbolToName.put("NQUSB351020LM", "Real Estate Investment Trusts")
+    symbolToName.put("NQUSB35LM", "Real Estate")
+    symbolToName.put("NQUSB40", "Consumer Discretionary")
+    symbolToName.put("NQUSB4010", "Automobiles and Parts")
+    symbolToName.put("NQUSB40101020", "Automobiles")
+    symbolToName.put("NQUSB40101020LM", "Automobiles")
+    symbolToName.put("NQUSB40101025", "Auto Parts")
+    symbolToName.put("NQUSB40101025LM", "Auto Parts")
+    symbolToName.put("NQUSB4010LM", "Automobiles and Parts")
+    symbolToName.put("NQUSB4020", "Consumer Products and Services")
+    symbolToName.put("NQUSB402010", "Consumer Services")
+    symbolToName.put("NQUSB40201010", "Education Services")
+    symbolToName.put("NQUSB40201040", "Rental and Leasing Services: Consumer")
+    symbolToName.put("NQUSB40201070", "Consumer Services: Misc.")
+    symbolToName.put("NQUSB40201070LM", "Consumer Services: Misc.")
+    symbolToName.put("NQUSB402010LM", "Consumer Services")
+    symbolToName.put("NQUSB402020", "Household Goods and Home Construction")
+    symbolToName.put("NQUSB40202010", "Home Construction")
+    symbolToName.put("NQUSB40202010LM", "Home Construction")
+    symbolToName.put("NQUSB40202015", "Household Furnishings")
+    symbolToName.put("NQUSB40202015LM", "Household Furnishings")
+    symbolToName.put("NQUSB40202025", "Household Equipment and Products")
+    symbolToName.put("NQUSB402020LM", "Household Goods and Home Construction")
+    symbolToName.put("NQUSB402030", "Leisure Goods")
+    symbolToName.put("NQUSB40203010", "Consumer Electronics")
+    symbolToName.put("NQUSB40203040", "Electronic Entertainment")
+    symbolToName.put("NQUSB40203040LM", "Electronic Entertainment")
+    symbolToName.put("NQUSB40203045", "Toys")
+    symbolToName.put("NQUSB40203045LM", "Toys")
+    symbolToName.put("NQUSB40203050", "Recreational Products")
+    symbolToName.put("NQUSB40203050LM", "Recreational Products")
+    symbolToName.put("NQUSB40203055", "Recreational Vehicles and Boats")
+    symbolToName.put("NQUSB402030LM", "Leisure Goods")
+    symbolToName.put("NQUSB402040", "Personal Goods")
+    symbolToName.put("NQUSB40204020", "Clothing and Accessories")
+    symbolToName.put("NQUSB40204020LM", "Clothing and Accessories")
+    symbolToName.put("NQUSB40204025", "Footwear")
+    symbolToName.put("NQUSB40204035", "Cosmetics")
+    symbolToName.put("NQUSB402040LM", "Personal Goods")
+    symbolToName.put("NQUSB4020LM", "Consumer Products and Services")
+    symbolToName.put("NQUSB4030", "Media")
+    symbolToName.put("NQUSB40301010", "Entertainment")
+    symbolToName.put("NQUSB40301010LM", "Entertainment")
+    symbolToName.put("NQUSB40301020", "Media Agencies")
+    symbolToName.put("NQUSB40301020LM", "Media Agencies")
+    symbolToName.put("NQUSB40301030", "Publishing")
+    symbolToName.put("NQUSB40301030LM", "Publishing")
+    symbolToName.put("NQUSB40301035", "Radio and TV Broadcasters")
+    symbolToName.put("NQUSB40301035LM", "Radio and TV Broadcasters")
+    symbolToName.put("NQUSB4030LM", "Media")
+    symbolToName.put("NQUSB4040", "Retail")
+    symbolToName.put("NQUSB404010", "Retailers")
+    symbolToName.put("NQUSB40401010", "Diversified Retailers")
+    symbolToName.put("NQUSB40401010LM", "Broadline Diversified Retailers")
+    symbolToName.put("NQUSB40401020", "Apparel Retailers")
+    symbolToName.put("NQUSB40401020LM", "Apparel Retailers")
+    symbolToName.put("NQUSB40401025", "Home Improvement Retailers")
+    symbolToName.put("NQUSB40401030", "Specialty Retailers")
+    symbolToName.put("NQUSB40401030LM", "Specialty Retailers")
+    symbolToName.put("NQUSB404010LM", "Retailers")
+    symbolToName.put("NQUSB4040LM", "Retail")
+    symbolToName.put("NQUSB4050", "Travel and Leisure")
+    symbolToName.put("NQUSB40501010", "Airlines")
+    symbolToName.put("NQUSB40501010LM", "Airlines")
+    symbolToName.put("NQUSB40501015", "Travel and Tourism")
+    symbolToName.put("NQUSB40501015LM", "Travel and Tourism")
+    symbolToName.put("NQUSB40501020", "Casinos and Gambling")
+    symbolToName.put("NQUSB40501020LM", "Casinos and Gambling")
+    symbolToName.put("NQUSB40501025", "Hotels and Motels")
+    symbolToName.put("NQUSB40501025LM", "Hotels and Motels")
+    symbolToName.put("NQUSB40501030", "Recreational Services")
+    symbolToName.put("NQUSB40501030LM", "Recreational Services")
+    symbolToName.put("NQUSB40501040", "Restaurants and Bars")
+    symbolToName.put("NQUSB40501040LM", "Restaurants and Bars")
+    symbolToName.put("NQUSB4050LM", "Travel and Leisure")
+    symbolToName.put("NQUSB40LM", "Consumer Discretionary")
+    symbolToName.put("NQUSB45", "Consumer Staples")
+    symbolToName.put("NQUSB4510", "Food, Beverage and Tobacco")
+    symbolToName.put("NQUSB451010", "Beverages")
+    symbolToName.put("NQUSB45101015", "Distillers and Vintners")
+    symbolToName.put("NQUSB45101020", "Soft Drinks")
+    symbolToName.put("NQUSB45101020LM", "Soft Drinks")
+    symbolToName.put("NQUSB451010LM", "Beverages")
+    symbolToName.put("NQUSB451020", "Food Producers")
+    symbolToName.put("NQUSB45102010", "Farming, Fishing, Ranching and Plantations")
+    symbolToName.put("NQUSB45102020", "Food Products")
+    symbolToName.put("NQUSB45102020LM", "Food Products")
+    symbolToName.put("NQUSB451020LM", "Food Producers")
+    symbolToName.put("NQUSB451030", "Tobacco")
+    symbolToName.put("NQUSB4510LM", "Food, Beverage and Tobacco")
+    symbolToName.put("NQUSB4520", "Personal Care, Drug and Grocery Stores")
+    symbolToName.put("NQUSB45201010", "Food Retailers and Wholesalers")
+    symbolToName.put("NQUSB45201010LM", "Food Retailers and Wholesalers")
+    symbolToName.put("NQUSB45201015", "Drug Retailers")
+    symbolToName.put("NQUSB45201015LM", "Drug Retailers")
+    symbolToName.put("NQUSB45201020", "Personal Products")
+    symbolToName.put("NQUSB45201020LM", "Personal Products")
+    symbolToName.put("NQUSB45201030", "Nondurable Household Products")
+    symbolToName.put("NQUSB45201030LM", "Nondurable Household Products")
+    symbolToName.put("NQUSB4520LM", "Personal Care, Drug and Grocery Stores")
+    symbolToName.put("NQUSB45LM", "Consumer Staples")
+    symbolToName.put("NQUSB50", "Industrials")
+    symbolToName.put("NQUSB5010", "Construction and Materials")
+    symbolToName.put("NQUSB50101010", "Construction")
+    symbolToName.put("NQUSB50101015", "Engineering and Contracting Services")
+    symbolToName.put("NQUSB50101015LM", "Engineering and Contacting Services")
+    symbolToName.put("NQUSB50101020", "Building, Roofing/Wallboard and Plumbing")
+    symbolToName.put("NQUSB50101025", "Building: Climate Control")
+    symbolToName.put("NQUSB50101025LM", "Building: Climate Control")
+    symbolToName.put("NQUSB50101035", "Building Materials: Other")
+    symbolToName.put("NQUSB50101035LM", "Building Materials: Other")
+    symbolToName.put("NQUSB5010LM", "Construction and Materials")
+    symbolToName.put("NQUSB5020", "Industrial Goods and Services")
+    symbolToName.put("NQUSB502010", "Aerospace and Defense")
+    symbolToName.put("NQUSB50201010", "Aerospace")
+    symbolToName.put("NQUSB50201010LM", "Aerospace")
+    symbolToName.put("NQUSB50201020", "Defense")
+    symbolToName.put("NQUSB50201020LM", "Defense")
+    symbolToName.put("NQUSB502010LM", "Aerospace and Defense")
+    symbolToName.put("NQUSB502020", "Electronic and Electrical Equipment")
+    symbolToName.put("NQUSB50202010", "Electrical Components")
+    symbolToName.put("NQUSB50202020", "Electronic Equipment: Control and Filter")
+    symbolToName.put("NQUSB50202020LM", "Electronic Equipment: Control and Filter")
+    symbolToName.put("NQUSB50202025", "Electronic Equipment: Gauges and Meters")
+    symbolToName.put("NQUSB50202025LM", "Electronic Equipment: Gauges and Meters")
+    symbolToName.put("NQUSB50202040", "Electronic Equipment: Other")
+    symbolToName.put("NQUSB502020LM", "Electronic and Electrical Equipment")
+    symbolToName.put("NQUSB502030", "General Industrials")
+    symbolToName.put("NQUSB50203000", "Diversified Industrials")
+    symbolToName.put("NQUSB50203000LM", "Diversified Industrials")
+    symbolToName.put("NQUSB50203010", "Paints and Coatings")
+    symbolToName.put("NQUSB50203030", "Containers and Packaging")
+    symbolToName.put("NQUSB50203030LM", "Containers and Packaging")
+    symbolToName.put("NQUSB502030LM", "General Industrials")
+    symbolToName.put("NQUSB502040", "Industrial Engineering")
+    symbolToName.put("NQUSB50204000", "Machinery: Industrial")
+    symbolToName.put("NQUSB50204000LM", "Machinery: Industrial")
+    symbolToName.put("NQUSB50204010", "Machinery: Agricultural")
+    symbolToName.put("NQUSB50204020", "Machinery: Construction and Handling")
+    symbolToName.put("NQUSB50204050", "Machinery: Specialty")
+    symbolToName.put("NQUSB502040LM", "Industrial Engineering")
+    symbolToName.put("NQUSB502050", "Industrial Support Services")
+    symbolToName.put("NQUSB50205010", "Industrial Suppliers")
+    symbolToName.put("NQUSB50205010LM", "Industrial Suppliers")
+    symbolToName.put("NQUSB50205015", "Transaction Processing Services")
+    symbolToName.put("NQUSB50205015LM", "Transaction Processing Services")
+    symbolToName.put("NQUSB50205020", "Professional Business Support Services")
+    symbolToName.put("NQUSB50205020LM", "Professional Business Support Services")
+    symbolToName.put("NQUSB50205025", "Business Training and Employment Agencies")
+    symbolToName.put("NQUSB50205030", "Forms and Bulk Printing Services")
+    symbolToName.put("NQUSB50205040", "Security Services")
+    symbolToName.put("NQUSB502050LM", "Industrial Support Services")
+    symbolToName.put("NQUSB502060", "Industrial Transportation")
+    symbolToName.put("NQUSB50206010", "Trucking")
+    symbolToName.put("NQUSB50206010LM", "Trucking")
+    symbolToName.put("NQUSB50206015", "Commercial Vehicles and Parts")
+    symbolToName.put("NQUSB50206015LM", "Commercial Vehicles and Parts")
+    symbolToName.put("NQUSB50206020", "Railroads")
+    symbolToName.put("NQUSB50206020LM", "Railroads")
+    symbolToName.put("NQUSB50206025", "Railroad Equipment")
+    symbolToName.put("NQUSB50206025AUD", "Railroad Equipment AUD")
+    symbolToName.put("NQUSB50206025CAD", "Railroad Equipment CAD")
+    symbolToName.put("NQUSB50206025EUR", "Railroad Equipment EUR")
+    symbolToName.put("NQUSB50206025GBP", "Railroad Equipment GBP")
+    symbolToName.put("NQUSB50206025JPY", "Railroad Equipment JPY")
+    symbolToName.put("NQUSB50206030", "Marine Transportation")
+    symbolToName.put("NQUSB50206040", "Delivery Services")
+    symbolToName.put("NQUSB50206050", "Commercial Vehicle-Equipment Leasing")
+    symbolToName.put("NQUSB50206060", "Transportation Services")
+    symbolToName.put("NQUSB50206060LM", "Transportation Services")
+    symbolToName.put("NQUSB502060LM", "Industrial Transportation")
+    symbolToName.put("NQUSB5020LM", "Industrial Goods and Services")
+    symbolToName.put("NQUSB50LM", "Industrials")
+    symbolToName.put("NQUSB55", "Basic Materials")
+    symbolToName.put("NQUSB5510", "Basic Resources")
+    symbolToName.put("NQUSB551010", "Industrial Materials")
+    symbolToName.put("NQUSB55101000", "Diversified Materials")
+    symbolToName.put("NQUSB55101015", "Paper")
+    symbolToName.put("NQUSB551010LM", "Industrial Materials")
+    symbolToName.put("NQUSB551020", "Industrial Metals and Mining")
+    symbolToName.put("NQUSB55102000", "General Mining")
+    symbolToName.put("NQUSB55102010", "Iron and Steel")
+    symbolToName.put("NQUSB55102010LM", "Iron and Steel")
+    symbolToName.put("NQUSB55102015", "Metal Fabricating")
+    symbolToName.put("NQUSB551020LM", "Industrial Metals and Mining")
+    symbolToName.put("NQUSB551030", "Precious Metals and Mining")
+    symbolToName.put("NQUSB55103025", "Gold Mining")
+    symbolToName.put("NQUSB551030LM", "Precious Metals and Mining")
+    symbolToName.put("NQUSB5510LM", "Basic Resources")
+    symbolToName.put("NQUSB5520", "Chemicals")
+    symbolToName.put("NQUSB55201000", "Chemicals: Diversified")
+    symbolToName.put("NQUSB55201000LM", "Chemicals: Diversified")
+    symbolToName.put("NQUSB55201015", "Fertilizers")
+    symbolToName.put("NQUSB55201020", "Specialty Chemicals")
+    symbolToName.put("NQUSB55201020LM", "Specialty Chemicals")
+    symbolToName.put("NQUSB5520LM", "Chemicals")
+    symbolToName.put("NQUSB55LM", "Basic Materials")
+    symbolToName.put("NQUSB60", "Energy")
+    symbolToName.put("NQUSB601010", "Oil, Gas and Coal")
+    symbolToName.put("NQUSB60101000", "Integrated Oil and Gas")
+    symbolToName.put("NQUSB60101000LM", "Integrated Oil and Gas")
+    symbolToName.put("NQUSB60101010", "Oil: Crude Producers")
+    symbolToName.put("NQUSB60101010LM", "Oil: Crude Producers")
+    symbolToName.put("NQUSB60101015", "Offshore Drilling and Other Services")
+    symbolToName.put("NQUSB60101020", "Oil Refining and Marketing")
+    symbolToName.put("NQUSB60101020LM", "Oil Refining and Marketing")
+    symbolToName.put("NQUSB60101030", "Oil Equipment and Services")
+    symbolToName.put("NQUSB60101030LM", "Oil Equipment and Services")
+    symbolToName.put("NQUSB60101035", "Pipelines")
+    symbolToName.put("NQUSB60101035LM", "Pipelines")
+    symbolToName.put("NQUSB60101040", "Coal")
+    symbolToName.put("NQUSB601010LM", "Oil, Gas and Coal")
+    symbolToName.put("NQUSB601020", "Alternative Energy")
+    symbolToName.put("NQUSB60102010", "Alternative Fuels")
+    symbolToName.put("NQUSB60102020", "Renewable Energy Equipment")
+    symbolToName.put("NQUSB60102020LM", "Renewable Energy Equipment")
+    symbolToName.put("NQUSB601020LM", "Alternative Energy")
+    symbolToName.put("NQUSB60LM", "Energy")
+    symbolToName.put("NQUSB65", "Utilities")
+    symbolToName.put("NQUSB651010", "Electricity")
+    symbolToName.put("NQUSB65101010", "Alternative Electricity")
+    symbolToName.put("NQUSB65101015", "Conventional Electricity")
+    symbolToName.put("NQUSB65101015LM", "Conventional Electricity")
+    symbolToName.put("NQUSB651010LM", "Electricity")
+    symbolToName.put("NQUSB651020", "Gas, Water and Multi-utilities")
+    symbolToName.put("NQUSB65102000", "Multi-utilities")
+    symbolToName.put("NQUSB65102000LM", "Multi-utilities")
+    symbolToName.put("NQUSB65102020", "Gas Distribution")
+    symbolToName.put("NQUSB65102020LM", "Gas Distribution")
+    symbolToName.put("NQUSB65102030", "Water")
+    symbolToName.put("NQUSB651020LM", "Gas, Water and Multi-utilities")
+    symbolToName.put("NQUSB651030", "Waste and Disposal Services")
+    symbolToName.put("NQUSB651030LM", "Waste and Disposal Services")
+    symbolToName.put("NQUSB65LM", "Utilities")
+    symbolToName.put("NQUSBLM", "")
+
+var childrenMap=map.new<string, string>()
+
+initChildrenMap() =>
+    childrenMap.put("NQUSB", "NQUSB60,NQUSB55,NQUSB50,NQUSB20,NQUSB15,NQUSB65,NQUSB30,NQUSB35,NQUSB10,NQUSB40,NQUSB45")
+    childrenMap.put("NQUSB60", "NQUSB601010,NQUSB601020")
+    childrenMap.put("NQUSB55", "NQUSB5520,NQUSB5510")
+    childrenMap.put("NQUSB5520", "NQUSB55201000,NQUSB55201020,NQUSB55201015")
+    childrenMap.put("NQUSB5510", "NQUSB551010,NQUSB551020,NQUSB551030")
+    childrenMap.put("NQUSB50", "NQUSB5010,NQUSB5020")
+    childrenMap.put("NQUSB5010", "NQUSB50101035,NQUSB50101010,NQUSB50101015,NQUSB50101020,NQUSB50101025")
+    childrenMap.put("NQUSB5020", "NQUSB502010,NQUSB502030,NQUSB502020,NQUSB502040,NQUSB502060,NQUSB502050")
+    childrenMap.put("NQUSB4010", "NQUSB40101025,NQUSB40101020")
+    childrenMap.put("NQUSB4510", "NQUSB451010,NQUSB451020,NQUSB451030")
+    childrenMap.put("NQUSB4020", "NQUSB402020,NQUSB402030,NQUSB402040,NQUSB402010")
+    childrenMap.put("NQUSB20", "NQUSB201020,NQUSB201030,NQUSB201010")
+    childrenMap.put("NQUSB4040", "NQUSB404010")
+    childrenMap.put("NQUSB4030", "NQUSB40301020,NQUSB40301030,NQUSB40301010,NQUSB40301035")
+    childrenMap.put("NQUSB4050", "NQUSB40501010,NQUSB40501020,NQUSB40501025,NQUSB40501030,NQUSB40501040,NQUSB40501015")
+    childrenMap.put("NQUSB15", "NQUSB151020,NQUSB151010")
+    childrenMap.put("NQUSB65", "NQUSB651010,NQUSB651020,NQUSB651030")
+    childrenMap.put("NQUSB30", "NQUSB3010,NQUSB3030,NQUSB3020")
+    childrenMap.put("NQUSB3030", "NQUSB303020,NQUSB303010")
+    childrenMap.put("NQUSB35", "NQUSB351010,NQUSB351020")
+    childrenMap.put("NQUSB3020", "NQUSB302020,NQUSB302030,NQUSB302010")
+    childrenMap.put("NQUSB10", "NQUSB101010,NQUSB101020")
+    childrenMap.put("NQUSB601010", "NQUSB60101010,NQUSB60101000,NQUSB60101030,NQUSB60101035,NQUSB60101040,NQUSB60101015,NQUSB60101020")
+    childrenMap.put("NQUSB601020", "NQUSB60102020,NQUSB60102010")
+    childrenMap.put("NQUSB551010", "NQUSB55101015,NQUSB55101000")
+    childrenMap.put("NQUSB551020", "NQUSB55102010,NQUSB55102000,NQUSB55102015")
+    childrenMap.put("NQUSB551030", "NQUSB55103025")
+    childrenMap.put("NQUSB502010", "NQUSB50201010,NQUSB50201020")
+    childrenMap.put("NQUSB502030", "NQUSB50203030,NQUSB50203000,NQUSB50203010")
+    childrenMap.put("NQUSB502020", "NQUSB50202025,NQUSB50202010,NQUSB50202020,NQUSB50202040")
+    childrenMap.put("NQUSB502040", "NQUSB50204000,NQUSB50204010,NQUSB50204020,NQUSB50204050")
+    childrenMap.put("NQUSB502060", "NQUSB50206015,NQUSB50206040,NQUSB50206020,NQUSB50206060,NQUSB50206010,NQUSB50206030,NQUSB50206025,NQUSB50206050")
+    childrenMap.put("NQUSB502050", "NQUSB50205020,NQUSB50205025,NQUSB50205015,NQUSB50205010,NQUSB50205030,NQUSB50205040")
+    childrenMap.put("NQUSB451010", "NQUSB45101020,NQUSB45101015")
+    childrenMap.put("NQUSB451020", "NQUSB45102010,NQUSB45102020")
+    childrenMap.put("NQUSB402020", "NQUSB40202025,NQUSB40202015,NQUSB40202010")
+    childrenMap.put("NQUSB402030", "NQUSB40203010,NQUSB40203050,NQUSB40203045,NQUSB40203040,NQUSB40203055")
+    childrenMap.put("NQUSB402040", "NQUSB40204020,NQUSB40204025,NQUSB40204035")
+    childrenMap.put("NQUSB201020", "NQUSB20102010,NQUSB20102015,NQUSB20102020")
+    childrenMap.put("NQUSB201030", "NQUSB20103010,NQUSB20103015")
+    childrenMap.put("NQUSB404010", "NQUSB40401020,NQUSB40401010,NQUSB40401025,NQUSB40401030")
+    childrenMap.put("NQUSB151020", "NQUSB15102010,NQUSB15102015")
+    childrenMap.put("NQUSB651010", "NQUSB65101015,NQUSB65101010")
+    childrenMap.put("NQUSB651020", "NQUSB65102020,NQUSB65102000,NQUSB65102030")
+    childrenMap.put("NQUSB303020", "NQUSB30302010,NQUSB30302025,NQUSB30302020,NQUSB30302015")
+    childrenMap.put("NQUSB351010", "NQUSB35101010,NQUSB35101015")
+    childrenMap.put("NQUSB351020", "NQUSB35102030,NQUSB35102045,NQUSB35102040,NQUSB35102000,NQUSB35102070,NQUSB35102015,NQUSB35102010,NQUSB35102020,NQUSB35102025,NQUSB35102050")
+    childrenMap.put("NQUSB302020", "NQUSB30202010,NQUSB30202000,NQUSB30202015")
+    childrenMap.put("NQUSB101010", "NQUSB10101010,NQUSB10101020,NQUSB10101015")
+    childrenMap.put("NQUSB101020", "NQUSB10102015,NQUSB10102030,NQUSB10102010,NQUSB10102020")
+    childrenMap.put("NQUSB40", "NQUSB4010,NQUSB4020,NQUSB4040,NQUSB4030,NQUSB4050")
+    childrenMap.put("NQUSB45", "NQUSB4510,NQUSB4520")
+    childrenMap.put("NQUSB4520", "NQUSB45201030,NQUSB45201020,NQUSB45201015,NQUSB45201010")
+    childrenMap.put("NQUSB201010", "NQUSB20101020,NQUSB20101010,NQUSB20101025")
+    childrenMap.put("NQUSB302030", "NQUSB30203020,NQUSB30203000,NQUSB30203010")
+    childrenMap.put("NQUSB402010", "NQUSB40201070,NQUSB40201010,NQUSB40201040")
+    childrenMap.put("NQUSB302010", "NQUSB30201020,NQUSB30201025,NQUSB30201030")
+
+if barstate.isfirst
+    initSymbolToName()
+    initChildrenMap()
+
+getSectorDisplayName(sectorCode) =>
+    string displayName=''
+
+    for s in sectorArr
+        if s.name == sectorCode
+            displayName := s.displayName
+            break
+
+    if displayName == ''
+        displayName := symbolToName.get(sectorCode)
+
+    if na(displayName) or displayName == ''
+        displayName := sectorCode
+
+    displayName
+
+getIndustrySectorV12(industry) =>
+    string code=''
+
+    if industry == 'Data Processing Services'
+        code := 'NQUSB10101010'
+    else if industry == 'Internet Software/Services'
+        code := 'NQUSB10101020'
+    else if industry == 'Information Technology Services'
+        code := 'NQUSB10101010'
+    else if industry == 'Packaged Software'
+        code := 'NQUSB10101015'
+
+    else if industry == 'Semiconductors'
+        code := 'NQUSB10102010'
+    else if industry == 'Telecommunications Equipment'
+        code := 'NQUSB151010'
+    else if industry == 'Aerospace & Defense'
+        code := 'NQUSB502010'
+    else if industry == 'Electronic Equipment/Instruments'
+        code := 'NQUSB50202025'
+    else if industry == 'Computer Processing Hardware'
+        code := 'NQUSB10102030'
+    else if industry == 'Computer Peripherals'
+        code := 'NQUSB10102030'
+    else if industry == 'Electronic Components'
+        code := 'NQUSB10102015'
+    else if industry == 'Electronic Production Equipment'
+        code := 'NQUSB10102020'
+    else if industry == 'Computer Communications'
+        code := 'NQUSB10102020'
+
+    else if industry == 'Major Banks'
+        code := 'NQUSB3010'
+    else if industry == 'Property/Casualty Insurance'
+        code := 'NQUSB30302025'
+    else if industry == 'Finance/Rental/Leasing'
+        code := 'NQUSB30201020'
+    else if industry == 'Investment Managers'
+        code := 'NQUSB30202010'
+    else if industry == 'Real Estate Investment Trusts'
+        code := 'NQUSB351020'
+    else if industry == 'Investment Banks/Brokers'
+        code := 'NQUSB302020'
+    else if industry == 'Regional Banks'
+        code := 'NQUSB3010'
+    else if industry == 'Multi-Line Insurance'
+        code := 'NQUSB30302010'
+    else if industry == 'Insurance Brokers/Services'
+        code := 'NQUSB30302015'
+    else if industry == 'Life/Health Insurance'
+        code := 'NQUSB303010'
+    else if industry == 'Real Estate Development'
+        code := 'NQUSB35101010'
+    else if industry == 'Specialty Insurance'
+        code := 'NQUSB303020'
+    else if industry == 'Financial Conglomerates'
+        code := 'NQUSB30202000'
+    else if industry == 'Savings Banks'
+        code := 'NQUSB3010'
+
+    else if industry == 'Pharmaceuticals: Major'
+        code := 'NQUSB20103015'
+    else if industry == 'Medical Specialties'
+        code := 'NQUSB20102010'
+    else if industry == 'Biotechnology'
+        code := 'NQUSB20103010'
+    else if industry == 'Pharmaceuticals: Other'
+        code := 'NQUSB20103015'
+    else if industry == 'Pharmaceuticals: Generic'
+        code := 'NQUSB20103015'
+
+    else if industry == 'Internet Retail'
+        code := 'NQUSB40401010'
+    else if industry == 'Specialty Stores'
+        code := 'NQUSB40401030'
+    else if industry == 'Home Improvement Chains'
+        code := 'NQUSB40401025'
+    else if industry == 'Department Stores'
+        code := 'NQUSB40401010'
+    else if industry == 'Apparel/Footwear Retail' // CRITICAL FIX FOR VSCO
+        code := 'NQUSB40401020'
+    else if industry == 'Drugstore Chains'
+        code := 'NQUSB45201015'
+    else if industry == 'Food Retail'
+        code := 'NQUSB45201010'
+    else if industry == 'Discount Stores'
+        code := 'NQUSB40401010'
+    else if industry == 'Electronics/Appliance Stores'
+        code := 'NQUSB40401030'
+    else if industry == 'Catalog/Specialty Distribution'
+        code := 'NQUSB40401030'
+
+    else if industry == 'Household/Personal Care'
+        code := 'NQUSB45201030'
+    else if industry == 'Beverages: Non-Alcoholic'
+        code := 'NQUSB45101020'
+    else if industry == 'Food: Specialty/Candy'
+        code := 'NQUSB45102020'
+    else if industry == 'Tobacco'
+        code := 'NQUSB451030'
+    else if industry == 'Beverages: Alcoholic'
+        code := 'NQUSB45101015'
+    else if industry == 'Apparel/Footwear'
+        code := 'NQUSB40204020'
+    else if industry == 'Food: Major Diversified'
+        code := 'NQUSB45102020'
+    else if industry == 'Food: Meat/Fish/Dairy'
+        code := 'NQUSB45102020'
+    else if industry == 'Consumer Sundries'
+        code := 'NQUSB45201030'
+
+    else if industry == 'Industrial Machinery'
+        code := 'NQUSB50204000'
+    else if industry == 'Electrical Products'
+        code := 'NQUSB50202010'
+    else if industry == 'Trucks/Construction/Farm Machinery'
+        code := 'NQUSB50204020'
+    else if industry == 'Auto Parts: OEM'
+        code := 'NQUSB40101025'
+    else if industry == 'Building Products'
+        code := 'NQUSB50101035'
+    else if industry == 'Industrial Conglomerates'
+        code := 'NQUSB50203000'
+    else if industry == 'Metal Fabrication'
+        code := 'NQUSB55102015'
+    else if industry == 'Miscellaneous Manufacturing'
+        code := 'NQUSB50203000'
+    else if industry == 'Office Equipment/Supplies'
+        code := 'NQUSB50205010'
+
+    else if industry == 'Motor Vehicles'
+        code := 'NQUSB40101020'
+    else if industry == 'Homebuilding'
+        code := 'NQUSB40202010'
+    else if industry == 'Recreational Products'
+        code := 'NQUSB40203050'
+    else if industry == 'Tools & Hardware'
+        code := 'NQUSB50204000'
+    else if industry == 'Electronics/Appliances'
+        code := 'NQUSB40202025'
+    else if industry == 'Home Furnishings'
+        code := 'NQUSB40202015'
+    else if industry == 'Automotive Aftermarket'
+        code := 'NQUSB40101025'
+    else if industry == 'Other Consumer Specialties'
+        code := 'NQUSB40201070'
+
+    else if industry == 'Oil & Gas Production'
+        code := 'NQUSB60101010'
+    else if industry == 'Coal'
+        code := 'NQUSB60101040'
+    else if industry == 'Integrated Oil'
+        code := 'NQUSB60101000'
+    else if industry == 'Oil Refining/Marketing'
+        code := 'NQUSB60101020'
+
+    else if industry == 'Restaurants'
+        code := 'NQUSB40501040'
+    else if industry == 'Hotels/Resorts/Cruise lines'
+        code := 'NQUSB40501025'
+    else if industry == 'Other Consumer Services'
+        code := 'NQUSB40201070'
+    else if industry == 'Movies/Entertainment'
+        code := 'NQUSB40301010'
+    else if industry == 'Cable/Satellite TV'
+        code := 'NQUSB15102010'
+    else if industry == 'Casinos/Gaming'
+        code := 'NQUSB40501020'
+    else if industry == 'Broadcasting'
+        code := 'NQUSB40301035'
+    else if industry == 'Publishing: Newspapers'
+        code := 'NQUSB40301030'
+    else if industry == 'Publishing: Books/Magazines'
+        code := 'NQUSB40301030'
+    else if industry == 'Media Conglomerates'
+        code := 'NQUSB40301010'
+
+    else if industry == 'Electric Utilities'
+        code := 'NQUSB651010'
+    else if industry == 'Gas Distributors'
+        code := 'NQUSB65102020'
+    else if industry == 'Water Utilities'
+        code := 'NQUSB65102030'
+    else if industry == 'Alternative Power Generation'
+        code := 'NQUSB65101010'
+
+    else if industry == 'Precious Metals'
+        code := 'NQUSB551030'
+    else if industry == 'Other Metals/Minerals'
+        code := 'NQUSB551010'
+    else if industry == 'Steel'
+        code := 'NQUSB55102010'
+    else if industry == 'Construction Materials'
+        code := 'NQUSB50101035'
+    else if industry == 'Forest Products'
+        code := 'NQUSB55101015'
+    else if industry == 'Aluminum'
+        code := 'NQUSB55102010'
+
+    else if industry == 'Oil & Gas Pipeline'
+        code := 'NQUSB60101035'
+    else if industry == 'Engineering & Construction'
+        code := 'NQUSB50101015'
+    else if industry == 'Environmental Services'
+        code := 'NQUSB651030'
+    else if industry == 'Contract Drilling'
+        code := 'NQUSB60101015'
+    else if industry == 'Oilfield Services/Equipment'
+        code := 'NQUSB60101030'
+
+    else if industry == 'Air Freight & Logistics'
+        code := 'NQUSB50206040'
+    else if industry == 'Airlines'
+        code := 'NQUSB40501010'
+    else if industry == 'Marine Transportation'
+        code := 'NQUSB50206030'
+    else if industry == 'Railroads'
+        code := 'NQUSB50206020'
+    else if industry == 'Trucking'
+        code := 'NQUSB50206010'
+
+    else if industry == 'Miscellaneous Commercial Services'
+        code := 'NQUSB50205020'
+    else if industry == 'Financial Publishing/Services'
+        code := 'NQUSB30201030'
+    else if industry == 'Advertising/Marketing Services'
+        code := 'NQUSB40301020'
+    else if industry == 'Commercial Printing/Forms'
+        code := 'NQUSB50205030'
+    else if industry == 'Personnel Services'
+        code := 'NQUSB50205025'
+
+    else if industry == 'Chemicals: Specialty'
+        code := 'NQUSB55201020'
+    else if industry == 'Industrial Specialties'
+        code := 'NQUSB50203000'
+    else if industry == 'Containers/Packaging'
+        code := 'NQUSB50203030'
+    else if industry == 'Agricultural Commodities/Milling'
+        code := 'NQUSB45102010'
+    else if industry == 'Chemicals: Agricultural'
+        code := 'NQUSB55201015'
+    else if industry == 'Pulp & Paper'
+        code := 'NQUSB55101015'
+    else if industry == 'Chemicals: Major Diversified'
+        code := 'NQUSB55201000'
+    else if industry == 'Textiles'
+        code := 'NQUSB40204020'
+
+    else if industry == 'Wireless Telecommunications'
+        code := 'NQUSB151020'
+    else if industry == 'Major Telecommunications'
+        code := 'NQUSB151020'
+    else if industry == 'Speciality Telecommunications'
+        code := 'NQUSB15102015'
+
+    else if industry == 'Managed Health Care'
+        code := 'NQUSB20101020'
+    else if industry == 'Medical/Nursing Services'
+        code := 'NQUSB20101020'
+    else if industry == 'Hospital/Nursing Management'
+        code := 'NQUSB20101010'
+    else if industry == 'Services to the Health Industry'
+        code := 'NQUSB20101025'
+
+    else if industry == 'Wholesale Distributors'
+        code := 'NQUSB45201010'
+    else if industry == 'Medical Distributors'
+        code := 'NQUSB20102015'
+    else if industry == 'Food Distributors'
+        code := 'NQUSB45201010'
+    else if industry == 'Electronics Distributors'
+        code := 'NQUSB10102015'
+
+    else if industry == 'Miscellaneous'
+        code := 'NQUSB40201070'
+    else if industry == 'Unclassified'
+        code := 'NQUSB40201070'
+    else if industry == 'Investment Trusts/Mutual Funds'
+        code := 'NQUSB30202000'
+
+    else
+        code := 'NQUSB10' // Default to Technology
+
+    code
+
+buildHierarchyFromCode(code) =>
+    // Build hierarchy by climbing up the code tree
+    // NQUSB10102010 → [NQUSB, NQUSB10, NQUSB101020, NQUSB10102010]
+    array<string> hierarchy=array.new<string>()
+
+    if str.startswith(code, 'NQUSB')
+        // Add NQUSB as the primary level (all sectors)
+        array.push(hierarchy, 'NQUSB')
+
+        suffix=str.substring(code, 5) // Remove "NQUSB" prefix
+        suffixLen=str.length(suffix)
+
+        // Climb up: extract NQUSB + 2 digits, + 4 digits, + 6 digits, etc.
+        for i=2 to suffixLen by 2
+            if i <= suffixLen
+                levelCode='NQUSB' + str.substring(suffix, 0, i)
+                array.push(hierarchy, levelCode)
+
+    hierarchy
+
+findStockIndustries(ticker) =>
+    array<string> matchedIndustries=array.new<string>()
+
+    detectedSector=getIndustrySectorV12(syminfo.industry)
+
+    if not na(detectedSector) and detectedSector != ''
+        hierarchyParts=buildHierarchyFromCode(detectedSector)
+
+        for part in hierarchyParts
+            matchedIndustries.push(part)
+
+    matchedIndustries
+
+getBestSectorMatch(baseIndustry) =>
+    string autoMatch=getIndustrySectorV12(baseIndustry)
+    string bestMatch=autoMatch
+
+    if fallbackLevel == 'Primary'
+        // Primary level: All sectors (NQUSB)
+        bestMatch := 'NQUSB'
+
+    else if fallbackLevel == 'Secondary'
+        // Secondary level: Broad sectors (NQUSB10, NQUSB15, etc.)
+        if str.startswith(autoMatch, 'NQUSB10')
+            bestMatch := 'NQUSB10'
+        else if str.startswith(autoMatch, 'NQUSB15')
+            bestMatch := 'NQUSB15'
+        else if str.startswith(autoMatch, 'NQUSB20')
+            bestMatch := 'NQUSB20'
+        else if str.startswith(autoMatch, 'NQUSB30')
+            bestMatch := 'NQUSB30'
+        else if str.startswith(autoMatch, 'NQUSB35')
+            bestMatch := 'NQUSB35'
+        else if str.startswith(autoMatch, 'NQUSB40')
+            bestMatch := 'NQUSB40'
+        else if str.startswith(autoMatch, 'NQUSB45')
+            bestMatch := 'NQUSB45'
+        else if str.startswith(autoMatch, 'NQUSB50')
+            bestMatch := 'NQUSB50'
+        else if str.startswith(autoMatch, 'NQUSB55')
+            bestMatch := 'NQUSB55'
+        else if str.startswith(autoMatch, 'NQUSB60')
+            bestMatch := 'NQUSB60'
+        else if str.startswith(autoMatch, 'NQUSB65')
+            bestMatch := 'NQUSB65'
+
+    else if fallbackLevel == 'Tertiary'
+        if str.startswith(autoMatch, 'NQUSB101010')
+            bestMatch := 'NQUSB101010'
+        else if str.startswith(autoMatch, 'NQUSB101020')
+            bestMatch := 'NQUSB101020'
+        else if str.startswith(autoMatch, 'NQUSB151020')
+            bestMatch := 'NQUSB151020'
+        else if str.startswith(autoMatch, 'NQUSB201010')
+            bestMatch := 'NQUSB201010'
+        else if str.startswith(autoMatch, 'NQUSB201020')
+            bestMatch := 'NQUSB201020'
+        else if str.startswith(autoMatch, 'NQUSB201030')
+            bestMatch := 'NQUSB201030'
+        else if str.startswith(autoMatch, 'NQUSB302010')
+            bestMatch := 'NQUSB302010'
+        else if str.startswith(autoMatch, 'NQUSB302020')
+            bestMatch := 'NQUSB302020'
+        else if str.startswith(autoMatch, 'NQUSB302030')
+            bestMatch := 'NQUSB302030'
+        else if str.startswith(autoMatch, 'NQUSB303020')
+            bestMatch := 'NQUSB303020'
+        else if str.startswith(autoMatch, 'NQUSB3010')
+            bestMatch := 'NQUSB3010'
+        else if str.startswith(autoMatch, 'NQUSB3020')
+            bestMatch := 'NQUSB3020'
+        else if str.startswith(autoMatch, 'NQUSB3030')
+            bestMatch := 'NQUSB3030'
+        else if str.startswith(autoMatch, 'NQUSB351010')
+            bestMatch := 'NQUSB351010'
+        else if str.startswith(autoMatch, 'NQUSB351020')
+            bestMatch := 'NQUSB351020'
+        else if str.startswith(autoMatch, 'NQUSB404010')
+            bestMatch := 'NQUSB404010'
+        else if str.startswith(autoMatch, 'NQUSB4010')
+            bestMatch := 'NQUSB4010'
+        else if str.startswith(autoMatch, 'NQUSB402010')
+            bestMatch := 'NQUSB402010'
+        else if str.startswith(autoMatch, 'NQUSB402020')
+            bestMatch := 'NQUSB402020'
+        else if str.startswith(autoMatch, 'NQUSB402030')
+            bestMatch := 'NQUSB402030'
+        else if str.startswith(autoMatch, 'NQUSB402040')
+            bestMatch := 'NQUSB402040'
+        else if str.startswith(autoMatch, 'NQUSB4020')
+            bestMatch := 'NQUSB4020'
+        else if str.startswith(autoMatch, 'NQUSB4030')
+            bestMatch := 'NQUSB4030'
+        else if str.startswith(autoMatch, 'NQUSB4040')
+            bestMatch := 'NQUSB4040'
+        else if str.startswith(autoMatch, 'NQUSB4050')
+            bestMatch := 'NQUSB4050'
+        else if str.startswith(autoMatch, 'NQUSB4510')
+            bestMatch := 'NQUSB4510'
+        else if str.startswith(autoMatch, 'NQUSB4520')
+            bestMatch := 'NQUSB4520'
+        else if str.startswith(autoMatch, 'NQUSB5010')
+            bestMatch := 'NQUSB5010'
+        else if str.startswith(autoMatch, 'NQUSB5020')
+            bestMatch := 'NQUSB5020'
+        else if str.startswith(autoMatch, 'NQUSB5510')
+            bestMatch := 'NQUSB5510'
+        else if str.startswith(autoMatch, 'NQUSB5520')
+            bestMatch := 'NQUSB5520'
+        else if str.startswith(autoMatch, 'NQUSB601010')
+            bestMatch := 'NQUSB601010'
+        else if str.startswith(autoMatch, 'NQUSB601020')
+            bestMatch := 'NQUSB601020'
+        else if str.startswith(autoMatch, 'NQUSB651010')
+            bestMatch := 'NQUSB651010'
+        else if str.startswith(autoMatch, 'NQUSB651020')
+            bestMatch := 'NQUSB651020'
+
+    bestMatch
+
+getDays(period) =>
+    switch period
+        '1 Week (5d)' => 5
+        '2 Weeks (10d)' => 10
+        '1 Month (21d)' => 21
+        '2 Months (42d)' => 42
+        '3 Months (63d)' => 63
+        '6 Months (126d)' => 126
+        '1 Year (252d)' => 252
+        'Custom' => customDays
+        => 63
+
+isLeafNode(code) =>
+    children=childrenMap.get(code)
+    na(children) or str.length(children) == 0
+
+f_ytd_change() =>
+    var float start_of_year_price=open
+    float ytd_change=na
+    if timeframe.change('12M')
+        start_of_year_price := open
+    if (not na(start_of_year_price))
+        ytd_change := ((close - start_of_year_price) / start_of_year_price) * 100
+    ytd_change
+
+f_mtd_change() =>
+    var float month_start_price=open
+    float mtd_change=na
+    if timeframe.change('M')
+        month_start_price := open
+    if (not na(month_start_price))
+        mtd_change := ((close - month_start_price) / month_start_price) * 100
+    mtd_change
+
+f_qtd_change() =>
+    var float quarter_start_price=open
+    float qtd_change=na
+    if timeframe.change('3M')
+        quarter_start_price := open
+    if (not na(quarter_start_price))
+        qtd_change := ((close - quarter_start_price) / quarter_start_price) * 100
+    qtd_change
+
+f_normalized_rs(indexSymbol, length) =>
+    indexClose=request.security(indexSymbol, timeframe.period, close)
+    RSclose=close / indexClose
+    newRngMax=99
+    newRngMin=1
+    HHDataclose=ta.highest(RSclose, length)
+    LLDataclose=ta.lowest(RSclose, length)
+    normalizeRSclose=na(HHDataclose - LLDataclose) ? na : ((newRngMax - newRngMin) * (RSclose - LLDataclose) / (HHDataclose - LLDataclose)) + newRngMin
+    nz(normalizeRSclose, 0)
+
+var table data=table.new(compact ? position.top_left : position.top_center, 1, 2)
+var table list=table.new(position.top_right, showMax+1, 2)
+outputArr=array.new<float>()
+filteredSymbols=array.new<string>()
+sectIdx=0
+showPercent=false
+txtCol=theme == 'Dark' ? color.white : color.black
+
+periodDisplay=timePeriod == 'Custom' ? str.tostring(customDays) + ' Days' : timePeriod
+var string sectorDisplayName=''
+
+getDisplayText(symbol, nameMap, isCurrentStockIndustry) =>
+    keyName=nameMap.get(symbol)
+    displayText=symbol
+
+    if displayMode == 'Name' and not na(keyName) and keyName != ''
+        displayText := keyName
+    else if displayMode == 'Both' and not na(keyName) and keyName != ''
+        displayText := symbol + ': ' + keyName
+
+    if isCurrentStockIndustry
+        displayText := highlightMarker + ' ' + displayText
+
+    displayText
+
+if barstate.islast
+    data.cell(0, 0, '')
+
+    detectedSectorCode=fallbackLevel == 'Auto' or fallbackLevel == 'Quaternary' ? getIndustrySectorV12(syminfo.industry) : getBestSectorMatch(syminfo.industry)
+
+    currentStockIndustries=findStockIndustries(syminfo.ticker)
+
+    sectorDisplayName := getSectorDisplayName(detectedSectorCode)
+
+    // Find the top-level sector code (first 7 chars: NQUSB + 2 digits)
+    // This is needed because sectorArr only contains top-level sectors
+    string topLevelSector=''
+
+    if detectedSectorCode == 'NQUSB'
+        // Special case: Primary level - display all sectors
+        topLevelSector := 'NQUSB'
+    else if str.startswith(detectedSectorCode, 'NQUSB') and str.length(detectedSectorCode) >= 7
+        topLevelSector := str.substring(detectedSectorCode, 0, 7) // NQUSB + first 2 digits
+
+    bool sectorFound=false
+
+    // Check if this is a leaf node (no children)
+    if isLeafNode(detectedSectorCode)
+        // LEAF NODE MODE: Use TradingView industry peers
+        sectorFound := true
+        string tvIndustry=syminfo.industry
+        bool currentStockAdded=false
+
+        // Find matching TradingView industry
+        for [idx, ind] in indArr
+            if ind.name == tvIndustry
+                // Found matching industry, calculate performance for all stocks
+                for sym in ind.symbols
+                    float value = na
+
+                    if timePeriod == 'YTD'
+                        value := request.security(sym, timeframe.period, f_ytd_change(), lookahead=barmerge.lookahead_on, ignore_invalid_symbol=true)
+                        showPercent := true
+                    else if timePeriod == 'MTD'
+                        value := request.security(sym, timeframe.period, f_mtd_change(), lookahead=barmerge.lookahead_on, ignore_invalid_symbol=true)
+                        showPercent := true
+                    else if timePeriod == 'QTD'
+                        value := request.security(sym, timeframe.period, f_qtd_change(), lookahead=barmerge.lookahead_on, ignore_invalid_symbol=true)
+                        showPercent := true
+                    else
+                        days=getDays(timePeriod)
+                        if performanceMetric == 'RS Rating'
+                            value := request.security(sym, timeframe.period, f_normalized_rs(rsIndex, days), lookahead=barmerge.lookahead_on, ignore_invalid_symbol=true)
+                            showPercent := false
+                        else // % Return
+                            value := request.security(sym, timeframe.period, ta.roc(close, days), lookahead=barmerge.lookahead_on, ignore_invalid_symbol=true)
+                            showPercent := true
+
+                    outputArr.push(value)
+                    filteredSymbols.push(sym)
+
+                    // Track if current stock was already in the list
+                    if sym == syminfo.ticker or str.contains(sym, syminfo.ticker)
+                        currentStockAdded := true
+
+                // Always add current stock if not already in the industry list
+                if not currentStockAdded
+                    float value = na
+
+                    if timePeriod == 'YTD'
+                        value := request.security(syminfo.ticker, timeframe.period, f_ytd_change(), lookahead=barmerge.lookahead_on, ignore_invalid_symbol=true)
+                        showPercent := true
+                    else if timePeriod == 'MTD'
+                        value := request.security(syminfo.ticker, timeframe.period, f_mtd_change(), lookahead=barmerge.lookahead_on, ignore_invalid_symbol=true)
+                        showPercent := true
+                    else if timePeriod == 'QTD'
+                        value := request.security(syminfo.ticker, timeframe.period, f_qtd_change(), lookahead=barmerge.lookahead_on, ignore_invalid_symbol=true)
+                        showPercent := true
+                    else
+                        days=getDays(timePeriod)
+                        if performanceMetric == 'RS Rating'
+                            value := request.security(syminfo.ticker, timeframe.period, f_normalized_rs(rsIndex, days), lookahead=barmerge.lookahead_on, ignore_invalid_symbol=true)
+                            showPercent := false
+                        else // % Return
+                            value := request.security(syminfo.ticker, timeframe.period, ta.roc(close, days), lookahead=barmerge.lookahead_on, ignore_invalid_symbol=true)
+                            showPercent := true
+
+                    outputArr.push(value)
+                    filteredSymbols.push(syminfo.ticker)
+
+                break
+    else
+        // NON-LEAF MODE: Use NQUSB children hierarchy
+        if detectedSectorCode == 'NQUSB'
+            // Special case: Primary level - collect all sectors
+            sectorFound := true
+            childrenStr=childrenMap.get('NQUSB')
+
+            if not na(childrenStr) and childrenStr != ''
+                children=str.split(childrenStr, ',')
+
+                for child in children
+                    float value = na
+
+                    if timePeriod == 'YTD'
+                        value := request.security(child, timeframe.period, f_ytd_change(), lookahead=barmerge.lookahead_on, ignore_invalid_symbol=true)
+                        showPercent := true
+                    else if timePeriod == 'MTD'
+                        value := request.security(child, timeframe.period, f_mtd_change(), lookahead=barmerge.lookahead_on, ignore_invalid_symbol=true)
+                        showPercent := true
+                    else if timePeriod == 'QTD'
+                        value := request.security(child, timeframe.period, f_qtd_change(), lookahead=barmerge.lookahead_on, ignore_invalid_symbol=true)
+                        showPercent := true
+                    else
+                        days=getDays(timePeriod)
+                        if performanceMetric == 'RS Rating'
+                            value := request.security(child, timeframe.period, f_normalized_rs(rsIndex, days), lookahead=barmerge.lookahead_on, ignore_invalid_symbol=true)
+                            showPercent := false
+                        else // % Return
+                            value := request.security(child, timeframe.period, ta.roc(close, days), lookahead=barmerge.lookahead_on, ignore_invalid_symbol=true)
+                            showPercent := true
+
+                    outputArr.push(value)
+                    filteredSymbols.push(child)
+
+        else
+            // Regular non-leaf mode: find matching sector
+            for [idx, s] in sectorArr
+                // Match against the top-level sector instead of detectedSectorCode
+                if s.name == topLevelSector
+                    sectIdx := idx
+                    sectorFound := true
+
+                    for sym in s.symbols
+                        // Check if sym is a direct child of detectedSectorCode using childrenMap
+                        bool isDirectChild=false
+                        childrenStr=childrenMap.get(detectedSectorCode)
+
+                        if not na(childrenStr) and childrenStr != ''
+                            children=str.split(childrenStr, ',')
+                            for child in children
+                                if child == sym
+                                    isDirectChild := true
+                                    break
+
+                        if isDirectChild
+                            float value = na
+
+                            if timePeriod == 'YTD'
+                                value := request.security(sym, timeframe.period, f_ytd_change(), lookahead=barmerge.lookahead_on, ignore_invalid_symbol=true)
+                                showPercent := true
+                            else if timePeriod == 'MTD'
+                                value := request.security(sym, timeframe.period, f_mtd_change(), lookahead=barmerge.lookahead_on, ignore_invalid_symbol=true)
+                                showPercent := true
+                            else if timePeriod == 'QTD'
+                                value := request.security(sym, timeframe.period, f_qtd_change(), lookahead=barmerge.lookahead_on, ignore_invalid_symbol=true)
+                                showPercent := true
+                            else
+                                days=getDays(timePeriod)
+                                if performanceMetric == 'RS Rating'
+                                    value := request.security(sym, timeframe.period, f_normalized_rs(rsIndex, days), lookahead=barmerge.lookahead_on, ignore_invalid_symbol=true)
+                                    showPercent := false
+                                else // % Return
+                                    value := request.security(sym, timeframe.period, ta.roc(close, days), lookahead=barmerge.lookahead_on, ignore_invalid_symbol=true)
+                                    showPercent := true
+
+                            outputArr.push(value)
+                            filteredSymbols.push(sym)
+
+    // Build title text with mode indicator
+    string modeIndicator=isLeafNode(detectedSectorCode) ? ' (TradingView Industry: ' + syminfo.industry + ')' : ''
+    titleText=detectedSectorCode + ' - ' + sectorDisplayName + modeIndicator + ' (' + performanceMetric + ' - ' + periodDisplay + ')'
+
+    if not sectorFound or outputArr.size() == 0
+        titleText := titleText + ' [No data available]'
+
+    sorted=outputArr.sort_indices(order.descending)
+
+    // Track current stock position
+    var int currentStockIndex=-1
+    var float currentStockValue=na
+    var string currentStockTicker=syminfo.ticker
+    bool currentStockInTopN=false
+    int currentStockRank=-1
+    int totalPeers=outputArr.size()
+
+    // Find current stock in the arrays
+    if showCurrentStock and outputArr.size()>0
+        for i=0 to filteredSymbols.size()-1
+            sym=filteredSymbols.get(i)
+            if str.contains(sym, currentStockTicker) or sym==currentStockTicker
+                currentStockIndex := i
+                currentStockValue := outputArr.get(i)
+                break
+
+        // Check if current stock is in top N and calculate rank
+        if currentStockIndex>=0
+            for i=0 to math.min(outputArr.size()-1, showMax)
+                si=sorted.get(i)
+                if si==currentStockIndex
+                    currentStockInTopN := true
+                    currentStockRank := i+1
+                    break
+            
+            // If not in top N, find rank
+            if not currentStockInTopN
+                for i=0 to outputArr.size()-1
+                    si=sorted.get(i)
+                    if si==currentStockIndex
+                        currentStockRank := i+1
+                        break
+
+    // Update title with rank
+    if showCurrentStock and currentStockRank>0
+        rankMarker=currentStockInTopN ? '' : ' ✕'
+        titleText := titleText + ' | ' + currentStockTicker + ' ranks #' + str.tostring(currentStockRank) + ' of ' + str.tostring(totalPeers) + rankMarker
+
+    data.cell(0, 1, titleText, text_color=txtCol, text_size=size.large)
+
+    if outputArr.size() > 0
+        space=3
+        for i=math.min(outputArr.size()-1, showMax) to 0
+            sect=sectorArr.get(sectIdx)
+            bar_pos=bar_index - (i*space)
+            si=sorted.get(i)
+            rank=outputArr.percentrank(si)
+            col=color.from_gradient(rank, 0, 100, color.red, color.lime)
+
+            currentSymbol=filteredSymbols.get(si)
+            isCurrentStockIndustry=false
+
+            if currentStockIndustries.size()>0
+                for stockInd in currentStockIndustries
+                    if currentSymbol==stockInd
+                        isCurrentStockIndustry := true
+                        break
+
+            // Check if this bar is the current stock
+            isCurrentStockBar=si==currentStockIndex
+
+            if not compact
+                labelText=getDisplayText(currentSymbol, symbolToName, isCurrentStockIndustry)
+                if isCurrentStockBar
+                    labelText := labelText + ' ●'
+
+                label.new(bar_pos, 0, labelText, textcolor=isCurrentStockBar ? color.new(#9C27B0, 0) : txtCol, style=label.style_label_up, color=color.new(color.white, 100))
+                line.new(bar_pos, 0, bar_pos, rank, width=8, color=col)
+                
+                valueText=str.tostring(outputArr.get(si), '#.#') + (showPercent ? '%' : '')
+                if isCurrentStockBar
+                    valueText := valueText + ' ●'
+                
+                label.new(bar_pos, rank, valueText, textcolor=isCurrentStockBar ? color.new(#9C27B0, 0) : txtCol, color=color.new(color.white, 100))
+            else
+                list.cell(0, 0, '')
+                cell=math.abs(i - (math.min(outputArr.size()-1, showMax)))
+                cellText = getDisplayText(currentSymbol, symbolToName, isCurrentStockIndustry)
+                if isCurrentStockBar
+                    cellText := cellText + ' ●'
+                list.cell(cell, 1, cellText + (results ? '\n' + str.tostring(outputArr.get(si), '#.#') + (showPercent ? '%' : '') : ''), text_color=txtCol)
+
+        // Display current stock if NOT in top N
+        if showCurrentStock and not currentStockInTopN and currentStockIndex >= 0
+            // Position: one space after last top performer
+            bar_pos_current=bar_index - ((math.min(outputArr.size()-1, showMax) + 2) * space)
+            rank_current=outputArr.percentrank(currentStockIndex)
+            col_current=color.from_gradient(rank_current, 0, 100, color.red, color.lime)
+
+            // Get current stock symbol from filteredSymbols
+            currentStockSymbol=filteredSymbols.get(currentStockIndex)
+
+            if not compact
+                // Label with rank number and ✕ marker
+                rankLabel=str.tostring(currentStockRank) + '. ' + currentStockTicker + ' ✕'
+                label.new(bar_pos_current, 0, rankLabel, textcolor=color.new(#9C27B0, 0), style=label.style_label_up, color=color.new(color.white,100))
+
+                // Dashed line to distinguish from top performers
+                line.new(bar_pos_current, 0, bar_pos_current, rank_current, width=6, color=col_current, style=line.style_dashed)
+
+                // Value label with ✕ marker
+                valueLabel=str.tostring(currentStockValue, '#.#') + (showPercent ? '%' : '') + ' ✕'
+                label.new(bar_pos_current, rank_current, valueLabel, textcolor=color.new(#9C27B0, 0), color=color.new(color.white, 100))
+            else
+                // In compact mode, add as extra row with gray text
+                list.cell(0, 0, '')
+                cellText=str.tostring(currentStockRank) + '. ' + currentStockTicker + ' ✕' + (results ? '\n' + str.tostring(currentStockValue, '#.#') + (showPercent ? '%' : '') : '')
+                list.cell(math.min(outputArr.size()-1, showMax) + 1, 1, cellText, text_color=color.gray)
