@@ -6,9 +6,44 @@ Since this improvement may not be accepted as an update to the original TradingV
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-[b]═══ PRIMARY IMPROVEMENT: NQUSB Hierarchical Index Benchmarks ═══[/b]
+[b][size=large]VERSION 9: TWO GAME-CHANGING INNOVATIONS[/size][/b]
 
-[b]The KEY improvement:[/b] Multi-Level Industry Granularity with Drill-Down/Drill-Up Navigation
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+[b]═══ INNOVATION 1: DUAL DISPLAY MODE ═══[/b]
+
+[b]One indicator, TWO complementary analysis views![/b]
+
+Version 9 introduces a display mode selector that transforms one indicator into TWO powerful analysis tools:
+
+[list]
+[*] [b]Display Mode 1:[/b] Stock vs Industry (e.g., MSFT vs NASDAQ Software Index)
+[*] [b]Display Mode 2:[/b] Industry vs SPY (e.g., NASDAQ Software Index vs SPY)
+[/list]
+
+[b]How to use:[/b] Add the indicator TWICE to your chart in separate panels to simultaneously view both comparisons!
+
+[b]Example: Analyzing MSFT[/b]
+[list]
+[*] [b]Panel 1 (Stock vs Industry):[/b] MSFT / NQUSB10101015 → Is MSFT outperforming software peers?
+[*] [b]Panel 2 (Industry vs SPY):[/b] NQUSB10101015 / SPY → Is the software sector outperforming the market?
+[/list]
+
+[b]Critical Trading Insights:[/b]
+[list]
+[*] ✅ [b]Stock ⬆️ + Industry ⬆️:[/b] Strong buy signal - both stock AND sector are strong
+[*] ⚠️ [b]Stock ⬆️ + Industry ⬇️:[/b] Stock-specific strength - monitor closely
+[*] 🔄 [b]Stock ⬇️ + Industry ⬆️:[/b] Stock weak but sector strong - consider sector ETF instead
+[*] ❌ [b]Stock ⬇️ + Industry ⬇️:[/b] Both weak - avoid or exit position
+[/list]
+
+[b]Why This Matters:[/b] Separate stock-specific performance from sector-wide trends to make better trading decisions!
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+[b]═══ INNOVATION 2: NQUSB Hierarchical Index Benchmarks ═══[/b]
+
+[b]Multi-Level Industry Granularity with Drill-Down/Drill-Up Navigation:[/b]
 
 [b]From:[/b] Simple ETF Comparison (1 Level)
 Stock → Industry ETF (e.g., "SOXX" for all semiconductors)
@@ -36,13 +71,16 @@ Stock → Industry ETF (e.g., "SOXX" for all semiconductors)
 [*] Arbitrary mappings - Manual ETF selection may not represent true industry
 [/list]
 
-[b]Improved Capabilities:[/b]
+[b]Improved Capabilities (Version 9):[/b]
 [list]
+[*] [b]Dual display mode[/b] - Stock vs Industry AND Industry vs SPY in one indicator
+[*] [b]Simultaneous dual-panel analysis[/b] - Add indicator twice to see both comparisons at once
 [*] [b]4-level hierarchical navigation[/b] - Drill-down and drill-up through industry classifications
 [*] [b]361 NQUSB official indices[/b] - NASDAQ US Benchmark Index structure
 [*] [b]Official NASDAQ classification[/b] - Industry-standard taxonomy
 [*] [b]Large Mid Cap (LM) option[/b] - Focus on larger companies when needed
 [*] [b]Enhanced UI[/b] - Clear level indicators and full index descriptions
+[*] [b]Default to Index Benchmark[/b] - Primary level (most specific) comparison out of the box
 [/list]
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -73,15 +111,20 @@ NQUSB10 - Technology Sector
 
 [b]Original Version:[/b]
 [list]
+[*] Display Modes: Stock vs Industry only
+[*] Dual Panel Support: ❌ No
 [*] Comparison System: Industry ETFs
 [*] Industry Levels: 1 (flat ETF mapping)
 [*] Total Classifications: ~140 industries
 [*] Hierarchy Navigation: ❌ No
 [*] Data Source: Manual ETF curation
+[*] Default Comparison: ETF
 [/list]
 
-[b]Improved Version:[/b]
+[b]Version 9 (Improved):[/b]
 [list]
+[*] Display Modes: ✅ [b]Stock vs Industry + Industry vs SPY[/b]
+[*] Dual Panel Support: ✅ [b]Add indicator twice for simultaneous views[/b]
 [*] Comparison System: NQUSB Official Indices
 [*] Industry Levels: [b]4 (hierarchical drill-down/up)[/b]
 [*] Total Classifications: [b]361 NQUSB indices[/b]
@@ -89,6 +132,7 @@ NQUSB10 - Technology Sector
 [*] Data Source: [b]NASDAQ official taxonomy[/b]
 [*] Large/Mid Cap Option: ✅ [b]LM variant toggle[/b]
 [*] Level Indicator: ✅ [b][Index-L1] to [Index-L4] labels[/b]
+[*] Default Comparison: [b]Index Benchmark (Primary level)[/b]
 [/list]
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -124,15 +168,23 @@ NQUSB10 - Technology Sector
 [b]═══ ADDITIONAL FEATURES ═══[/b]
 
 [list]
+[*] [b]Dual Display Mode (v9)[/b] - Stock vs Industry AND Industry vs SPY in one indicator
+[*] [b]Simultaneous Dual Panel Analysis (v9)[/b] - Add indicator twice to see both comparisons at once
 [*] [b]Dual Comparison System[/b] - Toggle between ETF mode (original) and Index Benchmark mode (NQUSB hierarchy)
 [*] [b]Better Fallback Logic[/b] - Manual Override > NQUSB Index > ETF > SPY default
 [*] [b]Enhanced Display[/b] - 4-row information table with full NQUSB index description
 [*] [b]Backward Compatible[/b] - All original ETF mappings still work, existing charts won't break
 [*] [b]Large Mid Cap Toggle[/b] - Optional "LM" suffix for focusing on larger companies only
+[*] [b]Smart Defaults (v9)[/b] - Index Benchmark mode with Primary level selected out of the box
 [/list]
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 [b]For complete documentation, data files, technical details, and the full NQUSB hierarchy structure, visit the GitHub repository.[/b]
 
-[b]The result:[/b] More accurate, more flexible, and more comprehensive industry strength analysis - enabling traders to understand exactly where their stock's performance comes from by drilling through multiple levels of industry classification.
+[b]The result:[/b] More accurate, more flexible, and more comprehensive industry strength analysis - enabling traders to:
+[list]
+[*] Understand exactly where their stock's performance comes from by drilling through multiple levels of industry classification
+[*] Separate stock-specific strength from sector-wide trends using dual display mode
+[*] Make better trading decisions by viewing both Stock vs Industry AND Industry vs Market simultaneously
+[/list]

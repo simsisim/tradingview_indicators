@@ -18,9 +18,56 @@ The repository includes:
 
 ---
 
-## 🎯 Primary Innovation: NQUSB Hierarchical Index Benchmarks
+## 🎯 Primary Innovations
 
-### **Main Improvement: Multi-Level Industry Granularity**
+### **Innovation 1: Dual Display Mode (v9) - Stock vs Industry AND Industry vs SPY**
+
+Version 9 introduces a **game-changing display mode selector** that transforms one indicator into TWO complementary analysis tools:
+
+#### **Two Display Modes:**
+1. **"Stock vs Industry"** - Shows how the stock performs against its industry (original functionality)
+2. **"Industry vs SPY"** - Shows how the industry performs against the broader market (NEW!)
+
+#### **Why This Matters:**
+You can now add the **same indicator twice** to your chart in separate panels to simultaneously view:
+- **Panel 1**: Stock vs Industry strength (e.g., MSFT vs NASDAQ Software)
+- **Panel 2**: Industry vs Market strength (e.g., NASDAQ Software vs SPY)
+
+#### **Example: Analyzing MSFT**
+- **Instance 1 (Stock vs Industry mode)**:
+  - Comparison: `MSFT / NQUSB10101015` (Microsoft vs NASDAQ Software Index)
+  - Insight: Is MSFT outperforming its software peers?
+
+- **Instance 2 (Industry vs SPY mode)**:
+  - Comparison: `NQUSB10101015 / SPY` (Software Index vs S&P 500)
+  - Insight: Is the entire software sector outperforming the market?
+
+#### **The Power of Dual Display:**
+By viewing both modes simultaneously, you can answer critical questions:
+- ✅ **Is my stock strong because it's beating peers, or because the entire industry is hot?**
+- ✅ **Is my stock weak because it's underperforming peers, or because the industry is in decline?**
+- ✅ **Should I hold the stock or rotate to a sector ETF?**
+- ✅ **Is this a stock-specific opportunity or a sector rotation signal?**
+
+#### **Trading Scenarios:**
+
+| **Stock vs Industry** | **Industry vs SPY** | **Interpretation** | **Action** |
+|----------------------|---------------------|-------------------|-----------|
+| ⬆️ Outperforming | ⬆️ Outperforming | Stock AND sector both strong | ✅ Strong buy signal |
+| ⬆️ Outperforming | ⬇️ Underperforming | Stock strong, sector weak | ⚠️ Stock-specific strength - monitor closely |
+| ⬇️ Underperforming | ⬆️ Outperforming | Stock weak, sector strong | 🔄 Consider sector ETF instead |
+| ⬇️ Underperforming | ⬇️ Underperforming | Stock AND sector both weak | ❌ Avoid or exit position |
+
+**Default Settings (v9):**
+- Display Mode: "Stock vs Industry"
+- Compare Against: "Index Benchmark" (NQUSB indices)
+- Index Selection: "Primary" (most specific level)
+
+---
+
+### **Innovation 2: NQUSB Hierarchical Index Benchmarks**
+
+#### **Main Improvement: Multi-Level Industry Granularity**
 
 The KEY improvement is replacing generic ETF comparisons with **NASDAQ's official NQUSB industry hierarchy**, enabling drill-down/drill-up analysis across **4 levels of industry classification**:
 
@@ -180,8 +227,10 @@ selectIndex(string indexString, string choice) =>
 
 ## Comparison Summary Table
 
-| **Feature** | **Original Version** | **Improved Version** |
+| **Feature** | **Original Version** | **Improved Version (v9)** |
 |-------------|---------------------|---------------------|
+| **Display Modes** | Stock vs Industry only | ✅ **Stock vs Industry + Industry vs SPY** |
+| **Dual Panel Support** | ❌ No | ✅ **Add indicator twice for simultaneous views** |
 | **Comparison System** | Industry ETFs | NQUSB Official Indices |
 | **Industry Levels** | 1 (flat ETF mapping) | **4 (hierarchical drill-down/up)** |
 | **Total Classifications** | ~140 industries | **361 NQUSB indices** |
@@ -192,6 +241,7 @@ selectIndex(string indexString, string choice) =>
 | **Level Indicator** | ❌ No | ✅ **[Index-L1] to [Index-L4] labels** |
 | **Fallback ETF** | Default ETF only | **ETF fallback + NQUSB priority** |
 | **Industry Coverage** | Limited by ETF availability | **Comprehensive (all TradingView industries)** |
+| **Default Comparison** | ETF | **Index Benchmark (Primary level)** |
 
 ---
 
@@ -334,19 +384,25 @@ else
 
 ## Conclusion
 
-While the improved version maintains all original ETF comparison functionality, the **game-changing innovation is the NASDAQ NQUSB hierarchical index system**:
+Version 9 delivers **TWO game-changing innovations**:
 
 ### **Key Advantages:**
-1. ✅ **4-level drill-down/drill-up navigation** - Zoom in to specific industries or zoom out to broad sectors
-2. ✅ **361 official NQUSB classifications** - Comprehensive industry coverage
-3. ✅ **NASDAQ-official taxonomy** - Industry-standard classification system
-4. ✅ **Large Mid Cap variants** - Optional focus on larger companies
-5. ✅ **Smart level selection** - Automatic hierarchy parsing with fallback logic
-6. ✅ **Enhanced UI** - Clear level indicators and full index descriptions
+1. ✅ **Dual Display Mode (v9)** - Stock vs Industry AND Industry vs SPY in one indicator
+2. ✅ **Simultaneous dual-panel analysis** - Add indicator twice to see both comparisons at once
+3. ✅ **4-level drill-down/drill-up navigation** - Zoom in to specific industries or zoom out to broad sectors
+4. ✅ **361 official NQUSB classifications** - Comprehensive industry coverage
+5. ✅ **NASDAQ-official taxonomy** - Industry-standard classification system
+6. ✅ **Large Mid Cap variants** - Optional focus on larger companies
+7. ✅ **Smart level selection** - Automatic hierarchy parsing with fallback logic
+8. ✅ **Enhanced UI** - Clear level indicators and full index descriptions
+9. ✅ **Default to Index Benchmark** - Primary level NQUSB comparison out of the box
 
 ### **The Result:**
 
-**More accurate, more flexible, and more comprehensive industry strength analysis** - enabling traders to understand **exactly where their stock's performance comes from** by drilling through multiple levels of industry classification.
+**More accurate, more flexible, and more comprehensive industry strength analysis** - enabling traders to:
+- Understand **exactly where their stock's performance comes from** by drilling through multiple levels of industry classification
+- Separate **stock-specific strength from sector-wide trends** using dual display mode
+- Make **better trading decisions** by viewing both Stock vs Industry AND Industry vs Market simultaneously
 
 ---
 
@@ -359,15 +415,39 @@ While the improved version maintains all original ETF comparison functionality, 
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-[b][size=large]PRIMARY IMPROVEMENT: NQUSB Hierarchical Index Benchmarks[/size][/b]
+[b][size=large]VERSION 9: TWO GAME-CHANGING INNOVATIONS[/size][/b]
 
-[b]The KEY improvement:[/b] Multi-Level Industry Granularity
+[b]═══ INNOVATION 1: DUAL DISPLAY MODE ═══[/b]
+
+[b]One indicator, TWO complementary analysis views:[/b]
+
+[list]
+[*] [b]Display Mode 1:[/b] Stock vs Industry (e.g., MSFT vs NASDAQ Software)
+[*] [b]Display Mode 2:[/b] Industry vs SPY (e.g., NASDAQ Software vs SPY)
+[/list]
+
+[b]Add the indicator TWICE to your chart for simultaneous dual-panel analysis![/b]
+
+[b]Trading Decision Matrix:[/b]
+[list]
+[*] [b]Stock ⬆️ + Industry ⬆️:[/b] Strong buy signal (both stock AND sector strong)
+[*] [b]Stock ⬆️ + Industry ⬇️:[/b] Stock-specific strength (monitor closely)
+[*] [b]Stock ⬇️ + Industry ⬆️:[/b] Consider sector ETF instead
+[*] [b]Stock ⬇️ + Industry ⬇️:[/b] Avoid or exit (both weak)
+[/list]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+[b]═══ INNOVATION 2: NQUSB Hierarchical Index Benchmarks ═══[/b]
+
+[b]Multi-Level Industry Granularity:[/b]
 
 [list]
 [*] [b]4 hierarchy levels:[/b] Primary (L4) → Secondary (L3) → Tertiary (L2) → Quaternary (L1)
-[*] [b]361 NQUSB classifications:[/b] NASDAQ official industry taxonomy  
+[*] [b]361 NQUSB classifications:[/b] NASDAQ official industry taxonomy
 [*] [b]Drill-down/drill-up navigation:[/b] Zoom in to specific industries or out to broad sectors
 [*] [b]Large Mid Cap variant:[/b] Optional LM suffix for larger companies only
+[*] [b]Default settings:[/b] Index Benchmark (Primary level) - most specific comparison out of the box
 [/list]
 
 [b]Example: Analyzing NVDA (Semiconductors)[/b]
@@ -383,9 +463,9 @@ While the improved version maintains all original ETF comparison functionality, 
 [b]Why This Matters:[/b]
 
 [list]
-[*] [b]Original:[/b] Single ETF comparison (no drill-down/up capability)
-[*] [b]Improved:[/b] 4-level hierarchical navigation across 361 industry classifications
-[*] [b]Use Cases:[/b] Identify if stock strength is industry-specific or sector-wide
+[*] [b]Original:[/b] Single ETF comparison, single view mode
+[*] [b]Version 9:[/b] Dual display modes + 4-level hierarchical navigation across 361 industry classifications
+[*] [b]Use Cases:[/b] Separate stock-specific strength from sector-wide trends
 [*] [b]Official Data:[/b] NASDAQ US Benchmark Index taxonomy (industry standard)
 [/list]
 
