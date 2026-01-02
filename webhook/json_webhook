@@ -1,0 +1,5 @@
+  Message field: Format as JSON for Discord:
+  {
+    "content": "🚨 **{{ticker}}** Alert!\nPrice: {{close}}\nTime: {{time}}\nCondition: {{plot_0}}"
+  }
+

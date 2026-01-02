@@ -1,0 +1,186 @@
+//@version=6
+indicator("Asset Ratio vs Benchmark v1", "RatioAssets-v1", precision = 2)
+
+// ========================================
+// TICKER TO BENCHMARK MAPPING
+// Based on names_vs_TW_YF.csv
+// ========================================
+f_getBenchmark(string ticker) =>
+    string benchmark = "VBINX"  // Default benchmark
+
+    // Government Bonds -> VBINX or GOVT
+    if ticker == "GOVT"
+        benchmark := "VBINX"
+    else if ticker == "BIL" or ticker == "SHY" or ticker == "IEI" or ticker == "IEF" or ticker == "TLH" or ticker == "TLT"
+        benchmark := "GOVT"
+
+    // Corporate Bonds
+    else if ticker == "LQD" or ticker == "HYG"
+        benchmark := "VBINX"
+
+    // SPY and Sectors
+    else if ticker == "SPY"
+        benchmark := "VBINX"
+    else if ticker == "XLB" or ticker == "XLF" or ticker == "XLK" or ticker == "XLU" or ticker == "XLRE" or ticker == "XLV" or ticker == "XLC" or ticker == "XLY" or ticker == "XLI" or ticker == "XLE"
+        benchmark := "SPY"
+
+    // Commodities
+    else if ticker == "DJP"
+        benchmark := "VBINX"
+    else if ticker == "DBA" or ticker == "USO" or ticker == "DBB" or ticker == "PDBC" or ticker == "GLD" or ticker == "SLV"
+        benchmark := "DJP"
+    else if ticker == "XLE"  // Energy also maps to DJP in CSV
+        benchmark := "DJP"
+
+    // Crypto
+    else if ticker == "BTC"
+        benchmark := "VBINX"
+
+    // Dollar Index
+    else if ticker == "DXY" or ticker == "DX-Y.NYB"
+        benchmark := "VBINX"
+
+    benchmark
+
+// ========================================
+// INPUT PARAMETERS
+// ========================================
+// Auto-detect current ticker
+string currentTicker = syminfo.ticker
+
+// Get default benchmark
+string defaultBenchmark = f_getBenchmark(currentTicker)
+
+// Benchmark override options
+sSelectedBenchmark = input.string("Auto", "Benchmark", options=["Auto", "VBINX", "SPY", "GOVT", "DJP", "QQQ", "IWM", "EFA", "EEM", "AGG", "TLT", "GLD", "Custom"], tooltip="Select benchmark for ratio calculation. 'Auto' uses the default from the mapping table.")
+sCustomBenchmark = input.string("VBINX", "Custom Benchmark Ticker", tooltip="Only used when 'Custom' is selected above")
+
+// Determine actual benchmark to use
+string actualBenchmark = defaultBenchmark
+if sSelectedBenchmark == "Auto"
+    actualBenchmark := defaultBenchmark
+else if sSelectedBenchmark == "Custom"
+    actualBenchmark := sCustomBenchmark
+else
+    actualBenchmark := sSelectedBenchmark
+
+// Display settings
+bInverseRatio = input.bool(false, "Inverse Ratio (Benchmark / Asset)", tooltip="When enabled, shows Benchmark/Asset instead of Asset/Benchmark")
+iSma = input.int(55, "SMA Period", minval=1)
+bShowSMA = input.bool(true, "Show SMA Line")
+bShowLabels = input.bool(true, "Show Ratio Label", tooltip="Display ratio label at the right edge of the chart")
+sLabelSize = input.string("small", "Label Size", options=["tiny", "small", "normal", "large", "huge"])
+sLabelStyle = input.string("left", "Label Position", options=["left", "right"], tooltip="Position relative to the bar")
+
+// Gap Adjustment Settings
+bWithoutGaps = input.bool(false, "Without Gaps", group="Gap Adjustment", tooltip="Calculate prices without overnight gaps from the start date")
+gapStartDate = input.time(timestamp("01 Jan 2024 00:00 +0000"), "Gap Adjustment Start Date", group="Gap Adjustment", tooltip="Start calculating gap-free prices from this date forward")
+
+// ========================================
+// PRICE DATA RETRIEVAL
+// ========================================
+// Current ticker (chart asset)
+assetClose = request.security(ticker.new("", currentTicker, session=session.regular), timeframe.period, close)
+assetOpen = request.security(ticker.new("", currentTicker, session=session.regular), timeframe.period, open)
+
+// Benchmark ticker
+benchmarkClose = request.security(ticker.new("", actualBenchmark, session=session.regular), timeframe.period, close)
+benchmarkOpen = request.security(ticker.new("", actualBenchmark, session=session.regular), timeframe.period, open)
+
+// ========================================
+// GAP ADJUSTMENT LOGIC
+// ========================================
+f_gapAdjustedPrice(float closePrice, float openPrice, bool enableGaps, int startDate) =>
+    var float cumulativeGap = 0.0
+    var float prevClose = na
+
+    // Detect new day (approximation: when open != previous close)
+    bool newDay = not na(prevClose) and not na(openPrice) and math.abs(openPrice - prevClose) > 0.001
+
+    // Calculate gap if we're past the start date and gaps are enabled
+    if enableGaps and time >= startDate and newDay
+        float gap = openPrice - prevClose
+        cumulativeGap += gap
+
+    // Update previous close for next iteration
+    prevClose := closePrice
+
+    // Return adjusted or original price
+    float adjustedPrice = enableGaps and time >= startDate ? closePrice - cumulativeGap : closePrice
+    adjustedPrice
+
+// Calculate gap-adjusted prices
+assetAdjusted = f_gapAdjustedPrice(assetClose, assetOpen, bWithoutGaps, gapStartDate)
+benchmarkAdjusted = f_gapAdjustedPrice(benchmarkClose, benchmarkOpen, bWithoutGaps, gapStartDate)
+
+// ========================================
+// RATIO CALCULATIONS
+// ========================================
+ratio = bInverseRatio ?
+     (assetAdjusted != 0 ? benchmarkAdjusted / assetAdjusted : na) :
+     (benchmarkAdjusted != 0 ? assetAdjusted / benchmarkAdjusted : na)
+
+smaRatio = ta.sma(ratio, iSma)
+
+// ========================================
+// PLOTTING
+// ========================================
+// Dynamic color based on ratio vs SMA
+colorRatio = ratio >= smaRatio ? color.new(color.green, 0) : color.new(color.red, 0)
+colorSMA = color.new(color.blue, 0)
+
+plot(ratio, color=colorRatio, title="Ratio", linewidth=2)
+plot(bShowSMA ? smaRatio : na, color=colorSMA, title="SMA", linewidth=1)
+
+// ========================================
+// LABELS AT LAST BAR
+// ========================================
+if bShowLabels and barstate.islast and not na(ratio)
+    // Create label text
+    string labelText = bInverseRatio ?
+         actualBenchmark + ":" + currentTicker :
+         currentTicker + ":" + actualBenchmark
+
+    // Add ratio value to label
+    labelText := labelText + "\n" + str.tostring(ratio, "#.####")
+
+    // Add gap-free indicator to label if enabled
+    string gapSuffix = bWithoutGaps ? " [No Gaps]" : ""
+
+    // Style and size mapping
+    string styleLoc = sLabelStyle == "right" ? label.style_label_right : label.style_label_left
+
+    string sizeLoc = size.small
+    if sLabelSize == "tiny"
+        sizeLoc := size.tiny
+    else if sLabelSize == "normal"
+        sizeLoc := size.normal
+    else if sLabelSize == "large"
+        sizeLoc := size.large
+    else if sLabelSize == "huge"
+        sizeLoc := size.huge
+
+    // Create label
+    label.new(bar_index, ratio, text=labelText + gapSuffix,
+         style=styleLoc,
+         color=colorRatio,
+         textcolor=color.white,
+         size=sizeLoc)
+
+// ========================================
+// INFO TABLE (Optional - shows current mappings)
+// ========================================
+bShowInfo = input.bool(false, "Show Info Table", group="Debug", tooltip="Display current ticker and benchmark mapping")
+
+if bShowInfo and barstate.islast
+    var table infoTable = table.new(position.top_right, 2, 3, border_width=1)
+
+    table.cell(infoTable, 0, 0, "Asset", text_color=color.white, bgcolor=color.gray)
+    table.cell(infoTable, 1, 0, currentTicker, text_color=color.white, bgcolor=color.gray)
+
+    table.cell(infoTable, 0, 1, "Benchmark", text_color=color.white, bgcolor=color.gray)
+    table.cell(infoTable, 1, 1, actualBenchmark, text_color=color.white, bgcolor=color.gray)
+
+    table.cell(infoTable, 0, 2, "Ratio", text_color=color.white, bgcolor=color.gray)
+    string ratioDisplay = bInverseRatio ? actualBenchmark + "/" + currentTicker : currentTicker + "/" + actualBenchmark
+    table.cell(infoTable, 1, 2, ratioDisplay, text_color=color.white, bgcolor=color.gray)

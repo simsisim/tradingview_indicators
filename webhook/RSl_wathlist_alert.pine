@@ -1,0 +1,22 @@
+//@version=5
+indicator("RSI_Multi-Symbol Scanner", overlay=false)
+
+// Request data from other symbols
+aaplRSI = request.security("AAPL", timeframe.period, ta.rsi(close, 14))
+tslaRSI = request.security("TSLA", timeframe.period, ta.rsi(close, 14))
+nvdaRSI = request.security("NVDA", timeframe.period, ta.rsi(close, 14))
+
+// Check conditions
+if aaplRSI > 70
+    alert('{"content": "🔴 AAPL OVERBOUGHT at RSI ' + str.tostring(aaplRSI) + '"}', alert.freq_once_per_bar)
+
+if tslaRSI > 70
+    alert('{"content": "🔴 TSLA OVERBOUGHT at RSI ' + str.tostring(tslaRSI) + '"}', alert.freq_once_per_bar)
+
+if nvdaRSI > 70
+    alert('{"content": "🔴 NVDA OVERBOUGHT at RSI ' + str.tostring(nvdaRSI) + '"}', alert.freq_once_per_bar)
+
+// Plot for visualization
+plot(aaplRSI, "AAPL RSI", color=color.red)
+plot(tslaRSI, "TSLA RSI", color=color.green)
+plot(nvdaRSI, "NVDA RSI", color=color.blue)

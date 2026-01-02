@@ -1,0 +1,18 @@
+  Group Performance Dashboard - Track Multiple Assets with RS Rating & Returns
+
+  Visual table dashboard displaying performance metrics for predefined asset groups. Monitor main indexes, sectors, commodities, bonds, and industry groups side-by-side.
+
+  Features:
+  - 25+ pre-configured groups (Main Indexes, SPY Sectors, Finance, Healthcare, etc.)
+  - RS Rating (1-99 strength vs benchmark) or % Return metrics
+  - Customizable timeframes (Year, YTD, Quarter, Custom periods)
+  - Sortable performance columns
+  - Color-coded cells (green/gray/red for quick analysis)
+  - Adjustable table position and size
+
+  Two versions available:
+  - v1: Supports both RS Rating and % Return modes (best for small-medium groups)
+  - v3: RS Rating only, optimized for large groups up to 39 items
+
+  Perfect for sector rotation, relative strength analysis, and multi-asset monitoring.
+

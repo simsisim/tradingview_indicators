@@ -1,0 +1,20 @@
+  Option 2: Pine Script Screener (Best for Watchlist)
+
+  Create a screener that monitors multiple symbols:
+
+  //@version=5
+  indicator("Watchlist Screener", overlay=false)
+
+  // Define your watchlist
+  var string[] watchlist = array.from("AAPL", "TSLA", "NVDA", "MSFT", "GOOGL")
+
+  // Your alert condition
+  rsiValue = ta.rsi(close, 14)
+  isOverbought = rsiValue > 70
+
+  if isOverbought
+      alert('{"content": "🔴 ' + syminfo.ticker + ' OVERBOUGHT at ' + str.tostring(close) + '"}', alert.freq_once_per_bar)
+
+  Then set one alert on this indicator with "Any alert() function call" - it monitors the current chart but you can duplicate
+  across watchlist charts.
+

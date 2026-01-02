@@ -1,0 +1,180 @@
+assets= GOVT, LOD, HYG, SPY, DJP, BTC, DXY, GSG
+SPY_sectors= XLB, XLF, XLK,XLU,XLRE,XLV,XLP,XLY,XLC,XLI,XLE
+DJP_group = DBA,XLE,USO,DBB, PDBC,GLD, SLV
+GOVT = BIL, SHY,IEI,IEF,TLH,TLT
+
+   // Commercial Services (5 mappings)
+    "Miscellaneous Commercial Services" => "NQUSB50,NQUSB5020,NQUSB502050,NQUSB50205020"
+    "Financial Publishing/Services" => "NQUSB30,NQUSB3020,NQUSB302010,NQUSB30201030"
+    "Advertising/Marketing Services" => "NQUSB40,NQUSB4030,NQUSB40301020"
+    "Commercial Printing/Forms" => "NQUSB50,NQUSB5020,NQUSB502050,NQUSB50205030"
+    "Personnel Services" => "NQUSB50,NQUSB5020,NQUSB502050,NQUSB50205025"
+
+    // Communications (3 mappings)
+    "Wireless Telecommunications" => "NQUSB15,NQUSB151020"
+    "Major Telecommunications" => "NQUSB15,NQUSB151020"
+    "Speciality Telecommunications" => "NQUSB15,NQUSB151020,NQUSB15102015"
+
+    // Consumer Durables (8 mappings)
+    "Motor Vehicles" => "NQUSB40,NQUSB4010,NQUSB40101020"
+    "Homebuilding" => "NQUSB40,NQUSB4020,NQUSB402020,NQUSB40202010"
+    "Recreational Products" => "NQUSB40,NQUSB4020,NQUSB402030,NQUSB40203050"
+    "Tools & Hardware" => "NQUSB50,NQUSB5020,NQUSB502040,NQUSB50204000"
+    "Electronics/Appliances" => "NQUSB40,NQUSB4020,NQUSB402020,NQUSB40202025"
+    "Home Furnishings" => "NQUSB40,NQUSB4020,NQUSB402020,NQUSB40202015"
+    "Automotive Aftermarket" => "NQUSB40,NQUSB4010,NQUSB40101025"
+    "Other Consumer Specialties" => "NQUSB40,NQUSB4020,NQUSB402010,NQUSB40201070"
+
+    // Consumer Non-Durables (9 mappings)
+    "Household/Personal Care" => "NQUSB45,NQUSB4520,NQUSB45201030"
+    "Beverages: Non-Alcoholic" => "NQUSB45,NQUSB4510,NQUSB451010,NQUSB45101020"
+    "Food: Specialty/Candy" => "NQUSB45,NQUSB4510,NQUSB451020,NQUSB45102020"
+    "Tobacco" => "NQUSB45,NQUSB4510,NQUSB451030"
+    "Beverages: Alcoholic" => "NQUSB45,NQUSB4510,NQUSB451010,NQUSB45101015"
+    "Apparel/Footwear" => "NQUSB40,NQUSB4040,NQUSB402040,NQUSB40204020"
+    "Food: Major Diversified" => "NQUSB45,NQUSB4510,NQUSB451020,NQUSB45102020"
+    "Food: Meat/Fish/Dairy" => "NQUSB45,NQUSB4510,NQUSB451020,NQUSB45102020"
+    "Consumer Sundries" => "NQUSB45,NQUSB4520,NQUSB45201030"
+
+    // Consumer Services (10 mappings)
+    "Restaurants" => "NQUSB40,NQUSB4050,NQUSB40501040"
+    "Hotels/Resorts/Cruise lines" => "NQUSB40,NQUSB4050,NQUSB40501025"
+    "Other Consumer Services" => "NQUSB40,NQUSB4020,NQUSB402010,NQUSB40201070"
+    "Movies/Entertainment" => "NQUSB40,NQUSB4030,NQUSB40301010"
+    "Cable/Satellite TV" => "NQUSB15,NQUSB151020,NQUSB15102010"
+    "Casinos/Gaming" => "NQUSB40,NQUSB4050,NQUSB40501020"
+    "Broadcasting" => "NQUSB40,NQUSB4030,NQUSB40301035"
+    "Publishing: Newspapers" => "NQUSB40,NQUSB4030,NQUSB40301030"
+    "Publishing: Books/Magazines" => "NQUSB40,NQUSB4030,NQUSB40301030"
+    "Media Conglomerates" => "NQUSB40,NQUSB4030,NQUSB40301010"
+
+    // Distribution Services (4 mappings)
+    "Wholesale Distributors" => "NQUSB45,NQUSB4520,NQUSB45201010"
+    "Medical Distributors" => "NQUSB20,NQUSB201020,NQUSB20102015"
+    "Food Distributors" => "NQUSB45,NQUSB4520,NQUSB45201010"
+    "Electronics Distributors" => "NQUSB10,NQUSB101020,NQUSB10102015"
+
+    // Electronic Technology (9 mappings)
+    "Semiconductors" => "NQUSB10,NQUSB101020,NQUSB10102010"
+    "Telecommunications Equipment" => "NQUSB15,NQUSB151010"
+    "Aerospace & Defense" => "NQUSB50,NQUSB5020,NQUSB502010"
+    "Electronic Equipment/Instruments" => "NQUSB50,NQUSB5020,NQUSB502020,NQUSB50202025"
+    "Computer Processing Hardware" => "NQUSB10,NQUSB101020,NQUSB10102030"
+    "Computer Peripherals" => "NQUSB10,NQUSB101020,NQUSB10102030"
+    "Electronic Components" => "NQUSB10,NQUSB101020,NQUSB10102015"
+    "Electronic Production Equipment" => "NQUSB10,NQUSB101020,NQUSB10102020"
+    "Computer Communications" => "NQUSB10,NQUSB101020,NQUSB10102020"
+
+    // Energy Minerals (4 mappings)
+    "Oil & Gas Production" => "NQUSB60,NQUSB601010,NQUSB60101010"
+    "Coal" => "NQUSB60,NQUSB601010,NQUSB60101040"
+    "Integrated Oil" => "NQUSB60,NQUSB601010,NQUSB60101000"
+    "Oil Refining/Marketing" => "NQUSB60,NQUSB601010,NQUSB60101020"
+
+    // Finance (14 mappings)
+    "Major Banks" => "NQUSB30,NQUSB3010"
+    "Property/Casualty Insurance" => "NQUSB30,NQUSB3030,NQUSB303020,NQUSB30302025"
+    "Finance/Rental/Leasing" => "NQUSB30,NQUSB3020,NQUSB302010,NQUSB30201020"
+    "Investment Managers" => "NQUSB30,NQUSB3020,NQUSB302020,NQUSB30202010"
+    "Real Estate Investment Trusts" => "NQUSB35,NQUSB351020"
+    "Investment Banks/Brokers" => "NQUSB30,NQUSB3020,NQUSB302020"
+    "Regional Banks" => "NQUSB30,NQUSB3010"
+    "Multi-Line Insurance" => "NQUSB30,NQUSB3030,NQUSB303020,NQUSB30302010"
+    "Insurance Brokers/Services" => "NQUSB30,NQUSB3030,NQUSB303020,NQUSB30302015"
+    "Life/Health Insurance" => "NQUSB30,NQUSB3030,NQUSB303010"
+    "Real Estate Development" => "NQUSB35,NQUSB351010,NQUSB35101010"
+    "Specialty Insurance" => "NQUSB30,NQUSB3030,NQUSB303020"
+    "Financial Conglomerates" => "NQUSB30,NQUSB3020,NQUSB302020,NQUSB30202000"
+    "Savings Banks" => "NQUSB30,NQUSB3010"
+
+    // Health Services (4 mappings)
+    "Managed Health Care" => "NQUSB20,NQUSB201010,NQUSB20101020"
+    "Medical/Nursing Services" => "NQUSB20,NQUSB201010,NQUSB20101020"
+    "Hospital/Nursing Management" => "NQUSB20,NQUSB201010,NQUSB20101010"
+    "Services to the Health Industry" => "NQUSB20,NQUSB201010,NQUSB20101025"
+
+    // Health Technology (5 mappings)
+    "Pharmaceuticals: Major" => "NQUSB20,NQUSB201030,NQUSB20103015"
+    "Medical Specialties" => "NQUSB20,NQUSB201020,NQUSB20102010"
+    "Biotechnology" => "NQUSB20,NQUSB201030,NQUSB20103010"
+    "Pharmaceuticals: Other" => "NQUSB20,NQUSB201030,NQUSB20103015"
+    "Pharmaceuticals: Generic" => "NQUSB20,NQUSB201030,NQUSB20103015"
+
+    // Industrial Services (5 mappings)
+    "Oil & Gas Pipeline" => "NQUSB60,NQUSB601010,NQUSB60101035"
+    "Engineering & Construction" => "NQUSB50,NQUSB5010,NQUSB50101015"
+    "Environmental Services" => "NQUSB65,NQUSB651030"
+    "Contract Drilling" => "NQUSB60,NQUSB601010,NQUSB60101015"
+    "Oilfield Services/Equipment" => "NQUSB60,NQUSB601010,NQUSB60101030"
+
+    // Miscellaneous (3 mappings)
+    "Miscellaneous" => "NQUSB40,NQUSB4020,NQUSB402010,NQUSB40201070"
+    "Unclassified" => "NQUSB40,NQUSB4020,NQUSB402010,NQUSB40201070"
+    "Investment Trusts/Mutual Funds" => "NQUSB30,NQUSB3020,NQUSB302020,NQUSB30202000"
+
+    // Non-Energy Minerals (6 mappings)
+    "Precious Metals" => "NQUSB55,NQUSB5510,NQUSB551030"
+    "Other Metals/Minerals" => "NQUSB55,NQUSB5510,NQUSB551010"
+    "Steel" => "NQUSB55,NQUSB5510,NQUSB551020,NQUSB55102010"
+    "Construction Materials" => "NQUSB50,NQUSB5010,NQUSB50101035"
+    "Forest Products" => "NQUSB55,NQUSB5510,NQUSB551010,NQUSB55101015"
+    "Aluminum" => "NQUSB55,NQUSB5510,NQUSB551020,NQUSB55102010"
+
+    // Process Industries (8 mappings)
+    "Chemicals: Specialty" => "NQUSB55,NQUSB5520,NQUSB55201020"
+    "Industrial Specialties" => "NQUSB50,NQUSB5020,NQUSB502030,NQUSB50203000"
+    "Containers/Packaging" => "NQUSB50,NQUSB5020,NQUSB502030,NQUSB50203030"
+    "Agricultural Commodities/Milling" => "NQUSB45,NQUSB4510,NQUSB451020,NQUSB45102010"
+    "Chemicals: Agricultural" => "NQUSB55,NQUSB5520,NQUSB55201015"
+    "Pulp & Paper" => "NQUSB55,NQUSB5510,NQUSB551010,NQUSB55101015"
+    "Chemicals: Major Diversified" => "NQUSB55,NQUSB5520,NQUSB55201000"
+    "Textiles" => "NQUSB40,NQUSB4020,NQUSB402040,NQUSB40204020"
+
+    // Producer Manufacturing (9 mappings)
+    "Industrial Machinery" => "NQUSB50,NQUSB5020,NQUSB502040,NQUSB50204000"
+    "Electrical Products" => "NQUSB50,NQUSB5020,NQUSB502020,NQUSB50202010"
+    "Trucks/Construction/Farm Machinery" => "NQUSB50,NQUSB5020,NQUSB502040,NQUSB50204020"
+    "Auto Parts: OEM" => "NQUSB40,NQUSB4010,NQUSB40101025"
+    "Building Products" => "NQUSB50,NQUSB5010,NQUSB50101035"
+    "Industrial Conglomerates" => "NQUSB50,NQUSB5020,NQUSB502030,NQUSB50203000"
+    "Metal Fabrication" => "NQUSB55,NQUSB5510,NQUSB551020,NQUSB55102015"
+    "Miscellaneous Manufacturing" => "NQUSB50,NQUSB5020,NQUSB502030,NQUSB50203000"
+    "Office Equipment/Supplies" => "NQUSB50,NQUSB5020,NQUSB502050,NQUSB50205010"
+
+    // Retail Trade (10 mappings)
+    "Internet Retail" => "NQUSB40,NQUSB4040,NQUSB404010,NQUSB40401010"
+    "Specialty Stores" => "NQUSB40,NQUSB4040,NQUSB404010,NQUSB40401030"
+    "Home Improvement Chains" => "NQUSB40,NQUSB4040,NQUSB404010,NQUSB40401025"
+    "Department Stores" => "NQUSB40,NQUSB4040,NQUSB404010,NQUSB40401010"
+    "Apparel/Footwear Retail" => "NQUSB40,NQUSB4040,NQUSB404010,NQUSB40401020"
+    "Drugstore Chains" => "NQUSB45,NQUSB4520,NQUSB45201015"
+    "Food Retail" => "NQUSB45,NQUSB4520,NQUSB45201010"
+    "Discount Stores" => "NQUSB40,NQUSB4040,NQUSB404010,NQUSB40401010"
+    "Electronics/Appliance Stores" => "NQUSB40,NQUSB4040,NQUSB404010,NQUSB40401030"
+    "Catalog/Specialty Distribution" => "NQUSB40,NQUSB4040,NQUSB404010,NQUSB40401030"
+
+    // Technology Services (4 mappings)
+    "Data Processing Services" => "NQUSB10,NQUSB101010,NQUSB10101010"
+    "Internet Software/Services" => "NQUSB10,NQUSB101010,NQUSB10101020"
+    "Information Technology Services" => "NQUSB10,NQUSB101010,NQUSB10101010"
+    "Packaged Software" => "NQUSB10,NQUSB101010,NQUSB10101015"
+
+    // Transportation (5 mappings)
+    "Air Freight & Logistics" => "NQUSB50,NQUSB5020,NQUSB502060,NQUSB50206040"
+    "Airlines" => "NQUSB40,NQUSB4050,NQUSB40501010"
+    "Marine Transportation" => "NQUSB50,NQUSB5020,NQUSB502060,NQUSB50206030"
+    "Railroads" => "NQUSB50,NQUSB5020,NQUSB502060,NQUSB50206020"
+    "Trucking" => "NQUSB50,NQUSB5020,NQUSB502060,NQUSB50206010"
+
+    // Utilities (4 mappings)
+    "Electric Utilities" => "NQUSB65,NQUSB651010"
+    "Gas Distributors" => "NQUSB65,NQUSB651020,NQUSB65102020"
+    "Water Utilities" => "NQUSB65,NQUSB651020,NQUSB65102030"
+    "Alternative Power Generation" => "NQUSB65,NQUSB651010,NQUSB65101010"
+    => "" // Empty string if no index benchmark exists
+
+
+main_indexes:
+SPY, QQQ, DJIA, XLK, XLP, XLY, IWD, IWF, DJU, DJT, DJUSSC, SPYV, SPYG, MDYV, MDYG, IJS, IJT, IWN, IWO
+
+

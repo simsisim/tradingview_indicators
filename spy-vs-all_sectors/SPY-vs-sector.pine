@@ -1,0 +1,104 @@
+//@version=6
+indicator("SPY vs All Sectors", "SPY-Sectors", overlay=false, precision=2)
+
+// ========================================
+// INPUT PARAMETERS
+// ========================================
+bShowLabels = input.bool(true, "Show Ticker Labels", tooltip="Display ticker labels at the right edge of the chart")
+
+// Individual sector toggles
+bShowSPY = input.bool(false, "SPY - S&P 500", group="Tickers to Display")
+bShowXLC = input.bool(false, "XLC - Communication Services", group="Tickers to Display")
+bShowXLY = input.bool(false, "XLY - Consumer Discretionary", group="Tickers to Display")
+bShowXLP = input.bool(false, "XLP - Consumer Staples", group="Tickers to Display")
+bShowXLE = input.bool(false, "XLE - Energy", group="Tickers to Display")
+bShowXLF = input.bool(false, "XLF - Financial", group="Tickers to Display")
+bShowXLV = input.bool(false, "XLV - Health Care", group="Tickers to Display")
+bShowXLI = input.bool(false, "XLI - Industrial", group="Tickers to Display")
+bShowXLB = input.bool(false, "XLB - Materials", group="Tickers to Display")
+bShowXLRE = input.bool(false, "XLRE - Real Estate", group="Tickers to Display")
+bShowXLK = input.bool(false, "XLK - Technology", group="Tickers to Display")
+bShowXLU = input.bool(false, "XLU - Utilities", group="Tickers to Display")
+
+// ========================================
+// PRICE DATA RETRIEVAL
+// ========================================
+spyClose = request.security(ticker.new("", "SPY", session=session.regular), timeframe.period, close)
+xlcClose = request.security(ticker.new("", "XLC", session=session.regular), timeframe.period, close)
+xlyClose = request.security(ticker.new("", "XLY", session=session.regular), timeframe.period, close)
+xlpClose = request.security(ticker.new("", "XLP", session=session.regular), timeframe.period, close)
+xleClose = request.security(ticker.new("", "XLE", session=session.regular), timeframe.period, close)
+xlfClose = request.security(ticker.new("", "XLF", session=session.regular), timeframe.period, close)
+xlvClose = request.security(ticker.new("", "XLV", session=session.regular), timeframe.period, close)
+xliClose = request.security(ticker.new("", "XLI", session=session.regular), timeframe.period, close)
+xlbClose = request.security(ticker.new("", "XLB", session=session.regular), timeframe.period, close)
+xlreClose = request.security(ticker.new("", "XLRE", session=session.regular), timeframe.period, close)
+xlkClose = request.security(ticker.new("", "XLK", session=session.regular), timeframe.period, close)
+xluClose = request.security(ticker.new("", "XLU", session=session.regular), timeframe.period, close)
+
+// ========================================
+// PLOTTING - Each ticker with unique color
+// ========================================
+plot(bShowSPY ? spyClose : na, color=color.new(color.white, 0), title="SPY", linewidth=2)
+
+plot(bShowXLC ? xlcClose : na, color=color.new(color.purple, 0), title="XLC", linewidth=2)
+
+plot(bShowXLY ? xlyClose : na, color=color.new(color.fuchsia, 0), title="XLY", linewidth=2)
+
+plot(bShowXLP ? xlpClose : na, color=color.new(color.green, 0), title="XLP", linewidth=2)
+
+plot(bShowXLE ? xleClose : na, color=color.new(color.orange, 0), title="XLE", linewidth=2)
+
+plot(bShowXLF ? xlfClose : na, color=color.new(color.blue, 0), title="XLF", linewidth=2)
+
+plot(bShowXLV ? xlvClose : na, color=color.new(color.red, 0), title="XLV", linewidth=2)
+
+plot(bShowXLI ? xliClose : na, color=color.new(color.yellow, 0), title="XLI", linewidth=2)
+
+plot(bShowXLB ? xlbClose : na, color=color.new(color.maroon, 0), title="XLB", linewidth=2)
+
+plot(bShowXLRE ? xlreClose : na, color=color.new(color.teal, 0), title="XLRE", linewidth=2)
+
+plot(bShowXLK ? xlkClose : na, color=color.new(color.aqua, 0), title="XLK", linewidth=2)
+
+plot(bShowXLU ? xluClose : na, color=color.new(color.gray, 0), title="XLU", linewidth=2)
+
+// ========================================
+// LABELS AT LAST BAR
+// ========================================
+if bShowLabels and barstate.islast
+    if bShowSPY and not na(spyClose)
+        label.new(bar_index, spyClose, text="SPY", style=label.style_label_left, color=color.new(color.white, 0), textcolor=color.black, size=size.small)
+
+    if bShowXLC and not na(xlcClose)
+        label.new(bar_index, xlcClose, text="XLC", style=label.style_label_left, color=color.new(color.purple, 0), textcolor=color.white, size=size.small)
+
+    if bShowXLY and not na(xlyClose)
+        label.new(bar_index, xlyClose, text="XLY", style=label.style_label_left, color=color.new(color.fuchsia, 0), textcolor=color.white, size=size.small)
+
+    if bShowXLP and not na(xlpClose)
+        label.new(bar_index, xlpClose, text="XLP", style=label.style_label_left, color=color.new(color.green, 0), textcolor=color.white, size=size.small)
+
+    if bShowXLE and not na(xleClose)
+        label.new(bar_index, xleClose, text="XLE", style=label.style_label_left, color=color.new(color.orange, 0), textcolor=color.white, size=size.small)
+
+    if bShowXLF and not na(xlfClose)
+        label.new(bar_index, xlfClose, text="XLF", style=label.style_label_left, color=color.new(color.blue, 0), textcolor=color.white, size=size.small)
+
+    if bShowXLV and not na(xlvClose)
+        label.new(bar_index, xlvClose, text="XLV", style=label.style_label_left, color=color.new(color.red, 0), textcolor=color.white, size=size.small)
+
+    if bShowXLI and not na(xliClose)
+        label.new(bar_index, xliClose, text="XLI", style=label.style_label_left, color=color.new(color.yellow, 0), textcolor=color.black, size=size.small)
+
+    if bShowXLB and not na(xlbClose)
+        label.new(bar_index, xlbClose, text="XLB", style=label.style_label_left, color=color.new(color.maroon, 0), textcolor=color.white, size=size.small)
+
+    if bShowXLRE and not na(xlreClose)
+        label.new(bar_index, xlreClose, text="XLRE", style=label.style_label_left, color=color.new(color.teal, 0), textcolor=color.white, size=size.small)
+
+    if bShowXLK and not na(xlkClose)
+        label.new(bar_index, xlkClose, text="XLK", style=label.style_label_left, color=color.new(color.aqua, 0), textcolor=color.black, size=size.small)
+
+    if bShowXLU and not na(xluClose)
+        label.new(bar_index, xluClose, text="XLU", style=label.style_label_left, color=color.new(color.gray, 0), textcolor=color.white, size=size.small)

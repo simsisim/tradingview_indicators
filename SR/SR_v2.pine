@@ -1,0 +1,174 @@
+//@version=6
+indicator("Market Ratio Selector v2 (Gap-Adjusted)", "SR-v2", precision = 2)
+
+// ========================================
+// INPUT PARAMETERS
+// ========================================
+// Column headers displayed as info
+sValueHeader = input.string("Value", "", group="Ratios to Display", inline="header1")
+sGrowthHeader = input.string("Growth", "", group="Ratios to Display", inline="header1")
+
+bShowSPYQQQ = input.bool(false, "SPY : QQQ", group="Ratios to Display")
+bShowXLCXLY = input.bool(false, "XLC : XLY", group="Ratios to Display")
+bShowIWDIWF = input.bool(false, "IWD : IWF", group="Ratios to Display")
+bShowDJUDJT = input.bool(false, "DJU : DJT", group="Ratios to Display")
+
+iSma = input.int(55, "SMA", display=display.none)
+bShowSMA = input.bool(true, "Show SMA Lines")
+bShowLabels = input.bool(true, "Show Ratio Labels", tooltip="Display ratio labels at the right edge of the chart")
+bInverseRatios = input.bool(false, "Inverse Ratios (Growth / Value)", tooltip="When enabled, flips all ratios (e.g., QQQ/SPY instead of SPY/QQQ)")
+
+// Gap Adjustment Settings
+bWithoutGaps = input.bool(false, "Without Gaps", group="Gap Adjustment", tooltip="Calculate prices without overnight gaps from the start date")
+gapStartDate = input.time(timestamp("01 Jan 2024 00:00 +0000"), "Gap Adjustment Start Date", group="Gap Adjustment", tooltip="Start calculating gap-free prices from this date forward")
+
+// ========================================
+// PRICE DATA RETRIEVAL
+// ========================================
+// SPY:QQQ
+spyClose = request.security(ticker.new("", "SPY", session=session.regular), timeframe.period, close)
+spyOpen = request.security(ticker.new("", "SPY", session=session.regular), timeframe.period, open)
+qqqClose = request.security(ticker.new("", "QQQ", session=session.regular), timeframe.period, close)
+qqqOpen = request.security(ticker.new("", "QQQ", session=session.regular), timeframe.period, open)
+
+// XLC:XLY
+xlcClose = request.security(ticker.new("", "XLC", session=session.regular), timeframe.period, close)
+xlcOpen = request.security(ticker.new("", "XLC", session=session.regular), timeframe.period, open)
+xlyClose = request.security(ticker.new("", "XLY", session=session.regular), timeframe.period, close)
+xlyOpen = request.security(ticker.new("", "XLY", session=session.regular), timeframe.period, open)
+
+// IWD:IWF
+iwdClose = request.security(ticker.new("", "IWD", session=session.regular), timeframe.period, close)
+iwdOpen = request.security(ticker.new("", "IWD", session=session.regular), timeframe.period, open)
+iwfClose = request.security(ticker.new("", "IWF", session=session.regular), timeframe.period, close)
+iwfOpen = request.security(ticker.new("", "IWF", session=session.regular), timeframe.period, open)
+
+// DJU:DJT
+djuClose = request.security(ticker.new("", "DJU", session=session.regular), timeframe.period, close)
+djuOpen = request.security(ticker.new("", "DJU", session=session.regular), timeframe.period, open)
+djtClose = request.security(ticker.new("", "DJT", session=session.regular), timeframe.period, close)
+djtOpen = request.security(ticker.new("", "DJT", session=session.regular), timeframe.period, open)
+
+// ========================================
+// GAP ADJUSTMENT LOGIC
+// ========================================
+// Function to calculate gap-adjusted price
+f_gapAdjustedPrice(float closePrice, float openPrice, bool enableGaps, int startDate) =>
+    var float cumulativeGap = 0.0
+    var float prevClose = na
+
+    // Detect new day (approximation: when open != previous close)
+    bool newDay = not na(prevClose) and not na(openPrice) and math.abs(openPrice - prevClose) > 0.001
+
+    // Calculate gap if we're past the start date and gaps are enabled
+    if enableGaps and time >= startDate and newDay
+        float gap = openPrice - prevClose
+        cumulativeGap += gap
+
+    // Update previous close for next iteration
+    prevClose := closePrice
+
+    // Return adjusted or original price
+    float adjustedPrice = enableGaps and time >= startDate ? closePrice - cumulativeGap : closePrice
+    adjustedPrice
+
+// Calculate gap-adjusted prices for each security
+spyAdjusted = f_gapAdjustedPrice(spyClose, spyOpen, bWithoutGaps, gapStartDate)
+qqqAdjusted = f_gapAdjustedPrice(qqqClose, qqqOpen, bWithoutGaps, gapStartDate)
+xlcAdjusted = f_gapAdjustedPrice(xlcClose, xlcOpen, bWithoutGaps, gapStartDate)
+xlyAdjusted = f_gapAdjustedPrice(xlyClose, xlyOpen, bWithoutGaps, gapStartDate)
+iwdAdjusted = f_gapAdjustedPrice(iwdClose, iwdOpen, bWithoutGaps, gapStartDate)
+iwfAdjusted = f_gapAdjustedPrice(iwfClose, iwfOpen, bWithoutGaps, gapStartDate)
+djuAdjusted = f_gapAdjustedPrice(djuClose, djuOpen, bWithoutGaps, gapStartDate)
+djtAdjusted = f_gapAdjustedPrice(djtClose, djtOpen, bWithoutGaps, gapStartDate)
+
+// ========================================
+// RATIO CALCULATIONS
+// ========================================
+ratioSPYQQQ = bInverseRatios ? (spyAdjusted != 0 ? qqqAdjusted / spyAdjusted : na) : (qqqAdjusted != 0 ? spyAdjusted / qqqAdjusted : na)
+ratioXLCXLY = bInverseRatios ? (xlcAdjusted != 0 ? xlyAdjusted / xlcAdjusted : na) : (xlyAdjusted != 0 ? xlcAdjusted / xlyAdjusted : na)
+ratioIWDIWF = bInverseRatios ? (iwdAdjusted != 0 ? iwfAdjusted / iwdAdjusted : na) : (iwfAdjusted != 0 ? iwdAdjusted / iwfAdjusted : na)
+ratioDJUDJT = bInverseRatios ? (djuAdjusted != 0 ? djtAdjusted / djuAdjusted : na) : (djtAdjusted != 0 ? djuAdjusted / djtAdjusted : na)
+
+// ========================================
+// SMA CALCULATIONS
+// ========================================
+smaSPYQQQ = ta.sma(ratioSPYQQQ, iSma)
+smaXLCXLY = ta.sma(ratioXLCXLY, iSma)
+smaIWDIWF = ta.sma(ratioIWDIWF, iSma)
+smaDJUDJT = ta.sma(ratioDJUDJT, iSma)
+
+// ========================================
+// DETECT HOW MANY RATIOS ARE ENABLED
+// ========================================
+int ratioCount = 0
+if bShowSPYQQQ
+    ratioCount := ratioCount + 1
+if bShowXLCXLY
+    ratioCount := ratioCount + 1
+if bShowIWDIWF
+    ratioCount := ratioCount + 1
+if bShowDJUDJT
+    ratioCount := ratioCount + 1
+
+bool singleRatio = ratioCount == 1
+
+// ========================================
+// PLOTTING - Each ratio with dynamic color
+// ========================================
+// SPY/QQQ
+colorSPYQQQ = singleRatio ?
+     (ratioSPYQQQ >= smaSPYQQQ ? color.new(color.green, 0) : color.new(color.red, 0)) :
+     (ratioSPYQQQ >= smaSPYQQQ ? color.new(color.blue, 0) : color.new(color.blue, 60))
+colorSMASPYQQQ = singleRatio ? color.new(color.blue, 0) : color.new(color.blue, 70)
+plot(bShowSPYQQQ ? ratioSPYQQQ : na, color=colorSPYQQQ, title="SPY:QQQ", linewidth=2)
+plot(bShowSPYQQQ and bShowSMA ? smaSPYQQQ : na, color=colorSMASPYQQQ, title="SPY:QQQ SMA", linewidth=1)
+
+// XLC/XLY
+colorXLCXLY = singleRatio ?
+     (ratioXLCXLY >= smaXLCXLY ? color.new(color.green, 0) : color.new(color.red, 0)) :
+     (ratioXLCXLY >= smaXLCXLY ? color.new(color.purple, 0) : color.new(color.purple, 60))
+colorSMAXLCXLY = singleRatio ? color.new(color.blue, 0) : color.new(color.purple, 70)
+plot(bShowXLCXLY ? ratioXLCXLY : na, color=colorXLCXLY, title="XLC:XLY", linewidth=2)
+plot(bShowXLCXLY and bShowSMA ? smaXLCXLY : na, color=colorSMAXLCXLY, title="XLC:XLY SMA", linewidth=1)
+
+// IWD/IWF
+colorIWDIWF = singleRatio ?
+     (ratioIWDIWF >= smaIWDIWF ? color.new(color.green, 0) : color.new(color.red, 0)) :
+     (ratioIWDIWF >= smaIWDIWF ? color.new(color.green, 0) : color.new(color.green, 60))
+colorSMAIWDIWF = singleRatio ? color.new(color.blue, 0) : color.new(color.green, 70)
+plot(bShowIWDIWF ? ratioIWDIWF : na, color=colorIWDIWF, title="IWD:IWF", linewidth=2)
+plot(bShowIWDIWF and bShowSMA ? smaIWDIWF : na, color=colorSMAIWDIWF, title="IWD:IWF SMA", linewidth=1)
+
+// DJU/DJT
+colorDJUDJT = singleRatio ?
+     (ratioDJUDJT >= smaDJUDJT ? color.new(color.green, 0) : color.new(color.red, 0)) :
+     (ratioDJUDJT >= smaDJUDJT ? color.new(color.orange, 0) : color.new(color.orange, 60))
+colorSMADJUDJT = singleRatio ? color.new(color.blue, 0) : color.new(color.orange, 70)
+plot(bShowDJUDJT ? ratioDJUDJT : na, color=colorDJUDJT, title="DJU:DJT", linewidth=2)
+plot(bShowDJUDJT and bShowSMA ? smaDJUDJT : na, color=colorSMADJUDJT, title="DJU:DJT SMA", linewidth=1)
+
+// ========================================
+// LABELS AT LAST BAR
+// ========================================
+if bShowLabels and barstate.islast
+    // Determine label text based on inverse setting
+    labelSPYQQQ = bInverseRatios ? "QQQ:SPY" : "SPY:QQQ"
+    labelXLCXLY = bInverseRatios ? "XLY:XLC" : "XLC:XLY"
+    labelIWDIWF = bInverseRatios ? "IWF:IWD" : "IWD:IWF"
+    labelDJUDJT = bInverseRatios ? "DJT:DJU" : "DJU:DJT"
+
+    // Add gap-free indicator to label if enabled
+    string gapSuffix = bWithoutGaps ? " [No Gaps]" : ""
+
+    if bShowSPYQQQ and not na(ratioSPYQQQ)
+        label.new(bar_index, ratioSPYQQQ, text=labelSPYQQQ + gapSuffix, style=label.style_label_left, color=color.new(color.blue, 0), textcolor=color.white, size=size.small)
+
+    if bShowXLCXLY and not na(ratioXLCXLY)
+        label.new(bar_index, ratioXLCXLY, text=labelXLCXLY + gapSuffix, style=label.style_label_left, color=color.new(color.purple, 0), textcolor=color.white, size=size.small)
+
+    if bShowIWDIWF and not na(ratioIWDIWF)
+        label.new(bar_index, ratioIWDIWF, text=labelIWDIWF + gapSuffix, style=label.style_label_left, color=color.new(color.green, 0), textcolor=color.white, size=size.small)
+
+    if bShowDJUDJT and not na(ratioDJUDJT)
+        label.new(bar_index, ratioDJUDJT, text=labelDJUDJT + gapSuffix, style=label.style_label_left, color=color.new(color.orange, 0), textcolor=color.white, size=size.small)

@@ -1,0 +1,436 @@
+// This source code is subject to the terms of the Mozilla Public License 2.0 at https://mozilla.org/MPL/2.0/
+// © valpatradd - Simplified Group Dashboard v3 - RS Rating Only (Optimized)
+
+//@version=6
+indicator('Group RS Dashboard', 'Group RS Dashboard', overlay=true)
+
+// ---- Group Selection ----
+var gGroup = 'Group Selection'
+group_select = input.string('assets', 'Select Group',
+     ['assets', 'main_indexes', 'SPY_sectors', 'DJP_group', 'GOVT', 'NQUSB_4digit', 'Finance',
+      'Commercial_Services', 'Communications', 'Consumer_Durables', 'Consumer_NonDurables',
+      'Consumer_Services', 'Distribution_Services', 'Electronic_Technology', 'Energy_Minerals',
+      'Health_Services', 'Health_Technology', 'Industrial_Services', 'Miscellaneous',
+      'NonEnergy_Minerals', 'Process_Industries_Part1', 'Process_Industries_Part2',
+      'Producer_Manufacturing', 'Retail_Trade', 'Technology_Services',
+      'Transportation', 'Utilities'],
+     group=gGroup,
+     tooltip='Choose which group to display. Optimized for large groups (up to 39 items).')
+
+// ---- RS Rating Settings ----
+var gPerformance = 'RS Rating Settings'
+rs_benchmark = input.symbol('SPY', 'RS Benchmark Symbol',
+     group=gPerformance,
+     tooltip='Symbol to compare against for RS Rating (default: SPY)')
+
+// ---- Timeframe for RS Rating ----
+var gTimeframe = 'Performance Timeframe'
+perf_mode = input.string('Year', 'Period',
+     ['Year', 'YTD', 'Half Year', 'Quarter', 'Custom Month', 'Custom Week', 'Custom Days'],
+     group=gTimeframe)
+custom_bars = input.int(1, 'Custom Period (bars)', minval=1, group=gTimeframe,
+     tooltip='Used for Custom Month/Week/Days options')
+sort_mode = input.string('Descending', 'Sort by RS Rating',
+     ['None', 'Ascending', 'Descending'],
+     group=gTimeframe,
+     tooltip='Sort the table by RS Rating column')
+
+// ---- Table Display Settings ----
+var gTable = 'Table Settings'
+input_tab_pos = input.string('Top Left', 'Position',
+     ['Top Left', 'Top Center', 'Top Right', 'Middle Left', 'Middle Center', 'Middle Right', 'Bottom Left', 'Bottom Center', 'Bottom Right'],
+     group=gTable)
+tab_pos = switch input_tab_pos
+    'Top Left'    => position.top_left
+    'Top Center'  => position.top_center
+    'Top Right'   => position.top_right
+    'Middle Left' => position.middle_left
+    'Middle Center' => position.middle_center
+    'Middle Right' => position.middle_right
+    'Bottom Left'  => position.bottom_left
+    'Bottom Center' => position.bottom_center
+    'Bottom Right' => position.bottom_right
+
+input_tab_size = input.string('Auto', 'Size',
+     options=['Auto', 'Tiny', 'Small', 'Normal', 'Large', 'Huge'],
+     group=gTable)
+tab_size = switch input_tab_size
+    'Auto'   => size.auto
+    'Tiny'   => size.tiny
+    'Small'  => size.small
+    'Normal' => size.normal
+    'Large'  => size.large
+    'Huge'   => size.huge
+
+col_offset = input.int(3, 'Offset:  Horizontal', 0, group=gTable, tooltip='Shifts the table to the right.')
+row_offset = input.int(3, '             Vertical      ', 0, group=gTable, inline='Offset', tooltip='Shifts the table downward.')
+
+in_font = input.string('Default', 'Text Font', ['Default', 'Monospace'], group=gTable)
+font = switch in_font
+    'Default'   => font.family_default
+    'Monospace' => font.family_monospace
+
+col_f = input.color(color.new(#363A45, 100), 'Frame', group=gTable, inline='Frame')
+w_f = input.int(0, '', 0, group=gTable, inline='Frame')
+col_b = input.color(color.new(#363A45, 100), 'Border', group=gTable, inline='Border')
+w_b = input.int(1, '', 0, group=gTable, inline='Border')
+
+// ---- Symbol Groups ----
+// Based on groups file content
+var string[] assets = array.from('GOVT', 'LOD', 'HYG', 'SPY', 'DJP', 'BTC', 'DXY', 'GSG')
+var string[] assets_names = array.from('US Treasuries', 'World Markets', 'High Yield Bonds', 'S&P 500', 'Commodities', 'Bitcoin', 'US Dollar', 'Commodities Index')
+
+var string[] main_indexes = array.from('SPY', 'QQQ', 'DJIA', 'XLK', 'XLP', 'XLY', 'IWD', 'IWF', 'DJU', 'DJT', 'DJUSSC', 'SPYV', 'SPYG', 'MDYV', 'MDYG', 'IJS', 'IJT', 'IWN', 'IWO')
+var string[] main_indexes_names = array.from('S&P 500', 'Nasdaq 100', 'Dow Jones', 'Technology', 'Cons Staples', 'Cons Discret', 'Value Large', 'Growth Large', 'Utilities', 'Transportation', 'Small Cap', 'S&P Value', 'S&P Growth', 'Mid Value', 'Mid Growth', 'Small Value', 'Small Growth', 'Small Value R', 'Small Growth R')
+
+var string[] SPY_sectors = array.from('XLB', 'XLF', 'XLK', 'XLU', 'XLRE', 'XLV', 'XLP', 'XLY', 'XLC', 'XLI', 'XLE')
+var string[] SPY_sectors_names = array.from('Materials', 'Financials', 'Technology', 'Utilities', 'Real Estate', 'Healthcare', 'Consumer Staples', 'Consumer Discretionary', 'Communications', 'Industrials', 'Energy')
+
+var string[] DJP_group = array.from('DBA', 'XLE', 'USO', 'DBB', 'PDBC', 'GLD', 'SLV')
+var string[] DJP_group_names = array.from('Agriculture', 'Energy Sector', 'Crude Oil', 'Base Metals', 'Commodities', 'Gold', 'Silver')
+
+var string[] GOVT = array.from('BIL', 'SHY', 'IEI', 'IEF', 'TLH', 'TLT')
+var string[] GOVT_names = array.from('1-3 Month', '1-3 Year', '3-7 Year', '7-10 Year', '10-20 Year', '20+ Year')
+
+var string[] NQUSB_4digit = array.from('NQUSB5520', 'NQUSB5510', 'NQUSB5010', 'NQUSB5020', 'NQUSB4010', 'NQUSB4510', 'NQUSB4020', 'NQUSB4040', 'NQUSB4030', 'NQUSB4050', 'NQUSB3010', 'NQUSB3030', 'NQUSB3020', 'NQUSB4520')
+var string[] NQUSB_4digit_names = array.from('Chemicals', 'Basic Resources', 'Construction & Materials', 'Industrial Goods & Services', 'Automobiles & Parts', 'Food, Beverage & Tobacco', 'Consumer Products & Services', 'Retail', 'Media', 'Travel & Leisure', 'Banks', 'Insurance', 'Financial Services', 'Personal Care & Grocery')
+
+var string[] Finance = array.from('NQUSB30', 'NQUSB3010', 'NQUSB3020', 'NQUSB302010', 'NQUSB30201020', 'NQUSB302020', 'NQUSB30202000', 'NQUSB30202010', 'NQUSB3030', 'NQUSB303010', 'NQUSB303020', 'NQUSB30302010', 'NQUSB30302015', 'NQUSB30302025', 'NQUSB35', 'NQUSB351010', 'NQUSB35101010', 'NQUSB351020')
+var string[] Finance_names = array.from('Financials', 'Banks', 'Financial Services', 'Finance & Credit', 'Consumer Lending', 'Investment Banking', 'Diversified Financial', 'Asset Managers', 'Insurance', 'Life Insurance', 'Non-life Insurance', 'Full Line Insurance', 'Insurance Brokers', 'Property & Casualty', 'Real Estate', 'RE Investment & Services', 'RE Holding & Development', 'REITs')
+
+var string[] Commercial_Services = array.from('NQUSB30', 'NQUSB3020', 'NQUSB302010', 'NQUSB30201030', 'NQUSB40', 'NQUSB4030', 'NQUSB40301020', 'NQUSB50', 'NQUSB5020', 'NQUSB502050', 'NQUSB50205020', 'NQUSB50205025', 'NQUSB50205030')
+var string[] Commercial_Services_names = array.from('Financials', 'Financial Svcs', 'Finance & Credit', 'Financial Data', 'Consumer Discret', 'Media', 'Media Agencies', 'Industrials', 'Industrial Goods', 'Industrial Support', 'Prof Business Support', 'Personnel Svcs', 'Printing/Forms')
+
+var string[] Communications = array.from('NQUSB15', 'NQUSB151020', 'NQUSB15102015')
+var string[] Communications_names = array.from('Telecommunications', 'Telecom Service Providers', 'Telecom Services')
+
+var string[] Consumer_Durables = array.from('NQUSB40', 'NQUSB4010', 'NQUSB40101020', 'NQUSB40101025', 'NQUSB4020', 'NQUSB402010', 'NQUSB40201070', 'NQUSB402020', 'NQUSB40202010', 'NQUSB40202015', 'NQUSB40202025', 'NQUSB402030', 'NQUSB40203050', 'NQUSB50', 'NQUSB5020', 'NQUSB502040', 'NQUSB50204000')
+var string[] Consumer_Durables_names = array.from('Consumer Discret', 'Automobiles & Parts', 'Automobiles', 'Auto Parts', 'Consumer Products', 'Consumer Svcs', 'Other Consumer Svcs', 'Household Goods', 'Home Construction', 'Household Furnishings', 'Household Equipment', 'Leisure Goods', 'Recreational Products', 'Industrials', 'Industrial Goods', 'Industrial Engineering', 'Machinery: Industrial')
+
+var string[] Consumer_NonDurables = array.from('NQUSB40', 'NQUSB402040', 'NQUSB40204020', 'NQUSB4040', 'NQUSB45', 'NQUSB4510', 'NQUSB451010', 'NQUSB45101015', 'NQUSB45101020', 'NQUSB451020', 'NQUSB45102020', 'NQUSB451030', 'NQUSB4520', 'NQUSB45201030')
+var string[] Consumer_NonDurables_names = array.from('Consumer Discret', 'Personal Goods', 'Clothing & Access', 'Retail', 'Consumer Staples', 'Food Beverage Tobacco', 'Beverages', 'Distillers & Vintners', 'Soft Drinks', 'Food Producers', 'Food Products', 'Tobacco', 'Personal Care Stores', 'Nondurable Household')
+
+var string[] Consumer_Services = array.from('NQUSB15', 'NQUSB151020', 'NQUSB15102010', 'NQUSB40', 'NQUSB4020', 'NQUSB402010', 'NQUSB40201070', 'NQUSB4030', 'NQUSB40301010', 'NQUSB40301030', 'NQUSB40301035', 'NQUSB4050', 'NQUSB40501020', 'NQUSB40501025', 'NQUSB40501040')
+var string[] Consumer_Services_names = array.from('Telecommunications', 'Telecom Providers', 'Cable TV', 'Consumer Discret', 'Consumer Products', 'Consumer Svcs', 'Other Consumer Svcs', 'Media', 'Entertainment', 'Publishing', 'Broadcasting', 'Travel & Leisure', 'Casinos & Gambling', 'Hotels & Motels', 'Restaurants & Bars')
+
+var string[] Distribution_Services = array.from('NQUSB10', 'NQUSB101020', 'NQUSB10102015', 'NQUSB20', 'NQUSB201020', 'NQUSB20102015', 'NQUSB45', 'NQUSB4520', 'NQUSB45201010')
+var string[] Distribution_Services_names = array.from('Technology', 'Tech Hardware', 'Electronic Components', 'Health Care', 'Medical Equipment', 'Medical Supplies', 'Consumer Staples', 'Personal Care Stores', 'Food Retailers')
+
+var string[] Electronic_Technology = array.from('NQUSB10', 'NQUSB101020', 'NQUSB10102010', 'NQUSB10102015', 'NQUSB10102020', 'NQUSB10102030', 'NQUSB15', 'NQUSB151010', 'NQUSB50', 'NQUSB5020', 'NQUSB502010', 'NQUSB502020', 'NQUSB50202025')
+var string[] Electronic_Technology_names = array.from('Technology', 'Tech Hardware', 'Semiconductors', 'Electronic Components', 'Production Tech Equip', 'Computer Hardware', 'Telecommunications', 'Telecom Equipment', 'Industrials', 'Industrial Goods', 'Aerospace & Defense', 'Electronic & Elec Equip', 'Gauges & Meters')
+
+var string[] Energy_Minerals = array.from('NQUSB60', 'NQUSB601010', 'NQUSB60101000', 'NQUSB60101010', 'NQUSB60101020', 'NQUSB60101040')
+var string[] Energy_Minerals_names = array.from('Energy', 'Oil Gas & Coal', 'Integrated Oil & Gas', 'Oil: Crude Producers', 'Oil Refining', 'Coal')
+
+var string[] Health_Services = array.from('NQUSB20', 'NQUSB201010', 'NQUSB20101010', 'NQUSB20101020', 'NQUSB20101025')
+var string[] Health_Services_names = array.from('Health Care', 'Health Care Providers', 'Health Care Facilities', 'Health Care Mgmt', 'Health Care Services')
+
+var string[] Health_Technology = array.from('NQUSB20', 'NQUSB201020', 'NQUSB20102010', 'NQUSB201030', 'NQUSB20103010', 'NQUSB20103015')
+var string[] Health_Technology_names = array.from('Health Care', 'Medical Equipment', 'Medical Equipment', 'Pharma & Biotech', 'Biotechnology', 'Pharmaceuticals')
+
+var string[] Industrial_Services = array.from('NQUSB50', 'NQUSB5010', 'NQUSB50101015', 'NQUSB60', 'NQUSB601010', 'NQUSB60101015', 'NQUSB60101030', 'NQUSB60101035', 'NQUSB65', 'NQUSB651030')
+var string[] Industrial_Services_names = array.from('Industrials', 'Construction', 'Engineering & Contracting', 'Energy', 'Oil Gas & Coal', 'Contract Drilling', 'Oilfield Svcs/Equip', 'Oil & Gas Pipeline', 'Utilities', 'Waste & Disposal')
+
+var string[] Miscellaneous = array.from('NQUSB30', 'NQUSB3020', 'NQUSB302020', 'NQUSB30202000', 'NQUSB40', 'NQUSB4020', 'NQUSB402010', 'NQUSB40201070')
+var string[] Miscellaneous_names = array.from('Financials', 'Financial Svcs', 'Investment Banking', 'Diversified Financial', 'Consumer Discret', 'Consumer Products', 'Consumer Svcs', 'Misc Consumer Svcs')
+
+var string[] NonEnergy_Minerals = array.from('NQUSB50', 'NQUSB5010', 'NQUSB50101035', 'NQUSB55', 'NQUSB5510', 'NQUSB551010', 'NQUSB55101015', 'NQUSB551020', 'NQUSB55102010', 'NQUSB551030')
+var string[] NonEnergy_Minerals_names = array.from('Industrials', 'Construction', 'Building Materials', 'Basic Materials', 'Basic Resources', 'Industrial Materials', 'Paper', 'Industrial Metals', 'Iron & Steel', 'Precious Metals')
+
+var string[] Process_Industries_Part1 = array.from('NQUSB40', 'NQUSB4020', 'NQUSB402040', 'NQUSB40204020', 'NQUSB45', 'NQUSB4510', 'NQUSB451020', 'NQUSB45102010', 'NQUSB50', 'NQUSB5020', 'NQUSB502030', 'NQUSB50203000', 'NQUSB50203030', 'NQUSB55', 'NQUSB5510', 'NQUSB551010', 'NQUSB55101015', 'NQUSB5520', 'NQUSB55201000', 'NQUSB55201015')
+var string[] Process_Industries_Part1_names = array.from('Consumer Discret', 'Consumer Products', 'Personal Goods', 'Textiles', 'Consumer Staples', 'Food Beverage Tobacco', 'Food Producers', 'Agricultural Commodities', 'Industrials', 'Industrial Goods', 'General Industrials', 'Diversified Industrials', 'Containers & Packaging', 'Basic Materials', 'Basic Resources', 'Industrial Materials', 'Pulp & Paper', 'Chemicals', 'Chemicals: Diversified', 'Chemicals: Agricultural')
+
+var string[] Process_Industries_Part2 = array.from('NQUSB55201020')
+var string[] Process_Industries_Part2_names = array.from('Chemicals: Specialty')
+
+var string[] Producer_Manufacturing = array.from('NQUSB40', 'NQUSB4010', 'NQUSB40101025', 'NQUSB50', 'NQUSB5010', 'NQUSB50101035', 'NQUSB5020', 'NQUSB502020', 'NQUSB50202010', 'NQUSB502030', 'NQUSB50203000', 'NQUSB502040', 'NQUSB50204000', 'NQUSB50204020', 'NQUSB502050', 'NQUSB50205010', 'NQUSB55', 'NQUSB5510', 'NQUSB551020', 'NQUSB55102015')
+var string[] Producer_Manufacturing_names = array.from('Consumer Discret', 'Automobiles & Parts', 'Auto Parts: OEM', 'Industrials', 'Construction', 'Building Products', 'Industrial Goods', 'Electronic & Elec Equip', 'Electrical Products', 'General Industrials', 'Diversified Industrials', 'Industrial Engineering', 'Industrial Machinery', 'Trucks/Const/Farm Mach', 'Industrial Support', 'Industrial Suppliers', 'Basic Materials', 'Basic Resources', 'Industrial Metals', 'Metal Fabrication')
+
+var string[] Retail_Trade = array.from('NQUSB40', 'NQUSB4040', 'NQUSB404010', 'NQUSB40401010', 'NQUSB40401020', 'NQUSB40401025', 'NQUSB40401030', 'NQUSB45', 'NQUSB4520', 'NQUSB45201010', 'NQUSB45201015')
+var string[] Retail_Trade_names = array.from('Consumer Discret', 'Retail', 'Retailers', 'Diversified Retailers', 'Apparel Retailers', 'Home Improvement', 'Specialty Retailers', 'Consumer Staples', 'Personal Care Stores', 'Food Retailers', 'Drug Retailers')
+
+var string[] Technology_Services = array.from('NQUSB10', 'NQUSB101010', 'NQUSB10101010', 'NQUSB10101015', 'NQUSB10101020')
+var string[] Technology_Services_names = array.from('Technology', 'Software & Comp Svcs', 'Computer Services', 'Software', 'Consumer Digital Svcs')
+
+var string[] Transportation = array.from('NQUSB40', 'NQUSB4050', 'NQUSB40501010', 'NQUSB50', 'NQUSB5020', 'NQUSB502060', 'NQUSB50206010', 'NQUSB50206020', 'NQUSB50206030', 'NQUSB50206040')
+var string[] Transportation_names = array.from('Consumer Discret', 'Travel & Leisure', 'Airlines', 'Industrials', 'Industrial Goods', 'Industrial Transportation', 'Trucking', 'Railroads', 'Marine Transportation', 'Air Freight & Logistics')
+
+var string[] Utilities = array.from('NQUSB65', 'NQUSB651010', 'NQUSB65101010', 'NQUSB651020', 'NQUSB65102020', 'NQUSB65102030')
+var string[] Utilities_names = array.from('Utilities', 'Electricity', 'Alternative Electricity', 'Gas Water Multi-utilities', 'Gas Distribution', 'Water')
+
+// Get current group
+var string[] current_tickers = na
+var string[] current_names = na
+
+if group_select == 'assets'
+    current_tickers := assets
+    current_names := assets_names
+else if group_select == 'main_indexes'
+    current_tickers := main_indexes
+    current_names := main_indexes_names
+else if group_select == 'SPY_sectors'
+    current_tickers := SPY_sectors
+    current_names := SPY_sectors_names
+else if group_select == 'DJP_group'
+    current_tickers := DJP_group
+    current_names := DJP_group_names
+else if group_select == 'GOVT'
+    current_tickers := GOVT
+    current_names := GOVT_names
+else if group_select == 'NQUSB_4digit'
+    current_tickers := NQUSB_4digit
+    current_names := NQUSB_4digit_names
+else if group_select == 'Finance'
+    current_tickers := Finance
+    current_names := Finance_names
+else if group_select == 'Commercial_Services'
+    current_tickers := Commercial_Services
+    current_names := Commercial_Services_names
+else if group_select == 'Communications'
+    current_tickers := Communications
+    current_names := Communications_names
+else if group_select == 'Consumer_Durables'
+    current_tickers := Consumer_Durables
+    current_names := Consumer_Durables_names
+else if group_select == 'Consumer_NonDurables'
+    current_tickers := Consumer_NonDurables
+    current_names := Consumer_NonDurables_names
+else if group_select == 'Consumer_Services'
+    current_tickers := Consumer_Services
+    current_names := Consumer_Services_names
+else if group_select == 'Distribution_Services'
+    current_tickers := Distribution_Services
+    current_names := Distribution_Services_names
+else if group_select == 'Electronic_Technology'
+    current_tickers := Electronic_Technology
+    current_names := Electronic_Technology_names
+else if group_select == 'Energy_Minerals'
+    current_tickers := Energy_Minerals
+    current_names := Energy_Minerals_names
+else if group_select == 'Health_Services'
+    current_tickers := Health_Services
+    current_names := Health_Services_names
+else if group_select == 'Health_Technology'
+    current_tickers := Health_Technology
+    current_names := Health_Technology_names
+else if group_select == 'Industrial_Services'
+    current_tickers := Industrial_Services
+    current_names := Industrial_Services_names
+else if group_select == 'Miscellaneous'
+    current_tickers := Miscellaneous
+    current_names := Miscellaneous_names
+else if group_select == 'NonEnergy_Minerals'
+    current_tickers := NonEnergy_Minerals
+    current_names := NonEnergy_Minerals_names
+else if group_select == 'Process_Industries_Part1'
+    current_tickers := Process_Industries_Part1
+    current_names := Process_Industries_Part1_names
+else if group_select == 'Process_Industries_Part2'
+    current_tickers := Process_Industries_Part2
+    current_names := Process_Industries_Part2_names
+else if group_select == 'Producer_Manufacturing'
+    current_tickers := Producer_Manufacturing
+    current_names := Producer_Manufacturing_names
+else if group_select == 'Retail_Trade'
+    current_tickers := Retail_Trade
+    current_names := Retail_Trade_names
+else if group_select == 'Technology_Services'
+    current_tickers := Technology_Services
+    current_names := Technology_Services_names
+else if group_select == 'Transportation'
+    current_tickers := Transportation
+    current_names := Transportation_names
+else if group_select == 'Utilities'
+    current_tickers := Utilities
+    current_names := Utilities_names
+
+// ---- Performance Calculation ----
+_get_bars_back() =>
+    int bars = 0
+    if perf_mode == 'Year'
+        bars := 252  // Trading days in a year
+    else if perf_mode == 'YTD'
+        // Calculate bars from start of year
+        year_start = timestamp(year(timenow), 1, 1, 0, 0)
+        bars := bar_index - ta.valuewhen(time >= year_start, bar_index, 0)
+    else if perf_mode == 'Half Year'
+        bars := 126  // Half trading year
+    else if perf_mode == 'Quarter'
+        bars := 63   // Quarter trading days
+    else if perf_mode == 'Custom Month'
+        bars := custom_bars
+    else if perf_mode == 'Custom Week'
+        bars := custom_bars
+    else if perf_mode == 'Custom Days'
+        bars := custom_bars
+    bars
+
+bars_back = _get_bars_back()
+
+// Fetch benchmark data ONCE for all tickers (1 request total)
+benchmark_close = request.security(rs_benchmark, timeframe.period, close)
+
+// OPTIMIZED: Returns both price AND RS rating in a single request.security call
+// This function is called within request.security context, so it operates on the ticker's data
+_get_price_and_rs(benchmark_close_val, length) =>
+    // Calculate RS Rating using the pre-fetched benchmark
+    rs_ratio = close / benchmark_close_val
+    highest_rs = ta.highest(rs_ratio, length)
+    lowest_rs = ta.lowest(rs_ratio, length)
+    range_val = highest_rs - lowest_rs
+    rs_rating = na(range_val) or range_val == 0 ? na : ((98 * (rs_ratio - lowest_rs) / range_val) + 1)
+
+    // Return both current price and RS rating as a tuple
+    [close, nz(rs_rating, 0)]
+
+// Main performance function - makes only ONE request per ticker
+_calc_performance(ticker_symbol, lookback, benchmark_close_val) =>
+    // Single request.security call that fetches BOTH price and RS rating
+    [price, rs_rating] = request.security(ticker_symbol, timeframe.period,
+                                          _get_price_and_rs(benchmark_close_val, lookback))
+    [price, rs_rating]
+
+// ---- Data Collection and Sorting ----
+group_size = array.size(current_tickers)
+
+// Collect all data first
+var float[] prices_array = array.new<float>(0)
+var float[] perf_array = array.new<float>(0)
+var string[] tickers_sorted = array.new<string>(0)
+var string[] names_sorted = array.new<string>(0)
+
+if not na(current_tickers) and not na(current_names)
+    array.clear(prices_array)
+    array.clear(perf_array)
+    array.clear(tickers_sorted)
+    array.clear(names_sorted)
+
+    for i = 0 to group_size - 1
+        ticker = array.get(current_tickers, i)
+        desc = array.get(current_names, i)
+        [price, perf] = _calc_performance(ticker, bars_back, benchmark_close)
+
+        array.push(tickers_sorted, ticker)
+        array.push(names_sorted, desc)
+        array.push(prices_array, price)
+        array.push(perf_array, perf)
+
+    // Sort if requested
+    if sort_mode != 'None'
+        // Bubble sort to keep all arrays synchronized
+        for i = 0 to group_size - 2
+            for j = 0 to group_size - 2 - i
+                perf_j = array.get(perf_array, j)
+                perf_j1 = array.get(perf_array, j + 1)
+
+                // Handle NA values - push them to the end
+                swap_needed = false
+                if na(perf_j) and not na(perf_j1)
+                    swap_needed := true
+                else if not na(perf_j) and not na(perf_j1)
+                    if sort_mode == 'Ascending'
+                        swap_needed := perf_j > perf_j1
+                    else  // Descending
+                        swap_needed := perf_j < perf_j1
+
+                if swap_needed
+                    // Swap performance
+                    temp_perf = perf_j
+                    array.set(perf_array, j, perf_j1)
+                    array.set(perf_array, j + 1, temp_perf)
+
+                    // Swap prices
+                    temp_price = array.get(prices_array, j)
+                    array.set(prices_array, j, array.get(prices_array, j + 1))
+                    array.set(prices_array, j + 1, temp_price)
+
+                    // Swap tickers
+                    temp_ticker = array.get(tickers_sorted, j)
+                    array.set(tickers_sorted, j, array.get(tickers_sorted, j + 1))
+                    array.set(tickers_sorted, j + 1, temp_ticker)
+
+                    // Swap names
+                    temp_name = array.get(names_sorted, j)
+                    array.set(names_sorted, j, array.get(names_sorted, j + 1))
+                    array.set(names_sorted, j + 1, temp_name)
+
+// ---- Table Creation ----
+total_cols = 4 + col_offset
+total_rows = group_size + 1 + row_offset
+
+tab = table.new(tab_pos, total_cols, total_rows,
+     frame_color=col_f, frame_width=w_f,
+     border_color=col_b, border_width=w_b)
+
+// Fill vertical offset rows (if any)
+if row_offset > 0
+    for i = 0 to row_offset - 1
+        for j = 0 to total_cols - 1
+            table.cell(tab, j, i, "", text_color=color.new(color.white, 100))
+
+fill_offset(row) =>
+    if col_offset > 0
+        for j = 0 to col_offset - 1
+            table.cell(tab, j, row, "", text_color=color.new(color.white, 100))
+
+header_row = row_offset
+
+// Fill offset for header row
+fill_offset(header_row)
+
+// Header Row
+sort_indicator = sort_mode == 'None' ? '' : sort_mode == 'Ascending' ? ' ↑' : ' ↓'
+table.cell(tab, col_offset + 0, header_row, 'Ticker',
+     bgcolor=color.gray, text_color=color.white,
+     text_size=tab_size, text_font_family=font)
+table.cell(tab, col_offset + 1, header_row, 'Description',
+     bgcolor=color.gray, text_color=color.white,
+     text_size=tab_size, text_font_family=font)
+table.cell(tab, col_offset + 2, header_row, 'Last Price',
+     bgcolor=color.navy, text_color=color.white,
+     text_size=tab_size, text_font_family=font)
+table.cell(tab, col_offset + 3, header_row, 'RS Rating (' + perf_mode + ')' + sort_indicator,
+     bgcolor=color.gray, text_color=color.white,
+     text_size=tab_size, text_font_family=font)
+
+// Data Rows
+if not na(current_tickers) and not na(current_names)
+    for i = 0 to group_size - 1
+        data_row = header_row + 1 + i
+
+        // Fill offset for data row
+        fill_offset(data_row)
+
+        ticker = array.get(tickers_sorted, i)
+        desc = array.get(names_sorted, i)
+        price = array.get(prices_array, i)
+        perf = array.get(perf_array, i)
+
+        // Ticker column
+        table.cell(tab, col_offset + 0, data_row, ticker,
+             bgcolor=color.new(#909090, 70), text_color=#d6d6d6,
+             text_size=tab_size, text_font_family=font)
+
+        // Description column
+        table.cell(tab, col_offset + 1, data_row, desc,
+             bgcolor=color.new(#909090, 70), text_color=#d6d6d6,
+             text_size=tab_size, text_font_family=font)
+
+        // Price column
+        price_str = na(price) ? 'N/A' : str.tostring(price, '#.##')
+        table.cell(tab, col_offset + 2, data_row, price_str,
+             bgcolor=color.new(#909090, 70), text_color=#d6d6d6,
+             text_size=tab_size, text_font_family=font)
+
+        // RS Rating column with color coding
+        perf_str = na(perf) ? 'N/A' : str.tostring(perf, '#.#')
+
+        // Color coding based on RS Rating thresholds
+        perf_bg = na(perf) ? color.new(#2D3748, 0) :
+             perf >= 70 ? color.new(#1B4332, 0) :  // Strong RS (70-99) - Green
+             perf >= 50 ? color.new(#2D3748, 0) :  // Neutral RS (50-69) - Gray
+             color.new(#7D1007, 0)                 // Weak RS (1-49) - Red
+
+        table.cell(tab, col_offset + 3, data_row, perf_str,
+             bgcolor=perf_bg, text_color=color.white,
+             text_size=tab_size, text_font_family=font)
