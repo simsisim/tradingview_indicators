@@ -86,8 +86,8 @@ var string[] main_indexes_names = array.from('S&P 500', 'Nasdaq 100', 'Dow Jones
 var string[] SPY_sectors = array.from('XLB', 'XLF', 'XLK', 'XLU', 'XLRE', 'XLV', 'XLP', 'XLY', 'XLC', 'XLI', 'XLE')
 var string[] SPY_sectors_names = array.from('Materials', 'Financials', 'Technology', 'Utilities', 'Real Estate', 'Healthcare', 'Consumer Staples', 'Consumer Discretionary', 'Communications', 'Industrials', 'Energy')
 
-var string[] DJP_group = array.from('DBA', 'XLE', 'USO', 'DBB', 'PDBC', 'GLD', 'SLV')
-var string[] DJP_group_names = array.from('Agriculture', 'Energy Sector', 'Crude Oil', 'Base Metals', 'Commodities', 'Gold', 'Silver')
+var string[] DJP_group = array.from('DBA', 'XLE', 'USO', 'DBB', 'PDBC', 'GLD', 'SLV', 'GSG', 'ALIUSD', 'XCUUSD')
+var string[] DJP_group_names = array.from('Agriculture', 'Energy Sector', 'Crude Oil', 'Base Metals', 'Commodities', 'Gold', 'Silver', 'GSCI Commodity', 'Aluminum Spot', 'Copper Spot')
 
 var string[] GOVT = array.from('BIL', 'SHY', 'IEI', 'IEF', 'TLH', 'TLT')
 var string[] GOVT_names = array.from('1-3 Month', '1-3 Year', '3-7 Year', '7-10 Year', '10-20 Year', '20+ Year')
