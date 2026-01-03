@@ -5,7 +5,6 @@ indicator("Custom Industry Strength v9", "CIS-v9", precision = 2)
 // INPUT PARAMETERS
 // ========================================
 sDisplayMode = input.string("Stock vs Industry", "Display Mode:", options=["Stock vs Industry", "Industry vs SPY"], tooltip="Choose what comparison to display:\n- Stock vs Industry: Shows stock performance relative to its industry\n- Industry vs SPY: Shows industry performance relative to SPY")
-bInverseRatio = input.bool(false, "Inverse Ratio", tooltip="When enabled, flips the ratio calculation:\n- Stock vs Industry: Shows industry/stock instead of stock/industry\n- Industry vs SPY: Shows SPY/industry instead of industry/SPY")
 iSma = input.int(55,"SMA", display=display.none)
 sComparisonMode = input.string("Index Benchmark", "Compare Against:", options=["ETF", "Index Benchmark"], tooltip="Choose to compare against industry ETF or Nasdaq Index Benchmark")
 sIndexChoice = input.string("Primary", "Index Selection:", options=["Primary", "Secondary", "Tertiary", "Quaternary"], tooltip="Primary: Most specific level (e.g., NQUSB40401020)\nSecondary: Second level (e.g., NQUSB404010)\nTertiary: Third level (e.g., NQUSB4040)\nQuaternary: Broadest sector (e.g., NQUSB40)")
@@ -454,10 +453,7 @@ var float vSpySma = na
 
 if sDisplayMode == "Stock vs Industry"
     // Stock vs Industry Mode
-    if bInverseRatio
-        ratio := stockPrice != 0 ? compPrice / stockPrice : na
-    else
-        ratio := compPrice != 0 ? stockPrice / compPrice : na
+    ratio := compPrice != 0 ? stockPrice / compPrice : na
     ratioSMA := ta.sma(ratio, iSma)
 
     // For SPY highlighting
@@ -465,10 +461,7 @@ if sDisplayMode == "Stock vs Industry"
     vSpySma := ta.sma(vSpy, iSma)
 else
     // Industry vs SPY Mode
-    if bInverseRatio
-        ratio := compPrice != 0 ? spyClose / compPrice : na
-    else
-        ratio := spyClose != 0 ? compPrice / spyClose : na
+    ratio := spyClose != 0 ? compPrice / spyClose : na
     ratioSMA := ta.sma(ratio, iSma)
 
     // For SPY highlighting (in this mode, check if industry outpaces SPY)
@@ -495,15 +488,9 @@ displayNameToUse = not na(compTickerName) and compTickerName != "" ? compTickerN
 // Build display text based on mode
 var string vsText = na
 if sDisplayMode == "Stock vs Industry"
-    if bInverseRatio
-        vsText := compTickerOnly + " vs. " + syminfo.ticker
-    else
-        vsText := syminfo.ticker + " vs. " + compTickerOnly
+    vsText := syminfo.ticker + " vs. " + compTickerOnly
 else
-    if bInverseRatio
-        vsText := "SPY vs. " + compTickerOnly
-    else
-        vsText := compTickerOnly + " vs. SPY"
+    vsText := compTickerOnly + " vs. SPY"
 
 // Update table on the last bar (where request.security data is available)
 if barstate.islast

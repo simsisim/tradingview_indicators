@@ -1,0 +1,10 @@
+# RISK-ON / RISK-OFF INDICATORS
+# Combined risk appetite and inter-asset signals
+XLP/XLY
+SPY/QQQ
+DJU/DJT
+SPY/TLT
+SPY/GLD
+GLD/SPY
+BTC/GLD
+QQQ/SPY

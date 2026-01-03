@@ -1,0 +1,274 @@
+RATIO WATCHLIST - COMPREHENSIVE REFERENCE GUIDE
+================================================
+
+VALUE vs GROWTH RATIOS (5 ratios)
+----------------------------------
+Purpose: Track value vs growth factor performance across market cap sizes
+
+IWD/IWF          Russell 1000 Value / Russell 1000 Growth (Large Cap)
+                 Rising = Value outperforming Growth
+                 
+SPYV/SPYG        S&P 500 Value / S&P 500 Growth (Large Cap)
+                 Alternative large cap value/growth measure
+                 
+MDYV/MDYG        S&P 400 Value / S&P 400 Growth (Mid Cap)
+                 Mid cap value/growth performance
+                 
+IJS/IJT          S&P 600 Value / S&P 600 Growth (Small Cap)
+                 Small cap value/growth measure
+                 
+IWN/IWO          Russell 2000 Value / Russell 2000 Growth (Small Cap)
+                 Alternative small cap value/growth measure
+
+RISK-ON vs RISK-OFF RATIOS (3 ratios)
+--------------------------------------
+Purpose: Measure market risk appetite and defensive positioning
+
+XLP/XLY          Consumer Staples / Consumer Discretionary
+                 Classic risk-off/risk-on indicator
+                 Rising = Defensive positioning (Risk-Off)
+                 Falling = Risk appetite (Risk-On)
+                 
+SPY/QQQ          S&P 500 / Nasdaq 100
+                 Broad market vs tech-heavy index
+                 Rising = Broad market outperforming tech
+                 
+DJU/DJT          Dow Utilities / Dow Transportation
+                 Utilities (defensive) vs Transportation (cyclical)
+                 Rising = Defensive positioning
+
+SECTOR vs MARKET RATIOS (11 ratios)
+------------------------------------
+Purpose: Identify which sectors are leading or lagging the S&P 500
+
+SPY/DJUSSC       S&P 500 / Dow Jones Semiconductors
+                 Market vs chip stocks
+                 
+XLB/SPY          Materials / S&P 500
+                 Materials sector relative strength
+                 
+XLF/SPY          Financials / S&P 500
+                 Financial sector relative strength
+                 
+XLK/SPY          Technology / S&P 500
+                 Tech sector relative strength
+                 
+XLU/SPY          Utilities / S&P 500
+                 Utility sector relative strength
+                 
+XLRE/SPY         Real Estate / S&P 500
+                 Real estate sector relative strength
+                 
+XLV/SPY          Healthcare / S&P 500
+                 Healthcare sector relative strength
+                 
+XLC/SPY          Communication Services / S&P 500
+                 Communication sector relative strength
+                 
+XLY/SPY          Consumer Discretionary / S&P 500
+                 Consumer discretionary relative strength
+                 
+XLI/SPY          Industrials / S&P 500
+                 Industrial sector relative strength
+                 
+XLE/SPY          Energy / S&P 500
+                 Energy sector relative strength
+
+GOVERNMENT BONDS vs BENCHMARK RATIOS (7 ratios)
+------------------------------------------------
+Purpose: Track treasury performance vs balanced benchmark
+
+GOVT/VBINX       US Treasury Aggregate / Vanguard Balanced Index
+                 Overall treasury performance vs balanced portfolio
+                 
+BIL/GOVT         1-3 Month T-Bills / Treasury Aggregate
+                 Ultra short vs aggregate treasury
+                 
+SHY/GOVT         1-3 Year / Treasury Aggregate
+                 Short duration vs aggregate
+                 
+IEI/GOVT         3-7 Year / Treasury Aggregate
+                 Intermediate short vs aggregate
+                 
+IEF/GOVT         7-10 Year / Treasury Aggregate
+                 Intermediate vs aggregate
+                 
+TLH/GOVT         10-20 Year / Treasury Aggregate
+                 Long duration vs aggregate
+                 
+TLT/GOVT         20+ Year / Treasury Aggregate
+                 Ultra long duration vs aggregate
+
+CORPORATE BONDS vs BENCHMARK RATIOS (2 ratios)
+-----------------------------------------------
+Purpose: Track corporate bond performance vs balanced benchmark
+
+LQD/VBINX        Investment Grade Corporate Bonds / Vanguard Balanced
+                 High quality corporate bond performance
+                 
+HYG/VBINX        High Yield Bonds / Vanguard Balanced
+                 Junk bond performance vs balanced portfolio
+
+COMMODITIES vs BENCHMARK RATIOS (8 ratios)
+-------------------------------------------
+Purpose: Track commodity performance vs broad commodity index
+
+DJP/VBINX        Bloomberg Commodity Index / Vanguard Balanced
+                 Overall commodity performance
+                 
+DBA/DJP          Agriculture / Commodity Index
+                 Agriculture relative to broad commodities
+                 
+USO/DJP          Crude Oil / Commodity Index
+                 Oil relative to broad commodities
+                 
+DBB/DJP          Base Metals / Commodity Index
+                 Industrial metals vs broad commodities
+                 
+PDBC/DJP         Optimum Yield Commodities / Commodity Index
+                 Alternative commodity exposure
+                 
+GLD/DJP          Gold / Commodity Index
+                 Gold vs broad commodities
+                 
+SLV/DJP          Silver / Commodity Index
+                 Silver vs broad commodities
+                 
+XLE/DJP          Energy Sector / Commodity Index
+                 Energy stocks vs commodity index
+
+ALTERNATIVE ASSETS vs BENCHMARK RATIOS (3 ratios)
+--------------------------------------------------
+Purpose: Track alternative asset performance vs balanced benchmark
+
+BTC/VBINX        Bitcoin / Vanguard Balanced
+                 Crypto vs traditional 60/40 portfolio
+                 
+DXY/VBINX        US Dollar Index / Vanguard Balanced
+                 Dollar strength vs balanced portfolio
+                 
+SPY/VBINX        S&P 500 / Vanguard Balanced
+                 Stocks vs balanced portfolio
+
+YIELD CURVE & BOND SPREAD RATIOS (3 ratios)
+--------------------------------------------
+Purpose: Analyze treasury yield curve shape and steepness
+
+TLT/SHY          20+ Year / 1-3 Year Treasury
+                 Yield curve steepness indicator
+                 Rising = Steepening curve
+                 Falling = Flattening/Inverting curve
+                 
+IEF/BIL          7-10 Year / 1-3 Month Treasury
+                 Intermediate curve steepness
+                 
+TLH/IEI          10-20 Year / 3-7 Year Treasury
+                 Long end curve shape
+
+COMMODITY SPREAD RATIOS (3 ratios)
+-----------------------------------
+Purpose: Track relative performance within commodity complex
+
+GLD/SLV          Gold / Silver
+                 Gold-Silver ratio
+                 Rising = Gold outperforming silver
+                 Historical mean: ~60-80
+                 
+USO/DBA          Crude Oil / Agriculture
+                 Energy vs food prices
+                 
+DBB/GLD          Base Metals / Gold
+                 Industrial metals vs safe haven
+
+INTER-ASSET CLASS RATIOS (5 ratios)
+------------------------------------
+Purpose: Major cross-asset allocation signals
+
+SPY/TLT          Stocks / Bonds (20+ year)
+                 Classic risk-on/risk-off
+                 Rising = Risk-on (stocks leading)
+                 Falling = Risk-off (bonds leading)
+                 
+SPY/GLD          Stocks / Gold
+                 Equities vs safe haven
+                 Rising = Risk appetite
+                 Falling = Flight to safety
+                 
+GLD/SPY          Gold / Stocks (inverse of above)
+                 Safe haven vs equities
+                 
+BTC/GLD          Bitcoin / Gold
+                 Digital gold vs physical gold
+                 
+QQQ/SPY          Nasdaq 100 / S&P 500
+                 Tech-heavy vs broad market
+                 Rising = Tech leadership
+
+USE CASES
+=========
+
+1. FACTOR ROTATION STRATEGY
+   Monitor value/growth ratios across cap sizes:
+   - IWD/IWF, SPYV/SPYG (large cap)
+   - MDYV/MDYG (mid cap)
+   - IJS/IJT, IWN/IWO (small cap)
+   Screen all 5 together to identify which factor is leading
+
+2. RISK MANAGEMENT
+   Track risk-on/off indicators:
+   - XLP/XLY (consumer defensive vs cyclical)
+   - SPY/TLT (stocks vs bonds)
+   - DJU/DJT (utilities vs transportation)
+   Declining values = Increasing risk appetite
+
+3. SECTOR ROTATION
+   Screen all 11 sector/SPY ratios:
+   - Rising = Sector outperforming market
+   - Falling = Sector underperforming market
+   Sort by return % to find strongest/weakest sectors
+
+4. YIELD CURVE ANALYSIS
+   Monitor curve shape:
+   - TLT/SHY (overall steepness)
+   - IEF/BIL (short-intermediate)
+   - TLH/IEI (intermediate-long)
+   Flattening = Economic slowdown concerns
+
+5. COMMODITY TRENDS
+   Track commodity leadership:
+   - DBA/DJP, USO/DJP, GLD/DJP, SLV/DJP
+   - GLD/SLV ratio for precious metals
+   Screen to identify hot commodity sectors
+
+6. MULTI-ASSET ALLOCATION
+   Screen inter-asset ratios for allocation signals:
+   - SPY/TLT, SPY/GLD for stock positioning
+   - BTC/GLD for crypto vs traditional safe haven
+   - DXY/VBINX for dollar strength impact
+
+SCREENER CONFIGURATION TIPS
+============================
+
+1. For Pine Screener, create separate watchlists by category:
+   - "Value-Growth Ratios" (5 symbols)
+   - "Risk Indicators" (8 symbols: risk-on/off + inter-asset)
+   - "Sector Leadership" (11 symbols)
+   - "Bond Market" (12 symbols: govt + corp + curve)
+   - "Commodities" (11 symbols: commodity + spreads)
+
+2. Best timeframes for analysis:
+   - Daily: Tactical signals (1W, 1M returns)
+   - Weekly: Intermediate trends (1M, 3M, 6M returns)
+   - Monthly: Strategic positioning (6M, 1Y, YTD returns)
+
+3. Key RS benchmarks to use:
+   - Most ratios: Use SPY as benchmark for RS rating
+   - Bond ratios: Use TLT or AGG
+   - Commodity ratios: Use DJP
+
+4. Sorting strategies:
+   - Sort by 1M Return % descending: Find recent momentum
+   - Sort by RS 1Y descending: Find long-term strength
+   - Sort by YTD Return %: Identify year-to-date leaders
+
+TOTAL: 50 RATIO SYMBOLS

@@ -1,0 +1,7 @@
+# VALUE vs GROWTH FACTOR ANALYSIS
+# All cap sizes for comprehensive factor rotation monitoring
+IWD/IWF
+SPYV/SPYG
+MDYV/MDYG
+IJS/IJT
+IWN/IWO

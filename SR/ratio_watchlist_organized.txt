@@ -1,0 +1,94 @@
+# ========================================
+# VALUE vs GROWTH RATIOS
+# ========================================
+# Large Cap
+IWD/IWF
+SPYV/SPYG
+
+# Mid Cap
+MDYV/MDYG
+
+# Small Cap
+IJS/IJT
+IWN/IWO
+
+# ========================================
+# RISK-ON vs RISK-OFF RATIOS
+# ========================================
+XLP/XLY
+SPY/QQQ
+DJU/DJT
+
+# ========================================
+# SECTOR vs MARKET RATIOS
+# ========================================
+SPY/DJUSSC
+XLB/SPY
+XLF/SPY
+XLK/SPY
+XLU/SPY
+XLRE/SPY
+XLV/SPY
+XLC/SPY
+XLY/SPY
+XLI/SPY
+XLE/SPY
+
+# ========================================
+# GOVERNMENT BONDS vs BENCHMARK RATIOS
+# ========================================
+GOVT/VBINX
+BIL/GOVT
+SHY/GOVT
+IEI/GOVT
+IEF/GOVT
+TLH/GOVT
+TLT/GOVT
+
+# ========================================
+# CORPORATE BONDS vs BENCHMARK RATIOS
+# ========================================
+LQD/VBINX
+HYG/VBINX
+
+# ========================================
+# COMMODITIES vs BENCHMARK RATIOS
+# ========================================
+DJP/VBINX
+DBA/DJP
+USO/DJP
+DBB/DJP
+PDBC/DJP
+GLD/DJP
+SLV/DJP
+XLE/DJP
+
+# ========================================
+# ALTERNATIVE ASSETS vs BENCHMARK RATIOS
+# ========================================
+BTC/VBINX
+DXY/VBINX
+SPY/VBINX
+
+# ========================================
+# YIELD CURVE & BOND SPREAD RATIOS
+# ========================================
+TLT/SHY
+IEF/BIL
+TLH/IEI
+
+# ========================================
+# COMMODITY SPREAD RATIOS
+# ========================================
+GLD/SLV
+USO/DBA
+DBB/GLD
+
+# ========================================
+# INTER-ASSET CLASS RATIOS
+# ========================================
+SPY/TLT
+SPY/GLD
+GLD/SPY
+BTC/GLD
+QQQ/SPY
