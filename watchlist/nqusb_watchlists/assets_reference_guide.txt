@@ -1,0 +1,100 @@
+GROUPS WATCHLIST - QUICK REFERENCE GUIDE
+========================================
+
+ASSET CLASSES (8 symbols)
+-------------------------
+GOVT    US Treasuries (iShares Core U.S. Treasury Bond ETF)
+LOD     World Markets (MSCI World Index Fund)
+HYG     High Yield Corporate Bonds (iShares iBoxx $ High Yield)
+SPY     S&P 500 (SPDR S&P 500 ETF Trust)
+DJP     Bloomberg Commodity Index
+BTC     Bitcoin
+DXY     US Dollar Index
+GSG     S&P GSCI Commodity Index
+
+MAIN INDEXES (19 symbols)
+-------------------------
+Large Cap:
+  SPY     S&P 500
+  QQQ     Nasdaq 100
+  DJIA    Dow Jones Industrial Average
+  
+Style Factors - Large Cap:
+  IWD     Russell 1000 Value
+  IWF     Russell 1000 Growth
+  SPYV    S&P 500 Value
+  SPYG    S&P 500 Growth
+  
+Style Factors - Mid Cap:
+  MDYV    S&P MidCap 400 Value
+  MDYG    S&P MidCap 400 Growth
+  
+Style Factors - Small Cap:
+  IJS     S&P SmallCap 600 Value
+  IJT     S&P SmallCap 600 Growth
+  IWN     Russell 2000 Value
+  IWO     Russell 2000 Growth
+  DJUSSC  Dow Jones Small Cap
+  
+Specialized:
+  DJU     Dow Jones Utilities Average
+  DJT     Dow Jones Transportation Average
+  XLK     Technology Sector
+  XLP     Consumer Staples Sector
+  XLY     Consumer Discretionary Sector
+
+SPY SECTORS (11 symbols)
+------------------------
+XLB     Materials
+XLF     Financials
+XLK     Technology
+XLU     Utilities
+XLRE    Real Estate
+XLV     Healthcare
+XLP     Consumer Staples
+XLY     Consumer Discretionary
+XLC     Communication Services
+XLI     Industrials
+XLE     Energy
+
+GOVERNMENT BONDS (6 symbols)
+----------------------------
+BIL     1-3 Month T-Bills (Ultra Short)
+SHY     1-3 Year Treasury (Short)
+IEI     3-7 Year Treasury (Intermediate Short)
+IEF     7-10 Year Treasury (Intermediate)
+TLH     10-20 Year Treasury (Long)
+TLT     20+ Year Treasury (Ultra Long)
+
+COMMODITIES (7 symbols)
+-----------------------
+DBA     Agriculture ETF (Invesco DB Agriculture)
+XLE     Energy Sector SPDR
+USO     Crude Oil (United States Oil Fund)
+DBB     Base/Industrial Metals (Invesco DB Base Metals)
+PDBC    Optimum Yield Diversified Commodities
+GLD     Gold (SPDR Gold Shares)
+SLV     Silver (iShares Silver Trust)
+
+USE CASES
+=========
+
+1. ASSET ALLOCATION SCREENING
+   - Run screener on "Asset Classes" to compare stocks/bonds/commodities/crypto
+   - Example ratios: SPY/TLT (stocks vs bonds), GLD/SPY (gold vs equities)
+
+2. SECTOR ROTATION
+   - Screen "SPY Sectors" to find strongest/weakest sectors
+   - Compare XLY/XLP (risk-on vs risk-off)
+
+3. YIELD CURVE ANALYSIS
+   - Screen "Government Bonds" to analyze curve shape
+   - Ratios: TLT/SHY (steepness), IEF/BIL (intermediate curve)
+
+4. SIZE & STYLE FACTORS
+   - Screen "Main Indexes" for factor performance
+   - Compare IWO/IWN (small growth vs value), SPYG/SPYV (large growth vs value)
+
+5. COMMODITY TRENDS
+   - Screen "Commodities" for inflation indicators
+   - Track GLD/SLV ratio, USO trends, DBA for agriculture

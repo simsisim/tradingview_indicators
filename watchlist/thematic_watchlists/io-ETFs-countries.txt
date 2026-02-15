@@ -1,0 +1,36 @@
+### SE Asia
+THD
+VNM
+### East Asia
+EWY
+EWT
+EVJ
+GXC
+FXI
+EWH
+KWEB
+### Oceania
+EWA
+### Europe
+EWP
+EPOL
+EWI
+GREK
+EWG
+EWK
+NORW
+EUFN
+PGAL
+### North America
+EWC
+### South America
+EWZ
+### Middle East/Europe
+TUR
+### Middle East
+KSA
+EIS
+### South Asia
+EPI
+### Global/Mixed
+EEM

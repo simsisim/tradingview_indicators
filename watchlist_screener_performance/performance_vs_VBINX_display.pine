@@ -1,0 +1,375 @@
+// This source code is subject to the terms of the Mozilla Public License 2.0 at https://mozilla.org/MPL/2.0/
+// © valpatradd - Pine Screener: Performance Display
+
+//@version=6
+indicator('Perf_vs_VBINX', 'Perf_vs_VBINX', overlay=true)
+
+// ====================================================================================
+// PINE SCREENER SCRIPT - RETURN % & RELATIVE STRENGTH CALCULATIONS
+// ====================================================================================
+// This script is designed for TradingView's Pine Screener feature.
+// It calculates percentage returns AND Relative Strength (RS) ratings for the CURRENT
+// symbol across multiple timeframes.
+//
+// FEATURES:
+// - Multi-period return calculations (1Y, YTD, 6M, 3M, 1M, 1W, Custom)
+// - Multi-period RS ratings vs benchmark (default: VBINX)
+// - Customizable benchmark symbol
+// - Inverse RS option (benchmark vs symbol)
+// - Individual toggles for each period
+//
+// HOW TO USE:
+// 1. Add this indicator to your Favorites
+// 2. Go to Pine Screener (Products > Screeners > Pine)
+// 3. Select your watchlist (e.g., "NQUSB Industries")
+// 4. Choose this indicator from the dropdown
+// 5. Configure return periods and RS settings
+// 6. Sort/filter results by any column
+// ====================================================================================
+
+// ---- Period Selection Settings ----
+var gPeriods = 'Return Period Configuration'
+
+// Primary period for calculation
+primary_period = input.string('Year', 'Primary Period',
+     options=['Year', 'YTD', 'Half Year', 'Quarter', '1 Month', '1 Week', 'Custom Days'],
+     group=gPeriods,
+     tooltip='Select the main period for return calculation. This will be the primary plot.')
+
+custom_days = input.int(20, 'Custom Period (Days)',
+     minval=1, maxval=252,
+     group=gPeriods,
+     tooltip='Number of trading days for Custom Days option')
+
+// ---- Multi-Period Display Options ----
+var gMulti = 'Multi-Period Display (Optional)'
+
+show_multiple = input.bool(true, 'Show Multiple Periods',
+     group=gMulti,
+     tooltip='Enable to display returns for multiple timeframes simultaneously')
+
+show_1y = input.bool(true, '1 Year Return',
+     group=gMulti,
+     tooltip='Display 1-year (252 trading days) return')
+
+show_ytd = input.bool(true, 'YTD Return',
+     group=gMulti,
+     tooltip='Display year-to-date return')
+
+show_6m = input.bool(true, '6 Month Return',
+     group=gMulti,
+     tooltip='Display 6-month (126 trading days) return')
+
+show_3m = input.bool(true, '3 Month Return',
+     group=gMulti,
+     tooltip='Display 3-month (63 trading days) return')
+
+show_1m = input.bool(true, '1 Month Return',
+     group=gMulti,
+     tooltip='Display 1-month (21 trading days) return')
+
+show_1w = input.bool(true, '1 Week Return',
+     group=gMulti,
+     tooltip='Display 1-week (5 trading days) return')
+
+show_custom = input.bool(true, 'Custom Period Return',
+     group=gMulti,
+     tooltip='Display custom period return when Custom Days is selected')
+
+// ---- Relative Strength Settings ----
+var gRS = 'Relative Strength (RS) Rating'
+
+rs_benchmark = input.symbol('VBINX', 'RS Benchmark Symbol',
+     group=gRS,
+     tooltip='Symbol to compare against for RS Rating (default: VBINX)')
+
+rs_inverse = input.bool(false, 'Inverse RS (Benchmark/Symbol)',
+     group=gRS,
+     tooltip='Calculate inverse RS: benchmark performance vs symbol instead of symbol vs benchmark')
+
+// Individual RS period toggles
+show_rs_1y = input.bool(true, 'RS 1 Year',
+     group=gRS,
+     tooltip='Display RS Rating for 1-year (252 trading days)')
+
+show_rs_ytd = input.bool(true, 'RS YTD',
+     group=gRS,
+     tooltip='Display RS Rating for year-to-date')
+
+show_rs_6m = input.bool(true, 'RS 6 Month',
+     group=gRS,
+     tooltip='Display RS Rating for 6-month (126 trading days)')
+
+show_rs_3m = input.bool(true, 'RS 3 Month',
+     group=gRS,
+     tooltip='Display RS Rating for 3-month (63 trading days)')
+
+show_rs_1m = input.bool(true, 'RS 1 Month',
+     group=gRS,
+     tooltip='Display RS Rating for 1-month (21 trading days)')
+
+show_rs_1w = input.bool(true, 'RS 1 Week',
+     group=gRS,
+     tooltip='Display RS Rating for 1-week (5 trading days)')
+
+     // ---- Relative Return Settings ----
+var gRel = 'Relative Return (Ticker / Benchmark)'
+
+show_rel_return = input.bool(true, 'Show Relative Return',
+     group=gRel,
+     tooltip='Enable to display returns relative to the benchmark (Ticker / Benchmark)')
+
+// Individual Relative Return toggles
+show_rr_1y = input.bool(true, 'Rel Return 1 Year',
+     group=gRel,
+     tooltip='Display Relative Return for 1-year')
+
+show_rr_ytd = input.bool(true, 'Rel Return YTD',
+     group=gRel,
+     tooltip='Display Relative Return for YTD')
+
+show_rr_6m = input.bool(true, 'Rel Return 6 Month',
+     group=gRel,
+     tooltip='Display Relative Return for 6-month')
+
+show_rr_3m = input.bool(true, 'Rel Return 3 Month',
+     group=gRel,
+     tooltip='Display Relative Return for 3-month')
+
+show_rr_1m = input.bool(true, 'Rel Return 1 Month',
+     group=gRel,
+     tooltip='Display Relative Return for 1-month')
+
+show_rr_1w = input.bool(true, 'Rel Return 1 Week',
+     group=gRel,
+     tooltip='Display Relative Return for 1-week')
+
+// ---- Return Calculation Functions ----
+
+// Get bars back based on period type
+_get_bars_back(period_type, custom_bars) =>
+    int bars = 0
+    if period_type == 'Year'
+        bars := 252  // Trading days in a year
+    else if period_type == 'YTD'
+        // Calculate bars from start of year
+        year_start = timestamp(year(timenow), 1, 1, 0, 0)
+        bars_since_start = bar_index - ta.valuewhen(time >= year_start, bar_index, 0)
+        // Ensure bars is valid (> 0), default to 1 if invalid
+        bars := na(bars_since_start) or bars_since_start <= 0 ? 1 : bars_since_start
+    else if period_type == 'Half Year'
+        bars := 126  // Half trading year (6 months)
+    else if period_type == 'Quarter'
+        bars := 63   // Quarter trading days (3 months)
+    else if period_type == '1 Month'
+        bars := 21   // Approximately 1 month of trading days
+    else if period_type == '1 Week'
+        bars := 5    // 1 week of trading days
+    else if period_type == 'Custom Days'
+        bars := custom_bars
+    // Final validation: ensure bars is always at least 1
+    bars := bars <= 0 ? 1 : bars
+    bars
+
+// Calculate percentage return for a given lookback period on a specific series
+_calc_return(src, lookback) =>
+    float return_pct = na
+
+    if lookback > 0 and bar_index >= lookback
+        past_val = src[lookback]
+        current_val = src
+
+        if not na(current_val) and not na(past_val) and past_val != 0
+            return_pct := ((current_val - past_val) / past_val) * 100
+
+    return_pct
+
+// Calculate RS Rating (normalized 1-99) using pre-fetched benchmark data
+_calc_rs_rating(benchmark_close_val, length, inverse) =>
+    float result = na
+
+    // Validate inputs - length must be > 0 and not na, benchmark must be valid
+    if not na(length) and length > 0 and not na(benchmark_close_val) and benchmark_close_val != 0
+        // Calculate RS ratio (symbol vs benchmark, or inverse)
+        rs_ratio = inverse ? benchmark_close_val / close : close / benchmark_close_val
+
+        // Normalize to 1-99 scale based on lookback period
+        highest_rs = ta.highest(rs_ratio, length)
+        lowest_rs = ta.lowest(rs_ratio, length)
+        range_val = highest_rs - lowest_rs
+
+        normalized = na(range_val) or range_val == 0 ? na : ((98 * (rs_ratio - lowest_rs) / range_val) + 1)
+        result := nz(normalized, 0)
+
+    result
+
+// Calculate Relative Return % ( (Price/Bench) / (PriceStrict/BenchStrict) - 1 ) * 100
+// Replaced by generic _calc_return on a ratio series
+
+// ---- Primary Period Calculation ----
+primary_bars = _get_bars_back(primary_period, custom_days)
+primary_return = _calc_return(close, primary_bars)
+
+// ---- Multi-Period Calculations ----
+// Fixed period calculations (always computed for potential use)
+bars_1y = 252
+bars_ytd = _get_bars_back('YTD', 0)
+bars_6m = 126
+bars_3m = 63
+bars_1m = 21
+bars_1w = 5
+
+return_1y = _calc_return(close, bars_1y)
+return_ytd = _calc_return(close, bars_ytd)
+return_6m = _calc_return(close, bars_6m)
+return_3m = _calc_return(close, bars_3m)
+return_1m = _calc_return(close, bars_1m)
+return_1w = _calc_return(close, bars_1w)
+
+// ---- RS Rating Calculation ----
+// Fetch benchmark data ONCE for all RS calculations (1 request.security call total)
+// Use gaps=barmerge.gaps_off to ensure we get the previous close if current bar is missing in benchmark
+benchmark_close = request.security(rs_benchmark, timeframe.period, close, gaps=barmerge.gaps_off)
+
+// Calculate RS for all periods using the same benchmark data
+rs_rating_1y = _calc_rs_rating(benchmark_close, bars_1y, rs_inverse)
+rs_rating_ytd = _calc_rs_rating(benchmark_close, bars_ytd, rs_inverse)
+rs_rating_6m = _calc_rs_rating(benchmark_close, bars_6m, rs_inverse)
+rs_rating_3m = _calc_rs_rating(benchmark_close, bars_3m, rs_inverse)
+rs_rating_1m = _calc_rs_rating(benchmark_close, bars_1m, rs_inverse)
+rs_rating_1w = _calc_rs_rating(benchmark_close, bars_1w, rs_inverse)
+
+// ---- Relative Return Calculation ----
+// 1. Construct the Ratio Series
+// Handling division by zero and NA values
+ratio_series = (not na(close) and not na(benchmark_close) and benchmark_close != 0) ? close / benchmark_close : na
+
+// 2. Calculate returns on this series
+rr_1y = _calc_return(ratio_series, bars_1y)
+rr_ytd = _calc_return(ratio_series, bars_ytd)
+rr_6m = _calc_return(ratio_series, bars_6m)
+rr_3m = _calc_return(ratio_series, bars_3m)
+rr_1m = _calc_return(ratio_series, bars_1m)
+rr_1w = _calc_return(ratio_series, bars_1w)
+
+// ---- Plot Outputs (Screener Columns) ----
+
+// Primary period plot (always shown)
+plot(show_multiple ? na : primary_return,
+     title='Primary Return %',
+     display=display.all)
+
+// Multi-period plots (only shown if enabled)
+plot(show_multiple and show_1w ? return_1w : na,
+     title='1W Return %',
+     display=display.all)
+
+plot(show_multiple and show_1m ? return_1m : na,
+     title='1M Return %',
+     display=display.all)
+
+plot(show_multiple and show_3m ? return_3m : na,
+     title='3M Return %',
+     display=display.all)
+
+plot(show_multiple and show_6m ? return_6m : na,
+     title='6M Return %',
+     display=display.all)
+
+// Custom period plot (shown when Custom Days is selected)
+plot(show_multiple and show_custom and primary_period == 'Custom Days' ? primary_return : na,
+     title='Custom Period Return %',
+     display=display.all)
+
+plot(show_multiple and show_1y ? return_1y : na,
+     title='1Y Return %',
+     display=display.all)
+
+plot(show_multiple and show_ytd ? return_ytd : na,
+     title='YTD Return %',
+     display=display.all)
+
+// RS Rating plots (multi-period)
+plot(show_rs_1w ? rs_rating_1w : na,
+     title='RS 1W',
+     display=display.all)
+
+plot(show_rs_1m ? rs_rating_1m : na,
+     title='RS 1M',
+     display=display.all)
+
+plot(show_rs_3m ? rs_rating_3m : na,
+     title='RS 3M',
+     display=display.all)
+
+plot(show_rs_6m ? rs_rating_6m : na,
+     title='RS 6M',
+     display=display.all)
+
+plot(show_rs_1y ? rs_rating_1y : na,
+     title='RS 1Y',
+     display=display.all)
+
+plot(show_rs_ytd ? rs_rating_ytd : na,
+     title='RS YTD',
+     display=display.all)
+
+// ---- Relative Return Plots ----
+plot(show_rel_return and show_rr_1w ? rr_1w : na,
+     title='Rel Return 1W %',
+     display=display.all)
+
+plot(show_rel_return and show_rr_1m ? rr_1m : na,
+     title='Rel Return 1M %',
+     display=display.all)
+
+plot(show_rel_return and show_rr_3m ? rr_3m : na,
+     title='Rel Return 3M %',
+     display=display.all)
+
+plot(show_rel_return and show_rr_6m ? rr_6m : na,
+     title='Rel Return 6M %',
+     display=display.all)
+
+plot(show_rel_return and show_rr_ytd ? rr_ytd : na,
+     title='Rel Return YTD %',
+     display=display.all)
+
+plot(show_rel_return and show_rr_1y ? rr_1y : na,
+     title='Rel Return 1Y %',
+     display=display.all)
+
+// ---- Visual Indicators (Optional - for chart overlay) ----
+// These don't appear in screener but help when viewing individual symbols
+
+// Color the background based on primary return
+bgcolor_color = primary_return > 0 ? color.new(color.green, 95) : primary_return < 0 ? color.new(color.red, 95) : color.new(color.gray, 95)
+
+bgcolor(bgcolor_color, title='Return Indicator')
+
+// ---- Information Label (Optional) ----
+// Shows current symbol's return on the chart (not in screener)
+var label info_label = na
+if barstate.islast
+    label.delete(info_label)
+
+    rs_text = str.format('\n\nRS Ratings:\n1Y: {0,number,#.#}\nYTD: {1,number,#.#}\n6M: {2,number,#.#}\n3M: {3,number,#.#}\n1M: {4,number,#.#}\n1W: {5,number,#.#}', rs_rating_1y, rs_rating_ytd, rs_rating_6m, rs_rating_3m, rs_rating_1m, rs_rating_1w)
+
+    val_rr_1y = nz(rr_1y, 0)
+    val_rr_ytd = nz(rr_ytd, 0)
+    val_rr_6m = nz(rr_6m, 0)
+    val_rr_3m = nz(rr_3m, 0)
+    val_rr_1m = nz(rr_1m, 0)
+    val_rr_1w = nz(rr_1w, 0)
+    
+    rr_text = show_rel_return ? str.format('\n\nRel Returns:\n1Y: {0,number,#.##}%\nYTD: {1,number,#.##}%\n6M: {2,number,#.##}%\n3M: {3,number,#.##}%\n1M: {4,number,#.##}%\n1W: {5,number,#.##}%', val_rr_1y, val_rr_ytd, val_rr_6m, val_rr_3m, val_rr_1m, val_rr_1w) : ''
+    
+    label_text = show_multiple ? str.format('Returns:\n1Y: {0,number,#.##}%\nYTD: {1,number,#.##}%\n6M: {2,number,#.##}%\n3M: {3,number,#.##}%\n1M: {4,number,#.##}%\n1W: {5,number,#.##}%{6}{7}', return_1y, return_ytd, return_6m, return_3m, return_1m, return_1w, rs_text, rr_text) : str.format('{0}: {1,number,#.##}%{2}{3}', primary_period, primary_return, rs_text, rr_text)
+
+    info_label := label.new(
+         bar_index, high,
+         text=label_text,
+         style=label.style_label_down,
+         color=primary_return > 0 ? color.new(color.green, 20) : color.new(color.red, 20),
+         textcolor=color.white,
+         size=size.small)

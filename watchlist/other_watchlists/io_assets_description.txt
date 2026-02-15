@@ -1,0 +1,80 @@
+# ========================================
+# ASSET CLASSES - Overview
+# ========================================
+# US Treasuries, World Markets, High Yield Bonds, S&P 500 
+# Commodities, Bitcoin, US Dollar, Commodities Index
+GOVT:iShares Treasury Bonds ETF
+LQD: iShares iBoxx $ Investment Grade Corporate Bond ETF
+HYG: iShares iBoxx $ High Yield Corporate Bond ETF
+SPY: SPY: SPDR S&P 500 ETF Trust
+DJP: IPath Bloomberg Commodity Index Total REturn ETN
+BTC: Bitcoin
+DXY: U.S. Dollar Currency Index
+GSG: iShares S&P500 GSCI Commodity Indexed Trust
+# ========================================
+# GOVERNMENT BONDS - US Treasury ETFs
+# ========================================
+# Treasury ETFs by maturity (1-3 months to 20+ years)
+BIL: State Street SPDR Bloomberg 1-3 Months T-Bill ETF
+SHY: iShares 1-3 Year Treasury Bonds ETF
+IEI: iShares 3-7 Year Treasury Bonds ETF
+IEF: iShares 7-10 Year Treasury Bonds ETF
+TLH: iShares 10-20 Year Treasury Bonds ETF
+TLT: iShares 20+ Year Treasury Bonds ETF
+# ========================================
+# MAIN INDEXES - Broad Market
+# ========================================
+# Major US stock market indexes and style factors
+SPY: SPDR S&P 500 ETF Trust; value
+QQQ: Invesco QQQ Trust Series; growth
+DJIA: Dow Jones Industrial Average; value
+XLK: State Street Technology Select Sector SPDR ETF;growth
+XLP: State Street Staples Select Sector SPDR ETF; value 
+XLY: State Street Consumer Discretionary Select Sector SPDR ETF;growth
+DJU: Dow Jones Utility Average; value
+DJCFD:DJT; Dow Jones Transport Average; growth
+NASDAQ:TRAN; Nasdaq Transportation; growth
+DJUSSC; Dow Jones U.S. Semicondutors Index; growth
+SPYV: State Street SPDR S&P 500 Value ETF; value
+SPYG: State Street SPDR S&P 500 Growth ETF; growth
+MDYV: State Street SPDR S&P Mid Cap Value ETF; value
+MDYG: State Street SPDR S&P Mid Cap Growth ETF
+IJS: iShares S&P Small-Cap 600 Value ETF; value
+IJT: iShares S&P Small-Cap 600 Growth ETF
+IWN: iShares Russell 2000 Value ETF; value
+IWO: iShares Russell 2000 Growth ETF; growth
+IWD: iShares Russell 1000 Value ETF; value
+IWF: iShares Russell 1000 Growth ETF; growth
+IWV: iShares Russell 3000 ETF
+VTHR: Vanguard Russel 3000 ETF
+# ========================================
+# SPY SECTORS - S&P 500 Sector ETFs
+# ========================================
+# 11 SPDR sector ETFs tracking S&P 500 sectors
+XLB: Materials; value
+XLF: Financial; growth
+XLK: Technology; growth
+XLU: Utilities; value
+XLRE: Real Estate; value
+XLV: Heathcare; value
+XLP: Consumer Staples; value
+XLY: Consumer Discretionary; growth
+XLC: Communication Services; growth
+XLI: Industrials; growth
+XLE: Energy; value
+# ========================================
+# COMMODITIES - DJP Group
+# ========================================
+# Agriculture, Energy, Metals, and Precious Metals ETFs
+DBA: Invesco DB Agriculture Fund
+XLE: State Street Energy Select Sector SPDR ETF
+USO: United States Oil Fund LP
+DBB: Invesco DB Base Metals Fund
+PDBC: Invesco Optimum Yield Diversified Commodity Strategy
+GLD: SPDR Gold Shares
+SLV: SPDR Silver Shares
+CPER: United States Copper Index Fund
+XME: Critical Metals Corp.
+PL: Platinum Futures
+PA: Palladium Futures
+HG: Copper Futures

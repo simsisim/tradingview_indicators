@@ -1,0 +1,10 @@
+### io_assets_classes
+GOVT
+LQD
+HYG
+SPY
+DJP
+BTC
+DXY
+GSG
+

@@ -1,0 +1,92 @@
+### Financials & Insurance
+IAK
+IHF
+IYF
+KBE
+SPY
+VGT
+XLF
+KBWB
+KIE
+KRE
+PBS
+PHO
+### Materials & Mining
+AA
+EMET
+GDXJ
+GLD
+MOO
+PICK
+REMX
+SLV
+SLX
+XLB
+### Utilities & Infrastructure
+IYT
+IYZ
+DBA
+FIW
+FSTA
+HACK
+IGM
+ITB
+CARZ
+COAL
+VOX
+VNQ
+VEGI
+PSCI
+PEJ
+PAVE
+OIH
+JEDI
+XSD
+XRX
+XLY
+XLU
+XHB
+XLI
+WOOD
+### Energy & Power
+SOXX
+SMHX
+SMH
+KWEB
+QTUM
+IBOT
+FDN
+CIBR
+IBUY
+IGV
+### Consumer & Retail
+PJP
+XLV
+PPH
+IHI
+IBB
+IBRN
+### Technology & Innovation
+TAN
+UGA
+URA
+XOP
+AMLP
+NUKZ
+NLR
+CRAK
+PBW
+### Healthcare & Life Sciences
+PBJ
+XLP
+RTH
+BJK
+EATZ
+XRT
+### Industrial & Aerospace
+JETS
+ITA
+AIRR
+XTN
+SEA
+PKB

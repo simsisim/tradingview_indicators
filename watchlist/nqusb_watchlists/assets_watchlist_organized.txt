@@ -1,0 +1,76 @@
+# ========================================
+# ASSET CLASSES - Overview
+# ========================================
+# US Treasuries, World Markets, High Yield Bonds, S&P 500, 
+# Commodities, Bitcoin, US Dollar, Commodities Index
+GOVT
+LOD
+HYG
+SPY
+DJP
+BTC
+DXY
+GSG
+
+# ========================================
+# MAIN INDEXES - Broad Market
+# ========================================
+# Major US stock market indexes and style factors
+SPY
+QQQ
+DJIA
+XLK
+XLP
+XLY
+IWD
+IWF
+DJU
+DJT
+DJUSSC
+SPYV
+SPYG
+MDYV
+MDYG
+IJS
+IJT
+IWN
+IWO
+
+# ========================================
+# SPY SECTORS - S&P 500 Sector ETFs
+# ========================================
+# 11 SPDR sector ETFs tracking S&P 500 sectors
+XLB
+XLF
+XLK
+XLU
+XLRE
+XLV
+XLP
+XLY
+XLC
+XLI
+XLE
+
+# ========================================
+# GOVERNMENT BONDS - US Treasury ETFs
+# ========================================
+# Treasury ETFs by maturity (1-3 months to 20+ years)
+BIL
+SHY
+IEI
+IEF
+TLH
+TLT
+
+# ========================================
+# COMMODITIES - DJP Group
+# ========================================
+# Agriculture, Energy, Metals, and Precious Metals ETFs
+DBA
+XLE
+USO
+DBB
+PDBC
+GLD
+SLV

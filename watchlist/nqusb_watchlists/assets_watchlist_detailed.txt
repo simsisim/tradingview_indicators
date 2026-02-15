@@ -1,0 +1,70 @@
+# ========================================
+# ASSET CLASSES - Multi-Asset Overview
+# ========================================
+GOVT    # US Treasuries (iShares)
+LOD     # World Markets ETF
+HYG     # High Yield Corporate Bonds
+SPY     # S&P 500
+DJP     # Commodities Index
+BTC     # Bitcoin
+DXY     # US Dollar Index
+GSG     # Commodities Broad Index
+
+# ========================================
+# MAIN INDEXES - Broad Market Exposure
+# ========================================
+SPY     # S&P 500
+QQQ     # Nasdaq 100
+DJIA    # Dow Jones Industrial Average
+XLK     # Technology Sector
+XLP     # Consumer Staples Sector
+XLY     # Consumer Discretionary Sector
+IWD     # Russell 1000 Value (Large Cap Value)
+IWF     # Russell 1000 Growth (Large Cap Growth)
+DJU     # Dow Jones Utilities Average
+DJT     # Dow Jones Transportation Average
+DJUSSC  # Dow Jones Small Cap Total Stock Market
+SPYV    # S&P 500 Value
+SPYG    # S&P 500 Growth
+MDYV    # S&P MidCap 400 Value
+MDYG    # S&P MidCap 400 Growth
+IJS     # S&P SmallCap 600 Value
+IJT     # S&P SmallCap 600 Growth
+IWN     # Russell 2000 Value
+IWO     # Russell 2000 Growth
+
+# ========================================
+# SPY SECTORS - SPDR S&P 500 Sector ETFs
+# ========================================
+XLB     # Materials
+XLF     # Financials
+XLK     # Technology
+XLU     # Utilities
+XLRE    # Real Estate
+XLV     # Healthcare
+XLP     # Consumer Staples
+XLY     # Consumer Discretionary
+XLC     # Communication Services
+XLI     # Industrials
+XLE     # Energy
+
+# ========================================
+# GOVERNMENT BONDS - US Treasury Curve
+# ========================================
+BIL     # 1-3 Month T-Bills
+SHY     # 1-3 Year Treasury
+IEI     # 3-7 Year Treasury
+IEF     # 7-10 Year Treasury
+TLH     # 10-20 Year Treasury
+TLT     # 20+ Year Treasury
+
+# ========================================
+# COMMODITIES - DJP Component Groups
+# ========================================
+DBA     # Agriculture ETF
+XLE     # Energy Sector
+USO     # Crude Oil
+DBB     # Base Metals (Industrial)
+PDBC    # Optimum Yield Diversified Commodities
+GLD     # Gold
+SLV     # Silver

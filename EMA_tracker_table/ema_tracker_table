@@ -1,0 +1,169 @@
+//@version=5
+indicator("EMA Tracker - Multi Timeframe", shorttitle="EMA Tracker", overlay=true)
+
+// ====== SETTINGS ======
+
+// Display Controls
+showTable = input.bool(true, "Show EMA Distance Table", group="Display Controls")
+tablePosition = input.string("Top Right", "Table Position",
+     options=["Top Left", "Top Center", "Top Right",
+              "Middle Left", "Middle Center", "Middle Right",
+              "Bottom Left", "Bottom Center", "Bottom Right"],
+     group="Display Controls")
+showEmaLines = input.bool(false, "Show EMA Lines on Chart", group="Display Controls")
+
+// EMA Line Visibility (only if showEmaLines is true)
+showDailyLines = input.bool(true, "  Daily EMA Lines", group="Display Controls")
+showWeeklyLines = input.bool(true, "  Weekly EMA Lines", group="Display Controls")
+showMonthlyLines = input.bool(true, "  Monthly EMA Lines", group="Display Controls")
+
+// EMA Periods
+emaShort = input.int(9, "Short EMA", minval=1, group="EMA Periods")
+emaMedium = input.int(21, "Medium EMA", minval=1, group="EMA Periods")
+emaLong = input.int(50, "Long EMA", minval=1, group="EMA Periods")
+
+// ====== CALCULATIONS ======
+
+// Current timeframe (Daily) EMAs
+dailyEma9 = ta.ema(close, emaShort)
+dailyEma21 = ta.ema(close, emaMedium)
+dailyEma50 = ta.ema(close, emaLong)
+
+// Weekly EMAs (using request.security)
+weeklyEma9 = request.security(syminfo.tickerid, "W", ta.ema(close, emaShort))
+weeklyEma21 = request.security(syminfo.tickerid, "W", ta.ema(close, emaMedium))
+weeklyEma50 = request.security(syminfo.tickerid, "W", ta.ema(close, emaLong))
+
+// Monthly EMAs (using request.security)
+monthlyEma9 = request.security(syminfo.tickerid, "M", ta.ema(close, emaShort))
+monthlyEma21 = request.security(syminfo.tickerid, "M", ta.ema(close, emaMedium))
+
+// Calculate percentage distance from EMAs
+// Positive = price above EMA, Negative = price below EMA
+calcPctDistance(price, ema) =>
+    ((price - ema) / ema) * 100
+
+// Daily distances
+dailyPct9 = calcPctDistance(close, dailyEma9)
+dailyPct21 = calcPctDistance(close, dailyEma21)
+dailyPct50 = calcPctDistance(close, dailyEma50)
+
+// Weekly distances
+weeklyPct9 = calcPctDistance(close, weeklyEma9)
+weeklyPct21 = calcPctDistance(close, weeklyEma21)
+weeklyPct50 = calcPctDistance(close, weeklyEma50)
+
+// Monthly distances
+monthlyPct9 = calcPctDistance(close, monthlyEma9)
+monthlyPct21 = calcPctDistance(close, monthlyEma21)
+
+// ====== PLOTTING EMA LINES ======
+
+// Plot actual EMA lines on chart (only if enabled)
+// Daily EMA Lines
+plot(showEmaLines and showDailyLines ? dailyEma9 : na, "Daily EMA 9",
+     color=color.new(color.blue, 0), linewidth=1, style=plot.style_line)
+plot(showEmaLines and showDailyLines ? dailyEma21 : na, "Daily EMA 21",
+     color=color.new(color.blue, 30), linewidth=2, style=plot.style_line)
+plot(showEmaLines and showDailyLines ? dailyEma50 : na, "Daily EMA 50",
+     color=color.new(color.blue, 60), linewidth=2, style=plot.style_line)
+
+// Weekly EMA Lines
+plot(showEmaLines and showWeeklyLines ? weeklyEma9 : na, "Weekly EMA 9",
+     color=color.new(color.purple, 0), linewidth=2, style=plot.style_line)
+plot(showEmaLines and showWeeklyLines ? weeklyEma21 : na, "Weekly EMA 21",
+     color=color.new(color.purple, 30), linewidth=3, style=plot.style_line)
+plot(showEmaLines and showWeeklyLines ? weeklyEma50 : na, "Weekly EMA 50",
+     color=color.new(color.purple, 60), linewidth=3, style=plot.style_line)
+
+// Monthly EMA Lines
+plot(showEmaLines and showMonthlyLines ? monthlyEma9 : na, "Monthly EMA 9",
+     color=color.new(color.orange, 0), linewidth=2, style=plot.style_line)
+plot(showEmaLines and showMonthlyLines ? monthlyEma21 : na, "Monthly EMA 21",
+     color=color.new(color.orange, 30), linewidth=3, style=plot.style_line)
+
+// ====== TABLE DISPLAY ======
+// Convert string position to position constant
+getTablePosition() =>
+    switch tablePosition
+        "Top Left" => position.top_left
+        "Top Center" => position.top_center
+        "Top Right" => position.top_right
+        "Middle Left" => position.middle_left
+        "Middle Center" => position.middle_center
+        "Middle Right" => position.middle_right
+        "Bottom Left" => position.bottom_left
+        "Bottom Center" => position.bottom_center
+        "Bottom Right" => position.bottom_right
+        => position.top_right  // default
+
+// Create table (only visible if showTable is enabled)
+var table emaTable = table.new(getTablePosition(), 4, 4, bgcolor=color.new(color.black, 10),
+     border_width=2, border_color=color.gray)
+
+if showTable and barstate.islast
+    // Headers
+    table.cell(emaTable, 0, 0, "Timeframe", text_color=color.white, bgcolor=color.new(color.gray, 50))
+    table.cell(emaTable, 1, 0, "EMA " + str.tostring(emaShort), text_color=color.white, bgcolor=color.new(color.gray, 50))
+    table.cell(emaTable, 2, 0, "EMA " + str.tostring(emaMedium), text_color=color.white, bgcolor=color.new(color.gray, 50))
+    table.cell(emaTable, 3, 0, "EMA " + str.tostring(emaLong), text_color=color.white, bgcolor=color.new(color.gray, 50))
+
+    // Daily row
+    table.cell(emaTable, 0, 1, "DAILY", text_color=color.white, bgcolor=color.new(color.blue, 70))
+    table.cell(emaTable, 1, 1,
+         (dailyPct9 >= 0 ? "Above " : "Below ") + str.tostring(math.abs(dailyPct9), "#.##") + "%",
+         text_color=color.white,
+         bgcolor=dailyPct9 >= 0 ? color.new(color.green, 60) : color.new(color.red, 60))
+    table.cell(emaTable, 2, 1,
+         (dailyPct21 >= 0 ? "Above " : "Below ") + str.tostring(math.abs(dailyPct21), "#.##") + "%",
+         text_color=color.white,
+         bgcolor=dailyPct21 >= 0 ? color.new(color.green, 60) : color.new(color.red, 60))
+    table.cell(emaTable, 3, 1,
+         (dailyPct50 >= 0 ? "Above " : "Below ") + str.tostring(math.abs(dailyPct50), "#.##") + "%",
+         text_color=color.white,
+         bgcolor=dailyPct50 >= 0 ? color.new(color.green, 60) : color.new(color.red, 60))
+
+    // Weekly row
+    table.cell(emaTable, 0, 2, "WEEKLY", text_color=color.white, bgcolor=color.new(color.purple, 70))
+    table.cell(emaTable, 1, 2,
+         (weeklyPct9 >= 0 ? "Above " : "Below ") + str.tostring(math.abs(weeklyPct9), "#.##") + "%",
+         text_color=color.white,
+         bgcolor=weeklyPct9 >= 0 ? color.new(color.green, 60) : color.new(color.red, 60))
+    table.cell(emaTable, 2, 2,
+         (weeklyPct21 >= 0 ? "Above " : "Below ") + str.tostring(math.abs(weeklyPct21), "#.##") + "%",
+         text_color=color.white,
+         bgcolor=weeklyPct21 >= 0 ? color.new(color.green, 60) : color.new(color.red, 60))
+    table.cell(emaTable, 3, 2,
+         (weeklyPct50 >= 0 ? "Above " : "Below ") + str.tostring(math.abs(weeklyPct50), "#.##") + "%",
+         text_color=color.white,
+         bgcolor=weeklyPct50 >= 0 ? color.new(color.green, 60) : color.new(color.red, 60))
+
+    // Monthly row
+    table.cell(emaTable, 0, 3, "MONTHLY", text_color=color.white, bgcolor=color.new(color.orange, 70))
+    table.cell(emaTable, 1, 3,
+         (monthlyPct9 >= 0 ? "Above " : "Below ") + str.tostring(math.abs(monthlyPct9), "#.##") + "%",
+         text_color=color.white,
+         bgcolor=monthlyPct9 >= 0 ? color.new(color.green, 60) : color.new(color.red, 60))
+    table.cell(emaTable, 2, 3,
+         (monthlyPct21 >= 0 ? "Above " : "Below ") + str.tostring(math.abs(monthlyPct21), "#.##") + "%",
+         text_color=color.white,
+         bgcolor=monthlyPct21 >= 0 ? color.new(color.green, 60) : color.new(color.red, 60))
+    table.cell(emaTable, 3, 3, "N/A", text_color=color.gray, bgcolor=color.new(color.black, 80))
+
+// ====== ALERTS ======
+// Alert when price crosses above/below key EMAs
+alertcondition(ta.crossover(close, dailyEma21), "Price crossed above Daily EMA 21", "{{ticker}} crossed above Daily EMA 21")
+alertcondition(ta.crossunder(close, dailyEma21), "Price crossed below Daily EMA 21", "{{ticker}} crossed below Daily EMA 21")
+
+// ====== SCREENER OUTPUTS ======
+// These can be used in TradingView Stock Screener
+// Add this indicator to your chart, then use these values in screener columns
+
+plot(dailyPct9, "D_EMA9_Pct", display=display.data_window)
+plot(dailyPct21, "D_EMA21_Pct", display=display.data_window)
+plot(dailyPct50, "D_EMA50_Pct", display=display.data_window)
+plot(weeklyPct9, "W_EMA9_Pct", display=display.data_window)
+plot(weeklyPct21, "W_EMA21_Pct", display=display.data_window)
+plot(weeklyPct50, "W_EMA50_Pct", display=display.data_window)
+plot(monthlyPct9, "M_EMA9_Pct", display=display.data_window)
+plot(monthlyPct21, "M_EMA21_Pct", display=display.data_window)

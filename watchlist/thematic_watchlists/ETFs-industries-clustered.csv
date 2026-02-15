@@ -1,0 +1,86 @@
+Symbol,Description,Cluster,Dim1,Dim2,Cluster_ID,Cluster_Name
+IAK,Life/Health Insurance,Healthcare,-0.101821585166297,-0.113604309544324,0,Financials & Insurance
+IHF,Financial Publishing/Services,Other,-0.0672689341584095,-0.144774835928835,0,Financials & Insurance
+IYF,Investment Managers,Financials,-0.110663565366327,-0.119856252127074,0,Financials & Insurance
+KBE,Savings Banks,Financials,-0.159419628401441,-0.194980305353293,0,Financials & Insurance
+KBWB,Major Banks,Financials,-0.168583214315766,-0.154652740805888,0,Financials & Insurance
+KIE,Insurance Brokers/Services,Financials,-0.0748293961476068,-0.159214034917646,0,Financials & Insurance
+KRE,Regional Banks,Financials,-0.159419628401441,-0.194980305353293,0,Financials & Insurance
+PBS,Advertising/Marketing Services,Other,-0.0260512148259757,-0.125313146657808,0,Financials & Insurance
+PHO,Environmental Services,Other,-0.0101111401143856,-0.065033990239144,0,Financials & Insurance
+SPY,Investment Trusts/Mutual Funds,Financials,-0.103715154173146,-0.108052454932999,0,Financials & Insurance
+VGT,Data Processing Services,Other,0.316423814336612,-0.00069205863494822,0,Financials & Insurance
+XLF,Finance/Rental/Leasing,Financials,-0.114214670203838,-0.128332593494462,0,Financials & Insurance
+AA,Aluminum,Other,-0.21435042427207,0.406515011424367,1,Materials & Mining
+EMET,Cooper and Green Metals,Materials,-0.230895527185002,0.411707793856408,1,Materials & Mining
+GDXJ,Junior Goldmines,Materials,-0.17989710898716,0.316231343571495,1,Materials & Mining
+GLD,Precious Metals,Materials,-0.310230944529319,0.657391360567062,1,Materials & Mining
+MOO,Chemicals: Agricultural,Other,-0.211886907716912,0.375955905037778,1,Materials & Mining
+PICK,Other Metals/Minerals,Materials,-0.310230944529319,0.657391360567062,1,Materials & Mining
+REMX,Rare Earth and Strategic Metals,Materials,-0.230895527185002,0.411707793856408,1,Materials & Mining
+SLV,Silver Miners,Materials,-0.311250177025666,0.647413369580073,1,Materials & Mining
+SLX,Metal Fabrication/ Steel,Materials,-0.21435042427207,0.406515011424367,1,Materials & Mining
+XLB,Chemicals: Major Diversified,Other,-0.206298102699701,0.311775262432315,1,Materials & Mining
+CARZ,Auto Parts: OEM,Other,-0.0427718881653303,-0.0165088532010587,2,Utilities & Infrastructure
+COAL,Coal,Energy,-0.0427718881653303,-0.0165088532010588,2,Utilities & Infrastructure
+DBA,Agricultural Commodities/Milling,Other,-0.0744135291470608,0.0305672514225647,2,Utilities & Infrastructure
+FIW,Water Utilities,Utilities,-0.0629195984152782,-0.0279927573210469,2,Utilities & Infrastructure
+FSTA,Tobacco,Other,-0.0528813949373575,-0.0218638273460059,2,Utilities & Infrastructure
+HACK,Computer Communications,Technology,-0.0559794012135086,-0.0249245171634736,2,Utilities & Infrastructure
+IGM,Electronic Equipment/Instruments,Technology,-0.0578985599858068,-0.0248148396989482,2,Utilities & Infrastructure
+ITB,Home Furnishings,Other,-0.0592633667305351,-0.0256553682012143,2,Utilities & Infrastructure
+IYT,Railroads,Industrials,-0.0427718881653303,-0.0165088532010589,2,Utilities & Infrastructure
+IYZ,Specialty Telecommunications,Other,-0.0704827995596924,-0.0263796418565067,2,Utilities & Infrastructure
+JEDI,Space Innovators,Other,-0.0528813949373575,-0.0218638273460059,2,Utilities & Infrastructure
+OIH,Contract Drilling,Other,-0.0528813949373575,-0.0218638273460058,2,Utilities & Infrastructure
+PAVE,Electrical Components,Other,-0.0608407084194422,-0.0269377390159956,2,Utilities & Infrastructure
+PEJ,Hotels/Resorts/Cruise lines,Other,-0.0528813949373575,-0.0218638273460059,2,Utilities & Infrastructure
+PSCI,Commercial Printing/Forms,Other,-0.0528813949373575,-0.0218638273460059,2,Utilities & Infrastructure
+VEGI,Agriculture,Other,-0.0528813949373578,-0.0218638273460061,2,Utilities & Infrastructure
+VNQ,Real Estate Development,Real Estate,-0.0528813949373575,-0.0218638273460059,2,Utilities & Infrastructure
+VOX,Major Telecommunications,Other,-0.0993317869467988,-0.0185698368779923,2,Utilities & Infrastructure
+WOOD,Building Products,Other,-0.0646731134197634,-0.0293808246538494,2,Utilities & Infrastructure
+XHB,Home Improvement Chains,Other,-0.0592633667305351,-0.0256553682012143,2,Utilities & Infrastructure
+XLI,Electrical Products,Other,-0.0705538236358322,-0.0327732054098851,2,Utilities & Infrastructure
+XLU,Electric Utilities,Other,-0.0629195984152782,-0.0279927573210468,2,Utilities & Infrastructure
+XLY,Miscellaneous,Other,-0.0427718881653303,-0.0165088532010589,2,Utilities & Infrastructure
+XRX,Office Equipment/Supplies,Other,-0.0578985599858069,-0.0248148396989483,2,Utilities & Infrastructure
+XSD,Computer Processing Hardware,Technology,-0.0347085793295124,-0.0249864717648872,2,Utilities & Infrastructure
+CIBR,Cybersecurity,Technology,0.439001165745882,0.0607068791566074,3,Energy & Power
+FDN,Internet Software/Services,Technology,0.536904892582328,0.0363736299706427,3,Energy & Power
+IBOT,Robotics ETF,Other,0.456827717093454,0.014544846477298,3,Energy & Power
+IBUY,Internet Retail,Technology,0.580636235708668,0.055582519581587,3,Energy & Power
+IGV,Packaged Software,Technology,0.526865575584604,0.0707502604342993,3,Energy & Power
+QTUM,Quantum,Other,0.781604794298083,0.113553810377812,3,Energy & Power
+SMH,Semis,Technology,0.514024030022487,0.0740910973050734,3,Energy & Power
+SMHX,Fabless Semis,Technology,0.40259419776119,0.0565685419531709,3,Energy & Power
+SOXX,Semiconductors,Technology,0.781604794298083,0.113553810377812,3,Energy & Power
+KWEB,China Internet,Technology,0.676014635124792,0.094313683062949,3,Energy & Power
+FDN,Internet-Fang,Technology,0.514884276684332,0.0705172150322325,3,Energy & Power
+IBB,Biotechnology,Healthcare,0.540235568085143,0.0610565534645435,4,Consumer & Retail
+IBRN,Neuroscience Heathcare Demographic,Other,-0.00357264628297557,-0.0232614778929207,4,Consumer & Retail
+IHI,Medical Devices,Healthcare,0.00940632590103832,-0.0230906546974979,4,Consumer & Retail
+PJP,Pharmaceuticals: Generic,Healthcare,-0.00470441807842398,-0.0254068682517703,4,Consumer & Retail
+PPH,Pharmaceuticals: Major,Healthcare,-0.0317988360617735,-0.0187382928177909,4,Consumer & Retail
+XLV,Healthcare,Healthcare,0.0432212630563405,-0.0214253379983834,4,Consumer & Retail
+AMLP,Oil & Gas Pipelines,Energy,-0.17696190587557,-0.422581072201081,5,Technology & Innovation
+CRAK,Oil Refining/Marketing,Energy,-0.167592146011277,-0.404063777763253,5,Technology & Innovation
+NLR,Uranium and Nuclear Energy,Energy,-0.201242662863479,-0.40715186349828,5,Technology & Innovation
+NUKZ,Range Nuclear Renaissance ETF,Energy,-0.0939288162656927,-0.324826801171058,5,Technology & Innovation
+PBW,Clean Energy,Energy,-0.201346530975116,-0.497265583577867,5,Technology & Innovation
+TAN,Alternative Power Generation/ Solar,Other,-0.130454970305775,-0.275711816240057,5,Technology & Innovation
+UGA,Gas Distributors,Energy,-0.14855047033928,-0.334126976010805,5,Technology & Innovation
+URA,Uranium,Energy,-0.17119824704139,-0.398678290257163,5,Technology & Innovation
+XOP,Integrated Oil,Energy,-0.161803098702894,-0.377245582511947,5,Technology & Innovation
+BJK,Casinos/Gaming,Other,-0.00678780492306011,-0.0416585831019827,6,Healthcare & Life Sciences
+EATZ,Restaurants,Other,0.0209466240447723,-0.0482553651535988,6,Healthcare & Life Sciences
+PBJ,Beverages: Alcoholic,Other,-0.00678780492306013,-0.041658583101983,6,Healthcare & Life Sciences
+RTH,Discount Stores,Other,-0.0167849858157181,-0.038214449494756,6,Healthcare & Life Sciences
+XLP,Household/Personal Care,Other,-0.00678780492306008,-0.0416585831019831,6,Healthcare & Life Sciences
+XRT,Apparel/Footwear,Consumer,-0.00678780492306009,-0.0416585831019831,6,Healthcare & Life Sciences
+AIRR,Industrial Machinery,Industrials,-0.0852972434646744,0.010871949043276,7,Industrial & Aerospace
+ITA,Aerospace & Defense,Other,-0.0852972434646748,0.0108719490432773,7,Industrial & Aerospace
+JETS,Airlines,Industrials,-0.092341958036403,0.0189637136399958,7,Industrial & Aerospace
+PKB,Construction Materials,Industrials,-0.218983100775003,0.355470544897819,7,Industrial & Aerospace
+SEA,Marine Shipping,Other,-0.0923419580364031,0.0189637136399958,7,Industrial & Aerospace
+XTN,Air Freight/Couriers,Industrials,-0.0810551234045178,0.00619976014886864,7,Industrial & Aerospace
