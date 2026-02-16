@@ -2,7 +2,7 @@
 // © valpatradd - Pine Screener: Performance Display
 
 //@version=6
-indicator('Perf_vs_SPY', 'Perf_vs_SPY', overlay=true)
+indicator('s-Perf_vs_VBINX', 's-Perf_vs_VBINX', overlay=true)
 
 // ====================================================================================
 // PINE SCREENER SCRIPT - RETURN % & RELATIVE STRENGTH CALCULATIONS
@@ -13,7 +13,7 @@ indicator('Perf_vs_SPY', 'Perf_vs_SPY', overlay=true)
 //
 // FEATURES:
 // - Multi-period return calculations (1Y, YTD, 6M, 3M, 1M, 1W, Custom)
-// - Multi-period RS ratings vs benchmark (default: SPY)
+// - Multi-period RS ratings vs benchmark (default: VBINX)
 // - Customizable benchmark symbol
 // - Inverse RS option (benchmark vs symbol)
 // - Individual toggles for each period
@@ -79,9 +79,9 @@ show_custom = input.bool(true, 'Custom Period Return',
 // ---- Relative Strength Settings ----
 var gRS = 'Relative Strength (RS) Rating'
 
-rs_benchmark = input.symbol('SPY', 'RS Benchmark Symbol',
+rs_benchmark = input.symbol('VBINX', 'RS Benchmark Symbol',
      group=gRS,
-     tooltip='Symbol to compare against for RS Rating (default: SPY)')
+     tooltip='Symbol to compare against for RS Rating (default: VBINX)')
 
 rs_inverse = input.bool(false, 'Inverse RS (Benchmark/Symbol)',
      group=gRS,

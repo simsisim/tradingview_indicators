@@ -1,0 +1,99 @@
+================================================================================
+TRADINGVIEW PUBLICATION - QUICK COPY-PASTE
+================================================================================
+
+TITLE:
+------
+s-PV Gap Screener - Price & Volume Breakouts + Gap Detection
+
+
+SHORT DESCRIPTION (for search/preview):
+---------------------------------------
+Multi-signal screener combining trend-filtered price/volume breakouts with dual-threshold gap detection. 19 output columns for comprehensive technical filtering.
+
+
+CATEGORY:
+---------
+Indicators & Strategies > Screeners
+
+
+TAGS (select applicable):
+-------------------------
+screener, breakout, volume, gap, momentum, trend, technical-analysis, multi-signal, price-action
+
+
+FULL DESCRIPTION (see TRADINGVIEW_DESCRIPTION.md for complete version):
+-----------------------------------------------------------------------
+
+📊 Overview
+
+s-PV Gap Screener is a comprehensive technical screener for TradingView's Pine Screener that combines:
+
+1. Price & Volume Breakouts - Trend-filtered with 200 SMA confirmation
+2. Gap Detection - Dual thresholds (5% and 10%)
+
+Inspired by TradeDots' Price and Volume Breakout Buy Strategy:
+https://www.tradingview.com/script/jc2hs2qK-Price-and-Volume-Breakout-Buy-Strategy-TradeDots/
+
+
+✨ Key Features
+
+• Trend-filtered breakouts (long AND short)
+• Volume confirmation required
+• Dual gap threshold tracking
+• 19 output columns
+• Combined scoring (0-80)
+• Fully customizable
+
+
+🎯 How to Use
+
+1. Add to DAILY chart
+2. Configure settings (or use defaults)
+3. Open Pine Screener
+4. Add "s-PV Gap Screener"
+5. Filter by Combined Score
+
+
+💡 Example Filters
+
+Fresh Breakouts:
+  PV Breakout Flag = 1
+  PV Days Ago <= 5
+  Volume Ratio >= 1.5
+
+High Conviction:
+  Combined Score >= 60
+  PV Breakout Flag = 1
+  Gap1 Flag = 1
+
+
+⚠️ Important
+
+• DAILY timeframe only
+• 500-bar historical limit
+• Dates in YYYYMMDD format
+
+
+🙏 Credits
+
+Inspired by TradeDots' PV Breakout Strategy. Expanded with gap detection, short setups, and multi-signal confirmation.
+
+
+Full documentation in published script and README.
+
+
+================================================================================
+IMPORTANT NOTES FOR PUBLISHING:
+================================================================================
+
+1. Make sure script compiles without errors
+2. Test on multiple symbols (AAPL, NVDA, etc.)
+3. Verify all 19 columns appear in Pine Screener
+4. Include link to TradeDots script in description
+5. Add your GitHub repo link if public
+6. Select "Open Source" license (MPL 2.0)
+7. Add chart example showing the info table
+8. Consider adding screenshots of Pine Screener results
+
+================================================================================

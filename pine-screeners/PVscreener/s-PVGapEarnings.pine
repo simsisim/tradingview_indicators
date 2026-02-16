@@ -1,10 +1,28 @@
 // This Pine Script™ code is subject to the terms of the Mozilla Public License 2.0 at https://mozilla.org/MPL/2.0/
-// Price & Volume Breakout + Gap Detection + Earnings Screener
-// Designed for TradingView Pine Screener: https://www.tradingview.com/pine-screener/
-// IMPORTANT: Use on DAILY timeframe for accurate daily analysis
+// © 2026 s-PV Gap Screener
+//
+// @description
+// Multi-signal screener combining trend-filtered price/volume breakouts with dual-threshold gap detection.
+// Inspired by TradeDots' Price and Volume Breakout Buy Strategy:
+// https://www.tradingview.com/script/jc2hs2qK-Price-and-Volume-Breakout-Buy-Strategy-TradeDots/
+//
+// @features
+// - Price & Volume breakout detection (long and short, with 200 SMA trend filter)
+// - Dual gap detection (customizable 5% and 10% thresholds)
+// - 19 screener output columns
+// - Combined scoring system (0-80)
+// - Fully customizable parameters
+//
+// @usage
+// 1. Add to DAILY chart
+// 2. Configure settings (or use defaults)
+// 3. Add to Pine Screener: https://www.tradingview.com/pine-screener/
+// 4. Filter and sort by Combined Score
+//
+// IMPORTANT: Use on DAILY timeframe for accurate analysis
 
 //@version=5
-indicator("PV Gap Earnings Screener", shorttitle="PVGE Screener", overlay=false)
+indicator("s-PV Gap Screener", shorttitle="s-PVG", overlay=false)
 
 // ============================================================================
 // INPUTS - All configurable parameters
@@ -36,19 +54,12 @@ gap_direction = input.string("Both", "Gap Direction", options=["Up Only", "Down 
 gap_lookback = input.int(100, "Search Last N Days", minval=1, maxval=500,
      group=g2, tooltip="How far back to scan for gap events")
 
-// GROUP 3: EARNINGS
-var g3 = "Earnings Data"
-enable_earnings = input.bool(true, "Enable Earnings Tracking", group=g3,
-     tooltip="Track past earnings dates (future earnings not available in Pine Script)")
-earnings_max_days = input.int(120, "Max Days to Track", minval=30, maxval=500,
-     group=g3, tooltip="Stop tracking earnings older than this many days")
-
 // ============================================================================
 // HELPER FUNCTIONS
 // ============================================================================
 
 // Convert timestamp to YYYYMMDD format
-timeToYYYYMMDD(t) =>
+timeToYYYYMMDD(int t) =>
     yearVal = year(t)
     monthVal = month(t)
     dayVal = dayofmonth(t)
@@ -115,9 +126,9 @@ if enable_pv
 
 // Determine primary breakout (most recent)
 pv_breakout_flag = 0.0
-pv_days_ago = na
-pv_date = na
-pv_strength = na
+float pv_days_ago = na
+float pv_date = na
+float pv_strength = na
 pv_type = 0.0  // 1 = long, -1 = short, 0 = none
 
 if not na(pv_long_days_ago) or not na(pv_short_days_ago)
@@ -204,42 +215,6 @@ gap1_flag = not na(gap1_days_ago) ? 1.0 : 0.0
 gap2_flag = not na(gap2_days_ago) ? 1.0 : 0.0
 
 // ============================================================================
-// EARNINGS DATA LOGIC
-// ============================================================================
-
-var float earnings_days_ago = na
-var float earnings_date = na
-var float earnings_90day_flag = na
-
-if enable_earnings
-    // Request earnings data (past only - future earnings not available)
-    [earningsTime, _, _] = request.earnings(syminfo.tickerid, earnings.actual, barmerge.gaps_on)
-
-    if not na(earningsTime)
-        // Calculate days since last earnings
-        earnings_bars = (time - earningsTime) / (1000 * 60 * 60 * 24)
-
-        if earnings_bars <= earnings_max_days
-            earnings_days_ago := earnings_bars
-            earnings_date := timeToYYYYMMDD(earningsTime)
-
-            // Flag if approaching 90-day earnings cycle (80-95 days)
-            earnings_90day_flag := (earnings_bars >= 80 and earnings_bars <= 95) ? 1 : 0
-        else
-            // Too old, don't track
-            earnings_days_ago := na
-            earnings_date := na
-            earnings_90day_flag := 0
-    else
-        earnings_days_ago := na
-        earnings_date := na
-        earnings_90day_flag := 0
-else
-    earnings_days_ago := na
-    earnings_date := na
-    earnings_90day_flag := 0
-
-// ============================================================================
 // COMPOSITE SIGNALS
 // ============================================================================
 
@@ -254,10 +229,6 @@ if gap1_flag == 1
     combined_score += 20
 if gap2_flag == 1
     combined_score += 30
-if not na(earnings_days_ago) and earnings_days_ago <= 5
-    combined_score += 10  // Recent earnings
-if not na(earnings_90day_flag) and earnings_90day_flag == 1
-    combined_score += 10  // Approaching earnings cycle
 
 // ============================================================================
 // SCREENER OUTPUTS - All plot() values become screener columns
@@ -285,11 +256,6 @@ plot(gap2_days_ago, "Gap2 Days Ago", display=display.data_window)
 plot(gap2_date, "Gap2 Date", display=display.data_window)
 plot(gap2_size, "Gap2 Size %", display=display.data_window)
 plot(gap2_direction, "Gap2 Direction", display=display.data_window)  // 1=up, -1=down
-
-// Earnings Outputs
-plot(earnings_days_ago, "Days Since Earnings", display=display.data_window)
-plot(earnings_date, "Last Earnings Date", display=display.data_window)
-plot(earnings_90day_flag, "Earnings 90-Day Flag", display=display.data_window)
 
 // Composite Outputs
 plot(any_signal, "Any Signal", display=display.data_window)
@@ -332,7 +298,7 @@ hline(1, "Signal Line", color=color.white, linestyle=hline.style_dotted)
 // INFORMATION TABLE (for individual chart viewing)
 // ============================================================================
 
-var table info_table = table.new(position.top_right, 2, 10,
+var table info_table = table.new(position.top_right, 2, 8,
      bgcolor=color.new(color.black, 80), border_width=1, border_color=color.gray)
 
 if barstate.islast
@@ -372,21 +338,10 @@ if barstate.islast
          not na(gap2_days_ago) ? str.tostring(gap2_days_ago, "#") : "N/A",
          text_color=color.yellow)
 
-    // Earnings
-    table.cell(info_table, 0, 7, "Last Earnings", text_color=color.white)
-    table.cell(info_table, 1, 7,
-         not na(earnings_days_ago) ? str.tostring(earnings_days_ago, "#") + " days" : "N/A",
-         text_color=color.aqua)
-
-    table.cell(info_table, 0, 8, "90-Day Cycle", text_color=color.white)
-    table.cell(info_table, 1, 8,
-         earnings_90day_flag == 1 ? "YES ⚠" : "No",
-         text_color=earnings_90day_flag == 1 ? color.yellow : color.gray)
-
     // Combined Score
-    table.cell(info_table, 0, 9, "Combined Score", text_color=color.white)
-    table.cell(info_table, 1, 9, str.tostring(combined_score, "#"),
-         text_color=combined_score >= 50 ? color.green : combined_score >= 30 ? color.yellow : color.gray)
+    table.cell(info_table, 0, 7, "Combined Score", text_color=color.white)
+    table.cell(info_table, 1, 7, str.tostring(combined_score, "#"),
+         text_color=combined_score >= 60 ? color.green : combined_score >= 30 ? color.yellow : color.gray)
 
 // ============================================================================
 // USAGE INSTRUCTIONS
@@ -402,9 +357,9 @@ if barstate.islast
 // EXAMPLE FILTERS:
 // - Recent breakouts: PV Breakout Flag = 1 AND PV Days Ago <= 5
 // - Big gaps: Gap2 Flag = 1 AND Gap2 Days Ago <= 10
-// - Post-earnings plays: Days Since Earnings >= 7 AND Days Since Earnings <= 14
-// - Pre-earnings setups: Earnings 90-Day Flag = 1 AND PV Breakout Flag = 1
-// - High conviction: Combined Score >= 50
+// - Long setups: PV Type = 1 AND Gap1 Direction = 1
+// - High conviction: Combined Score >= 60 (max 80: PV=30 + Gap1=20 + Gap2=30)
+// - Strong gaps with momentum: Gap2 Flag = 1 AND PV Breakout Flag = 1
 //
 // DATE FORMAT:
 // - Dates shown as YYYYMMDD (e.g., 20,260,127.00 = Jan 27, 2026)
@@ -412,7 +367,6 @@ if barstate.islast
 //
 // LIMITATIONS:
 // - 500-bar historical limit (~2 years on daily charts)
-// - Past earnings only (future earnings not available in Pine Script)
 // - Same settings apply to all symbols in screener
-// - For future earnings, use TradingView Stock Screener or earnings calendar
+// - Best used on liquid stocks with consistent volume
 //
