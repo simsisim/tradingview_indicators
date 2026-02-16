@@ -255,87 +255,87 @@ rr_1w = _calc_return(ratio_series, bars_1w)
 // ---- Plot Outputs (Screener Columns) ----
 
 // Primary period plot (always shown)
-plot(show_multiple ? na : primary_return,
+plot(primary_return,
      title='Primary Return %',
      display=display.all)
 
-// Multi-period plots (only shown if enabled)
-plot(show_multiple and show_1w ? return_1w : na,
+// Multi-period plots (always shown)
+plot(return_1w,
      title='1W Return %',
      display=display.all)
 
-plot(show_multiple and show_1m ? return_1m : na,
+plot(return_1m,
      title='1M Return %',
      display=display.all)
 
-plot(show_multiple and show_3m ? return_3m : na,
+plot(return_3m,
      title='3M Return %',
      display=display.all)
 
-plot(show_multiple and show_6m ? return_6m : na,
+plot(return_6m,
      title='6M Return %',
      display=display.all)
 
 // Custom period plot (shown when Custom Days is selected)
-plot(show_multiple and show_custom and primary_period == 'Custom Days' ? primary_return : na,
+plot(primary_period == 'Custom Days' ? primary_return : na,
      title='Custom Period Return %',
      display=display.all)
 
-plot(show_multiple and show_1y ? return_1y : na,
+plot(return_1y,
      title='1Y Return %',
      display=display.all)
 
-plot(show_multiple and show_ytd ? return_ytd : na,
+plot(return_ytd,
      title='YTD Return %',
      display=display.all)
 
-// RS Rating plots (multi-period)
-plot(show_rs_1w ? rs_rating_1w : na,
+// RS Rating plots (always shown)
+plot(rs_rating_1w,
      title='RS 1W',
      display=display.all)
 
-plot(show_rs_1m ? rs_rating_1m : na,
+plot(rs_rating_1m,
      title='RS 1M',
      display=display.all)
 
-plot(show_rs_3m ? rs_rating_3m : na,
+plot(rs_rating_3m,
      title='RS 3M',
      display=display.all)
 
-plot(show_rs_6m ? rs_rating_6m : na,
+plot(rs_rating_6m,
      title='RS 6M',
      display=display.all)
 
-plot(show_rs_1y ? rs_rating_1y : na,
+plot(rs_rating_1y,
      title='RS 1Y',
      display=display.all)
 
-plot(show_rs_ytd ? rs_rating_ytd : na,
+plot(rs_rating_ytd,
      title='RS YTD',
      display=display.all)
 
-// ---- Relative Return Plots ----
-plot(show_rel_return and show_rr_1w ? rr_1w : na,
+// ---- Relative Return Plots (always shown) ----
+plot(rr_1w,
      title='Rel Return 1W %',
      display=display.all)
 
-plot(show_rel_return and show_rr_1m ? rr_1m : na,
+plot(rr_1m,
      title='Rel Return 1M %',
      display=display.all)
 
-plot(show_rel_return and show_rr_3m ? rr_3m : na,
+plot(rr_3m,
      title='Rel Return 3M %',
      display=display.all)
 
-plot(show_rel_return and show_rr_6m ? rr_6m : na,
+plot(rr_6m,
      title='Rel Return 6M %',
      display=display.all)
 
-plot(show_rel_return and show_rr_ytd ? rr_ytd : na,
+plot(rr_ytd,
      title='Rel Return YTD %',
      display=display.all)
 
-plot(show_rel_return and show_rr_1y ? rr_1y : na,
+plot(rr_1y,
      title='Rel Return 1Y %',
      display=display.all)
 

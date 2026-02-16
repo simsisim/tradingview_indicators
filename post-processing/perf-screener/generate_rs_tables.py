@@ -6,12 +6,15 @@ import re
 from datetime import datetime
 
 # Configuration
-WORK_DIR = '/home/imagda/_invest2024/latex/macroeconomics/pics/market_helath_topBottom/pine_screener_performance/csv/'
-CONFIG_FILE = '/home/imagda/_invest2024/latex/macroeconomics/pics/market_helath_topBottom/pine_screener_performance/run_top_losers_gainers_v2.txt'
+# Get the directory where this script is located
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+WORK_DIR = os.path.join(SCRIPT_DIR, 'csv')
+CONFIG_FILE = os.path.join(SCRIPT_DIR, 'run_top_losers_gainers_v2.txt')
 # Output directory to png subdirectory
-OUTPUT_DIR = os.path.join(WORK_DIR, '../png/')
+OUTPUT_DIR = os.path.join(SCRIPT_DIR, 'png')
 
-def process_csv(input_csv_path, columns_to_keep, sort_column, rows_to_display):
+def process_csv(input_csv_path, columns_to_keep, sort_column, rows_to_display,
+                chart_metric=None, generate_charts=True, generate_tables=True):
     # If path is relative, join with WORK_DIR, else use as is
     if not os.path.isabs(input_csv_path):
         input_csv_path = os.path.join(WORK_DIR, input_csv_path)
@@ -121,14 +124,13 @@ def process_csv(input_csv_path, columns_to_keep, sort_column, rows_to_display):
         # 20 rows -> 2 + 8 = 10.
         fig_height = 2 + (rows_to_display * 0.45) 
 
-        # Update create_table_image to accept widths
-        def create_table_with_widths(df, title, filename):
+        # Helper function to draw table on an axis
+        def draw_table_on_axis(ax, df, title):
             import textwrap
-            
-            fig, ax = plt.subplots(figsize=(12, fig_height))
+
             ax.axis('off')
             ax.axis('tight')
-            
+
             # Prepare alternating row colors
             colors = []
             for i in range(len(df)):
@@ -136,44 +138,135 @@ def process_csv(input_csv_path, columns_to_keep, sort_column, rows_to_display):
                     colors.append(['#E0E0E0'] * len(df.columns))
                 else:
                     colors.append(['w'] * len(df.columns))
-            
+
             # Wrap headers
-            # Wrap text to approx 10 chars to encourage 2 lines
             wrapped_columns = ["\n".join(textwrap.wrap(c, width=12, break_long_words=False)) for c in df.columns]
 
             table = ax.table(
-                cellText=df.values, 
-                colLabels=wrapped_columns, 
-                loc='center', 
-                cellLoc='center', 
+                cellText=df.values,
+                colLabels=wrapped_columns,
+                loc='center',
+                cellLoc='center',
                 colWidths=col_widths,
-                cellColours=colors
+                cellColours=colors,
+                bbox=[0, 0.15, 1, 0.85]  # [left, bottom, width, height] - shift table up
             )
-            
+
             # Adjust header height (row 0)
             cells = table.get_celld()
             for (row, col), cell in cells.items():
                 if row == 0:
-                    # Increase header height
                     current_height = cell.get_height()
-                    cell.set_height(current_height * 2.5) 
-            
-            table.auto_set_font_size(False)
-            table.set_fontsize(8) # Reduced font size
-            table.scale(1.2, 1.2)
-            
-            plt.title(title, fontsize=16, pad=20)
-            if subtitle:
-                plt.text(0.5, 0.96, subtitle, ha='center', va='center', transform=fig.transFigure, fontsize=12)
-            
-            # Ensure output directory exists (create it just in case, though main should do it)
-            if not os.path.exists(OUTPUT_DIR):
-                 try:
-                     os.makedirs(OUTPUT_DIR)
-                 except OSError as e:
-                     print(f"Error creating directory {OUTPUT_DIR}: {e}")
-                     return
+                    cell.set_height(current_height * 2.5)
 
+            table.auto_set_font_size(False)
+            table.set_fontsize(8)
+            table.scale(1.2, 1.2)
+
+            ax.set_title(title, fontsize=14, pad=-3, fontweight='bold')
+
+        # Helper function to draw chart on an axis
+        def draw_chart_on_axis(ax, df, chart_metric):
+            """Draw vertical bar chart on the provided axis"""
+
+            # Validate metric exists
+            if chart_metric not in df.columns:
+                print(f"  Warning: Chart metric '{chart_metric}' not found in columns. Skipping chart.")
+                return False
+
+            # Prepare data
+            symbols = df['Symbol'].tolist()
+            values = df[chart_metric].tolist()
+
+            # Determine colors based on values
+            colors = []
+            for val in values:
+                if val > 0.5:
+                    colors.append('#2E7D32')  # Green for positive
+                elif val < -0.5:
+                    colors.append('#C62828')  # Red for negative
+                else:
+                    colors.append('#757575')  # Gray for near-zero
+
+            # Create vertical bar chart
+            x_pos = range(len(symbols))
+            bars = ax.bar(x_pos, values, color=colors, alpha=0.8, width=0.7)
+
+            # Set x-axis labels
+            ax.set_xticks(x_pos)
+            ax.set_xticklabels(symbols, rotation=45, ha='right')
+
+            # Add value labels on bars
+            for i, (bar, val) in enumerate(zip(bars, values)):
+                y_offset = 0.02 * (max(values) - min(values)) if len(values) > 0 else 0.1
+                if val >= 0:
+                    y_pos = val + y_offset
+                    va = 'bottom'
+                else:
+                    y_pos = val - y_offset
+                    va = 'top'
+                ax.text(i, y_pos, f'{val:.2f}', ha='center', va=va, fontsize=8)
+
+            # Styling
+            ax.set_ylabel(chart_metric, fontsize=10)
+            ax.grid(axis='y', alpha=0.3, linestyle='--')
+            ax.spines['top'].set_visible(False)
+            ax.spines['right'].set_visible(False)
+
+            return True
+
+        # Combined function to create table + chart
+        def create_combined_visualization(df, chart_metric, title_prefix, filename):
+            """Create combined table and chart in one figure - chart above table"""
+            from matplotlib.gridspec import GridSpec
+
+            # Wide format: 100% wider, 50% shorter
+            fig_width = 24  # Doubled from 12
+
+            # Calculate heights - reduced by 50%
+            chart_height = 4  # Reduced from 8
+            table_height = fig_height * 0.65  # Reduced
+            combined_height = chart_height + table_height + 0.5  # Minimal padding
+
+            # Create figure with GridSpec for vertical layout
+            fig = plt.figure(figsize=(fig_width, combined_height))
+            # 2 rows, 1 column - CHART on top, TABLE on bottom
+            # Adjusted hspace to prevent overlap between chart x-axis and table title
+            # Set bottom to 0 to maximize table space
+            gs = GridSpec(2, 1, figure=fig, height_ratios=[chart_height, table_height],
+                         hspace=0.15, top=0.95, bottom=0.00)
+
+            # Create subplots
+            ax_chart = fig.add_subplot(gs[0])
+            ax_table = fig.add_subplot(gs[1])
+
+            # Draw chart first (on top)
+            chart_success = draw_chart_on_axis(ax_chart, df, chart_metric)
+
+            # Draw table below
+            table_title = f'{title_prefix} {rows_to_display} Assets by {sort_column}'
+            draw_table_on_axis(ax_table, df, table_title)
+
+            # Add overall title and subtitle with proper spacing
+            if subtitle:
+                # Place subtitle at very top
+                fig.text(0.5, 0.985, subtitle, ha='center', va='top', fontsize=11)
+                # Place main title slightly below
+                fig.text(0.5, 0.965, f'{title_prefix} {rows_to_display} Assets',
+                        ha='center', va='top', fontsize=16, fontweight='bold')
+            else:
+                fig.suptitle(f'{title_prefix} {rows_to_display} Assets',
+                           fontsize=16, fontweight='bold', y=0.98)
+
+            # Ensure output directory exists
+            if not os.path.exists(OUTPUT_DIR):
+                try:
+                    os.makedirs(OUTPUT_DIR)
+                except OSError as e:
+                    print(f"Error creating directory {OUTPUT_DIR}: {e}")
+                    return
+
+            # Save figure
             out_path = os.path.join(OUTPUT_DIR, filename)
             plt.savefig(out_path, bbox_inches='tight', dpi=300)
             plt.close()
@@ -184,11 +277,16 @@ def process_csv(input_csv_path, columns_to_keep, sort_column, rows_to_display):
 
         # Top N (Gainers)
         top_n = df_sorted.head(rows_to_display)
-        create_table_with_widths(top_n, f'Top {rows_to_display} Assets by {sort_column}', f'{base_name}_top.png')
-        
+
         # Bottom N (Losers)
         bottom_n = df_sorted.tail(rows_to_display).sort_values(by=actual_sort_col, ascending=True)
-        create_table_with_widths(bottom_n, f'Bottom {rows_to_display} Assets by {sort_column}', f'{base_name}_bottom.png')
+
+        # Use chart_metric if specified, otherwise fall back to sort_column
+        metric_to_chart = chart_metric if chart_metric else sort_column
+
+        # Generate combined visualizations (table + chart in one file)
+        create_combined_visualization(top_n, metric_to_chart, 'Top', f'{base_name}_top.png')
+        create_combined_visualization(bottom_n, metric_to_chart, 'Bottom', f'{base_name}_bottom.png')
         
     except FileNotFoundError:
         print(f"  Error: Could not find file {input_csv_path}")
@@ -204,25 +302,28 @@ def parse_config(config_path):
     columns_to_keep = []
     sort_column = ''
     rows_to_display = 20 # Default
-    
+    chart_metric = None # Default to None (will use sort_column)
+    generate_charts = True # Default
+    generate_tables = True # Default
+
     with open(config_path, 'r') as f:
         lines = f.readlines()
-        
+
     section = None
     for line in lines:
         line = line.strip()
         if not line: continue
-        
+
         if line.startswith('###'):
             if 'files to run' in line:
                 section = 'files'
             else:
                 section = None # End of section?
             continue
-            
+
         if section == 'files':
             files.append(line)
-        
+
         if line.startswith('COLUMNS_TO_KEEP'):
             try:
                 # Extract the list part: COLUMNS_TO_KEEP = [...]
@@ -231,7 +332,7 @@ def parse_config(config_path):
                     columns_to_keep = ast.literal_eval(parts[1].strip())
             except Exception as e:
                 print(f"Error parsing columns: {e}")
-                
+
         if line.startswith('SORT_COLUMN'):
             try:
                 parts = line.split('=', 1)
@@ -240,7 +341,33 @@ def parse_config(config_path):
                     sort_column = ast.literal_eval(parts[1].strip())
             except Exception as e:
                 print(f"Error parsing sort column: {e}")
-        
+
+        if line.startswith('CHART_METRIC'):
+            try:
+                parts = line.split('=', 1)
+                if len(parts) == 2:
+                    chart_metric = ast.literal_eval(parts[1].strip())
+            except Exception as e:
+                print(f"Error parsing chart metric: {e}")
+
+        if line.startswith('GENERATE_CHARTS'):
+            try:
+                parts = line.split('=', 1)
+                if len(parts) == 2:
+                    value = parts[1].strip()
+                    generate_charts = value.lower() in ['true', '1', 'yes']
+            except Exception as e:
+                print(f"Error parsing generate charts: {e}")
+
+        if line.startswith('GENERATE_TABLES'):
+            try:
+                parts = line.split('=', 1)
+                if len(parts) == 2:
+                    value = parts[1].strip()
+                    generate_tables = value.lower() in ['true', '1', 'yes']
+            except Exception as e:
+                print(f"Error parsing generate tables: {e}")
+
         if line.startswith('ROWS_TO_DISPLAY'):
              try:
                 parts = line.split('=', 1)
@@ -248,18 +375,18 @@ def parse_config(config_path):
                     rows_to_display = int(parts[1].strip())
              except Exception as e:
                  print(f"Error parsing rows to display: {e}")
-                 
-    return files, columns_to_keep, sort_column, rows_to_display
+
+    return files, columns_to_keep, sort_column, rows_to_display, chart_metric, generate_charts, generate_tables
 
 def main():
-    config_path = os.path.join(WORK_DIR, CONFIG_FILE)
+    config_path = CONFIG_FILE
     if not os.path.exists(config_path):
         print(f"Error: Config file not found at {config_path}")
         return
 
     print(f"Reading config from: {config_path}")
-    files, columns_to_keep, sort_column, rows_to_display = parse_config(config_path)
-    
+    files, columns_to_keep, sort_column, rows_to_display, chart_metric, generate_charts, generate_tables = parse_config(config_path)
+
     # Ensure Output Directory Exists
     if not os.path.exists(OUTPUT_DIR):
         print(f"Creating output directory: {OUTPUT_DIR}")
@@ -271,23 +398,27 @@ def main():
     print(f"  Files: {len(files)}")
     print(f"  Columns: {columns_to_keep}")
     print(f"  Sort By: {sort_column}")
+    print(f"  Chart Metric: {chart_metric if chart_metric else sort_column}")
+    print(f"  Generate Charts: {generate_charts}")
+    print(f"  Generate Tables: {generate_tables}")
     print(f"  Rows to Display: {rows_to_display}")
 
     if not files:
         print("No files found in config.")
         return
-        
+
     if not columns_to_keep:
         # Fallback defaults?
         print("Error: No columns defined.")
         return
-        
+
     if not sort_column:
         print("Error: No sort column defined.")
         return
 
     for filename in files:
-        process_csv(filename, columns_to_keep, sort_column, rows_to_display)
+        process_csv(filename, columns_to_keep, sort_column, rows_to_display,
+                   chart_metric, generate_charts, generate_tables)
 
 if __name__ == "__main__":
     main()

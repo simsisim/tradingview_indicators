@@ -1,0 +1,17 @@
+### files to run
+watchlist_2025_v0_pinescreener_s-PV_Gap_Screener_2026-02-16.csv
+###
+COLUMNS_TO_KEEP = ['Symbol', 'Description', 'PV Days Ago', 'PV Breakout Date', 'PV Strength %', 'Price vs SMA %', 'Gap1 Days Ago', 'Gap1 Date', 'Gap1 Size %', 'Combined Score']
+###
+SORT_COLUMNS = ['PV Days Ago', 'Gap1 Size %']
+###
+SORT_ASCENDING = [True, False]
+###
+CHART_METRIC = 'Gap1 Size %'
+###
+FILTER_EXPRESSION = "(`PV Breakout Flag` == 1) and (`Gap1 Size %` > 0)"
+###
+SHOW_BOTTOM = False
+###
+ROWS_TO_DISPLAY = 20
+###

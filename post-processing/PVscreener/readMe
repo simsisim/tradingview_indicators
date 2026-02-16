@@ -1,0 +1,45 @@
+ What the config does:                                                                                                              
+                                                                                
+  1. Filter: (PV Breakout Flag == 1) and (Gap1 Size % > 0)                                                                           
+    - Only shows PV breakouts that have a positive gap                                                                               
+    - Filtered from 741 → 103 stocks
+  2. Multi-Level Sort:
+    - Primary: PV Days Ago (ascending) → Most recent first (0 = today)
+    - Secondary: Gap1 Size % (descending) → Biggest gaps first
+  3. Result: Top 20 shows:
+    - All have PV Days Ago = 0.0 (today's breakouts!)
+    - Sorted by gap size: 19.67% down to 8.91%
+    - Only 1 chart generated (no bottom chart)
+
+  Config Breakdown:
+
+  # Multi-column sorting
+  SORT_COLUMNS = ['PV Days Ago', 'Gap1 Size %']
+  SORT_ASCENDING = [True, False]        # First asc, second desc
+
+  # Filter for PV breakouts with positive gaps
+  FILTER_EXPRESSION = "(`PV Breakout Flag` == 1) and (`Gap1 Size %` > 0)"
+
+  # Only show top results
+  SHOW_BOTTOM = False
+
+  # Chart shows gap sizes
+  CHART_METRIC = 'Gap1 Size %'
+
+  Other Scenarios You Can Create:
+
+  Scenario 2: Oldest PV Breakouts (still active)
+  SORT_COLUMNS = ['PV Days Ago']
+  SORT_ASCENDING = [False]
+  SHOW_BOTTOM = False
+
+  Scenario 3: Highest Combined Scores
+  SORT_COLUMNS = ['Combined Score']
+  SORT_ASCENDING = [False]
+  SHOW_BOTTOM = True  # Show both top and bottom
+
+  Scenario 4: Recent Gaps Only (no PV filter)
+  SORT_COLUMNS = ['Gap1 Days Ago', 'Gap1 Size %']
+  SORT_ASCENDING = [True, False]
+  FILTER_EXPRESSION = "`Gap1 Flag` == 1"
+
