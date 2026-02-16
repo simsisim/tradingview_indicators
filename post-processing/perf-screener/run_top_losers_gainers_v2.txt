@@ -1,0 +1,6 @@
+### files to run 
+/home/imagda/_invest2024/latex/macroeconomics/pics/market_helath_topBottom/pine_screener_performance/csv/SPY_2026-02-02.csv
+###
+COLUMNS_TO_KEEP = ['Symbol', 'Rel Return 1W %', 'Rel Return 1M %', 'Rel Return 3M %', 'RS 1M']
+###
+SORT_COLUMN = 'Rel Return 1M %'

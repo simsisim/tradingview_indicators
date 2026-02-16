@@ -1,0 +1,15 @@
+### files to run 
+/home/imagda/_invest2024/latex/macroeconomics/pics/market_health/performance_screener/csv/SPYsectors_2026-01-12.csv
+/home/imagda/_invest2024/latex/macroeconomics/pics/market_health/performance_screener/csv/SPX_2026-01-12.csv
+/home/imagda/_invest2024/latex/macroeconomics/pics/market_health/performance_screener/csv/NQUSB_v1_2026-01-12.csv
+/home/imagda/_invest2024/latex/macroeconomics/pics/market_health/performance_screener/csv/NASDAQ_2026-01-12.csv
+/home/imagda/_invest2024/latex/macroeconomics/pics/market_health/performance_screener/csv/indices_2026-01-12.csv
+/home/imagda/_invest2024/latex/macroeconomics/pics/market_health/performance_screener/csv/ETFs_2026-01-12.csv
+/home/imagda/_invest2024/latex/macroeconomics/pics/market_health/performance_screener/csv/DJIA_2026-01-12.csv
+/home/imagda/_invest2024/latex/macroeconomics/pics/market_health/performance_screener/csv/DJI_2026-01-12.csv
+###
+COLUMNS_TO_KEEP = ['Symbol','Description', '1W Return %','1M Return %','3M Return %','6M Return %', 'RS 1W', 'RS 1M', 'Rel Return 1W %', 'Rel Return 1M %', 'Rel Return 3M %']
+###
+SORT_COLUMN = '1W Return %'
+
+ROWS_TO_DISPLAY = 20

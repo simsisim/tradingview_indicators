@@ -1,0 +1,9 @@
+### files to run 
+/home/imagda/_invest2024/latex/macroeconomics/pics/RS_ratios/major/csv/NQUSB_2026-01-03.csv
+/home/imagda/_invest2024/latex/macroeconomics/pics/RS_ratios/major/csv/ETF_industries_2026-01-03.csv
+/home/imagda/_invest2024/latex/macroeconomics/pics/RS_ratios/major/csv/NASDAQ100_2026-01-03.csv
+/home/imagda/_invest2024/latex/macroeconomics/pics/RS_ratios/major/csv/SP500_2026-01-03.csv
+###
+COLUMNS_TO_KEEP = ['Symbol', 'Beschreibung', 'Rel Return 1W %', 'Rel Return 1M %', 'Rel Return 3M %', 'Rel Return 6M %']
+###
+SORT_COLUMN = 'Rel Return 1W %'
